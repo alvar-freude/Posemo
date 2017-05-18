@@ -28,24 +28,25 @@ my $builder = Module::Build->new(
    release_status    => 'testing',
 
    tap_harness_args => {
-                         sources => {
-                                      Perl  => undef,
-                                      pgTAP => {
-                                                 dbname    => '_posemo_tests',
-                                                 username  => '_posemo_superuser', # pgTAP needs superuser!
-                                                 # superuser => '_posemo_superuser',
-                                                 host      => undef,
-                                                 suffix    => '.pg',
-                                                 port      => 15432,
-                                               },
-                                    },
-                       },
-   
+      sources => {
+         Perl  => undef,
+         pgTAP => {
+                    dbname   => '_posemo_tests',
+                    username => '_posemo_superuser',       # pgTAP needs superuser!
+                                                           # superuser => '_posemo_superuser',
+                    host     => undef,
+                    suffix   => '.pg',
+                    port     => 15432,
+                  },
+                 },
+   },
+
    configure_requires => { 'Module::Build' => 0, },
    build_requires     => {
       'Test::More'                        => 0,
       'Test::Exception'                   => 0.25,
       'TAP::Parser::SourceHandler::pgTAP' => 3.25,
+      'Config::Tiny'                      => 2.20,
 
       # 'Test::MockObject'     => 1.20140408,
       # 'Test::File'           => 1.41,
@@ -75,5 +76,3 @@ my $builder = Module::Build->new(
                                 );
 
 $builder->create_build_script();
-
-
