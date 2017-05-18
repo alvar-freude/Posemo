@@ -1,0 +1,25 @@
+-- Start transaction and plan the tests.
+BEGIN;
+SELECT plan(5);
+
+
+-- Run the tests.
+
+SELECT has_function( 'writeable'::name, ARRAY['text']::name[], 'function writeable exists' );
+
+
+SELECT is( (SELECT count(*) FROM writeable), 0::BIGINT, 'writeable table empty');
+SELECT is( (SELECT writeable('Textmeldung')), true, 'writeable check returns true value');
+SELECT is( (SELECT count(*) FROM writeable), 1::BIGINT, 'writeable has one entry');
+
+SELECT row_eq( $$ SELECT * FROM writeable $$, ROW('Textmeldung', NOW())::writeable, 'writeable has written the row'  );
+
+
+
+-- Finish the tests and clean up.
+SELECT * FROM finish();
+ROLLBACK;
+
+SELECT 1;
+
+
