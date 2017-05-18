@@ -25,21 +25,21 @@ Posemo is a modular framework for creating Monitoring Checks for PostgreSQL. It 
 Posemo is a modern Perl application using Moose; at installation it generates PostgerSQL functions for every check. These functions are called by an unprivileged user who can only call there functions, nothing else. But since they are `SECURITY DEFINER` functions, they run with more privileges (usually as superuser). You need a superuser for installation, but checks can run (from remote or local) by an unprivileged user. Therefore, **the monitoring server has no access to your databases, no access to PostgreSQL internals – it can only call some predefined functions.**
 
 
-For a simple check you may look at the *Alive* Check, which simply returns true if the server is reachable.
+For a simple check you may look below at the *Alive* Check, which simply returns true if the server is reachable. It uses a lot of defaults from `PostgreSQL::SecureMonitoring::Checks`:
 
 ```
-package PostgreSQL::SecureMonitoring::Checks::Alive;
+package PostgreSQL::SecureMonitoring::Checks::Alive;  # by Default, the name of the check is build from this package name
 
-use Moose;
-extends "PostgreSQL::SecureMonitoring::Checks";
+use Moose;                                            # This is a Moose class ...
+extends "PostgreSQL::SecureMonitoring::Checks";       # ... which extends our base check class
 
-sub _build_sql { return "SELECT true;"; }
+sub _build_sql { return "SELECT true;"; }             # this sub simply returns the SQL for the check
 
-1;
+1;                                                    # every Perl module must return (end with) a true value
 
 ```
 
-For more examples see the modules in `lib/PostgreSQL/SecureMonitoring/Checks` and the base class `PostgreSQL::SecureMonitoring::Checks`.
+For more examples see the modules in `lib/PostgreSQL/SecureMonitoring/Checks` and the base class `PostgreSQL::SecureMonitoring::Checks` (in [lib/PostgreSQL/SecureMonitoring/Checks.pm](lib/PostgreSQL/SecureMonitoring/Checks.pm)) (available in the dev branch!).
 
 More documentation is on the TODO list … ;-)
 
