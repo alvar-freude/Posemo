@@ -3,7 +3,6 @@ use 5.006;
 use strict;
 use warnings FATAL => 'all';
 use Test::More;
-
 plan tests => 3;
 
 sub not_in_file_ok
@@ -46,7 +45,7 @@ sub module_boilerplate_ok
                  );
    }
 
-not_in_file_ok( README                       => "The README is used..." => qr/The README is used/,
+not_in_file_ok( "README.md"                  => "The README is used..." => qr/The README is used/,
                 "'version information here'" => qr/to provide version information/, );
 
 not_in_file_ok( Changes => "placeholder date/time" => qr(Date/time) );

@@ -11,11 +11,11 @@ use warnings;
 
 =head1 VERSION
 
-Version 0.1.x, $Revision: 672 $
+Version 0.1.0
 
 =cut
 
-use version; our $VERSION = qv(0.1.0);
+use version; our $VERSION = qv("v0.1.0");
 
 
 =head1 SYNOPSIS

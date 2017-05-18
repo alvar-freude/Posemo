@@ -7,24 +7,20 @@ use DBI;
 
  MooseX::DBI -- DBI connection role for Moose
 
- $Id: DBI.pm 669 2016-11-24 16:19:30Z alvar $
-
 =head1 VERSION
 
-Version 0.5, $Revision: 560 $
+Version 0.5.0
 
 =cut
 
-#<<<
-my $BASE_VERSION = "0.5"; use version; our $VERSION = qv( sprintf "$BASE_VERSION.%d", q$Revision: 560 $ =~ /(\d+)/xg );
-#>>>
+use version; our $VERSION = qv("v0.5.0");
+
 
 =head1 SYNOPSIS
 
 =encoding utf8
 
  with MooseX::DBI;
- 
  # [...] later
  
  $self->dbh->do("INSERT INTO test VALUES (1,2,3);");
@@ -218,7 +214,6 @@ sub numify
 
    return $self;
    }
-
 
 
 1;

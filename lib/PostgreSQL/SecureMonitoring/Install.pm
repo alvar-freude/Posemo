@@ -8,15 +8,6 @@ use 5.010;
 
  PostgreSQL::SecureMonitoring::Install - Install all functions from all Checks etc.
 
- $Id: Install.pm 669 2016-11-24 16:19:30Z alvar $
-
-=head1 VERSION
-
-Version 0.2.x, $Revision: 669 $
-
-=cut
-
-
 =head1 SYNOPSIS
 
 =encoding utf8

@@ -4,11 +4,7 @@ package PostgreSQL::SecureMonitoring::Checks::Activity;
 
  PostgreSQL::SecureMonitoring::Checks::Activity -- statistics about backend activity (active, idle, ...)
 
- $Id: Activity.pm 666 2016-09-23 15:04:27Z alvar $
-
 =head1 SYNOPSIS
-
-...
 
 =head1 DESCRIPTION
 

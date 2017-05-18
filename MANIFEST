@@ -20,7 +20,6 @@ lib/PostgreSQL/SecureMonitoring/Output/JSON.pm
 lib/Test/PostgreSQL/SecureMonitoring.pm
 lib/Test/PostgreSQL/Starter.pm
 MANIFEST			This list of files
-README
 README.md
 t/000-load.t
 t/001-postgresql-start.t

@@ -15,7 +15,14 @@ has undef_string => ( is => "ro", isa => "Str",  default => "<undef>", documenta
 
  MooseX::ListAttributes -- Moose Role for listing all attributes / options
 
- $Id: ListAttributes.pm 567 2015-06-03 12:44:05Z alvar $
+=head1 VERSION
+
+Version 0.9.0
+
+=cut
+
+use version; our $VERSION = qv("v0.9.0");
+
 
 =head1 SYNOPSIS
 

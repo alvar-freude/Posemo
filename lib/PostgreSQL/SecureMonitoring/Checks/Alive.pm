@@ -4,8 +4,6 @@ package PostgreSQL::SecureMonitoring::Checks::Alive;
 
  PostgreSQL::SecureMonitoring::Checks::Alive -- minimalistic alive check
 
- $Id: Alive.pm 666 2016-09-23 15:04:27Z alvar $
-
 =head1 SYNOPSIS
 
 ...

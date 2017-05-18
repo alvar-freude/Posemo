@@ -8,18 +8,6 @@ use 5.010;
 
  PostgreSQL::SecureMonitoring::App - Application class for PostgreSQL Secure Monitoring
 
- $Id: App.pm 669 2016-11-24 16:19:30Z alvar $
-
-=head1 VERSION
-
-Version 0.2.x, $Revision: 669 $
-
-=cut
-
-#<<<
-my $BASE_VERSION = "0.1"; use version; our $VERSION = qv( sprintf "$BASE_VERSION.%d", q$Revision: 669 $ =~ /(\d+)/xg );
-#>>>
-
 
 =head1 SYNOPSIS
 

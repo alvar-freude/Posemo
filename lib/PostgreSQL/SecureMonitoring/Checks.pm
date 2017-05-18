@@ -4,8 +4,6 @@ package PostgreSQL::SecureMonitoring::Checks;
 
  PostgreSQL::SecureMonitoring::Checks -- base class for all Posemo checks
 
- $Id: Checks.pm 673 2017-05-12 13:01:01Z alvar $
-
 =head1 SYNOPSIS
 
 
@@ -16,8 +14,7 @@ package PostgreSQL::SecureMonitoring::Checks;
  use Moose;
  extends "PostgreSQL::SecureMonitoring::Checks";
  
- sub sql { return "SELECT true;"; } 
-
+ sub sql { return "SELECT true;"; }
 
  # .... TODO: other methods
  
