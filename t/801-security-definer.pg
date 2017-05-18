@@ -1,0 +1,83 @@
+--
+-- Testet, ob alle Funktionen mit SECURITY DEFINER auch den Suchpfad
+-- mit pg_temp am Ende gesetzt haben 
+--
+-- Aus Sicherheitsgründen MUSS pg_temp bei diesen Funktionen gesetzt werden.
+-- Siehe
+-- http://www.postgresql.org/docs/current/static/sql-createfunction.html#SQL-CREATEFUNCTION-SECURITY
+--
+
+
+
+BEGIN;
+
+
+CREATE TEMPORARY TABLE secfunc AS 
+  (
+    SELECT nspname || '.' || proname AS name, 
+           proconfig,
+           prosecdef
+      FROM pg_proc p
+ LEFT JOIN pg_namespace n ON pronamespace = n.oid
+     WHERE prosecdef
+       AND nspname NOT LIKE 'pg_%' 
+  ORDER BY name
+   );
+
+-- 
+-- Eine kleine Temp Funktion, um bedingungen sauber ausführen zu können
+-- Geht bestimmt auch anders, aber so auch ;-)
+--
+
+CREATE FUNCTION run_secdef_check() 
+   RETURNS SETOF text 
+   LANGUAGE plpgsql
+   AS
+   $code$
+   DECLARE cnt INTEGER;
+   DECLARE r   RECORD;
+   BEGIN
+   
+      SELECT INTO cnt count(*)::INTEGER FROM secfunc;
+      IF cnt = 0 THEN
+         RETURN NEXT plan(1);
+         RETURN NEXT skip('No security definer function.');
+      ELSE
+         RETURN NEXT plan(cnt);
+         FOR r IN 
+
+            -- ACHTUNG!
+            -- Der Reguläre Ausdruck beim match testet darauf, dass AM ENDE des Strings
+            -- (aus dem Array prokonfig) pg_temp steht.
+            -- Falls weitere Parameter bei der Funktionsdefinition zum search_path hinzukommen, 
+            -- KANN es sein, dass der Regex angepasst werden muss!
+
+            SELECT matches(
+               proconfig::text,
+               E'search_path=[^=]+pg_temp"?}',
+               'Funktion ' || name || ' mit SECURITY DEFINER braucht pg_temp als letztes im Suchpfad'
+               ) as match
+               FROM secfunc
+         LOOP
+            RETURN NEXT r.match;
+         END LOOP;
+
+      END IF;
+      
+      RETURN;
+      
+   END
+      
+   $code$;
+
+
+SELECT * FROM run_secdef_check();
+
+
+
+
+
+-- Finish the tests and clean up.
+SELECT * FROM finish();
+ROLLBACK;
+

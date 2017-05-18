@@ -1,0 +1,34 @@
+-- Start transaction and plan the tests.
+BEGIN;
+SELECT plan(8);
+
+
+-- Run the tests.
+
+SELECT has_function( 'backup_age'::name, ARRAY[]::name[], 'function backup_age exists' );
+
+SELECT is( (SELECT * FROM backup_age()), NULL, 'No backup running');
+
+
+SELECT lives_ok($$SELECT pg_start_backup('dummy')$$, 'Start Backup');
+
+SELECT ok( backup_age() IS NOT NULL, 'Backup running');
+
+SELECT lives_ok('SELECT pg_sleep(2)', 'Sleeping');
+
+
+SELECT ok( backup_age() >= 2, 'Backup runs at least 2 seconds');
+
+
+SET client_min_messages TO warning;
+
+SELECT lives_ok('SELECT pg_stop_backup()', 'Stopping backup');
+
+SELECT is( (SELECT * FROM backup_age()), NULL, 'Backup finished');
+
+
+-- Finish the tests and clean up.
+SELECT * FROM finish();
+ROLLBACK;
+
+
