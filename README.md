@@ -18,7 +18,7 @@ THERE WILL BE DRAGONS!
 
 ## Concepts
 
-Posemo is a modular framework for createing Monitoring Checks for PostgreSQL. It is simple to add a new check. Usually just have to write the SQL for the check and add some configuration.
+Posemo is a modular framework for creating Monitoring Checks for PostgreSQL. It is simple to add a new check. Usually just have to write the SQL for the check and add some configuration.
 
 Posemo is a modern Perl application using Moose; at installation it generates PostgerSQL functions for every check. These functions are called by an unprivileged user who can only call there functions, nothing else. But since they are `SECURITY DEFINER` functions, they run with more privileges (usually as superuser). You need a superuser for installation, but checks can run (from remote or local) by an unprivileged user. Therefore, **the monitoring server has no access to your databases, no access to PostgreSQL internals – it can only call some predefined functions.**
 
