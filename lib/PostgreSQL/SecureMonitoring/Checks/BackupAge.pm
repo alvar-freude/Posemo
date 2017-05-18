@@ -4,8 +4,6 @@ package PostgreSQL::SecureMonitoring::Checks::BackupAge;
 
  PostgreSQL::SecureMonitoring::Checks::BackupAge -- time in seconds, how long a backup label is set
 
- $Id: Alive.pm 666 2016-09-23 15:04:27Z alvar $
-
 =head1 SYNOPSIS
 
 ...

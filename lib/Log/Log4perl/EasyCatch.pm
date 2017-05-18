@@ -39,13 +39,13 @@ our @EXPORT = qw(
 
 
 
-#<<<
-my $BASE_VERSION = "0.2"; use version; our $VERSION = qv( sprintf "$BASE_VERSION.%d", q$Revision: 669 $ =~ /(\d+)/xg );
-#>>>
-
 =head1 VERSION
 
-Version 0.1.x
+Version 0.9.2
+
+=cut
+
+use version; our $VERSION = qv("v0.9.2");
 
 =head1 SYNOPSIS
 

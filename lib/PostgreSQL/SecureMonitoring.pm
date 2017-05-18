@@ -8,17 +8,13 @@ use 5.010;
 
  PostgreSQL::SecureMonitoring - Base Class for PostgreSQL Secure Monitoring Environment
 
- $Id: SecureMonitoring.pm 675 2017-05-17 15:10:44Z alvar $
-
 =head1 VERSION
 
-Version 0.2.x, $Revision: 675 $
+Version 0.2.1
 
 =cut
 
-#<<<
-my $BASE_VERSION = "0.1"; use version; our $VERSION = qv( sprintf "$BASE_VERSION.%d", q$Revision: 675 $ =~ /(\d+)/xg );
-#>>>
+use version; our $VERSION = qv("v0.2.1");
 
 
 =head1 SYNOPSIS

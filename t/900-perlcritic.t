@@ -46,7 +46,6 @@ Test::Perl::Critic->import(
          ValuesAndExpressions::ProhibitImplicitNewlines
          ValuesAndExpressions::ProhibitEmptyQuotes
          ValuesAndExpressions::RequireInterpolationOfMetachars
-         ValuesAndExpressions::RequireConstantVersion
 
          RegularExpressions::RequireDotMatchAnything
          RegularExpressions::RequireLineBoundaryMatching

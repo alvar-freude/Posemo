@@ -5,13 +5,20 @@ package Test::PostgreSQL::Starter;
 
  Test::PostgreSQL::Starter - Start one or more PostgreSQL servers in the background
  
- $Id: Starter.pm 673 2017-05-12 13:01:01Z alvar $
-
 =head1 VERSION
 
-Version 0.5.x, $Revision: 567 $
+Version 0.5.1
 
 =cut
+
+
+use strict;
+use warnings;
+
+use 5.010;                                         # uses some 5.10 features
+
+use version; our $VERSION = qv("v0.5.1");
+
 
 
 =head1 SYNOPSIS
@@ -70,16 +77,6 @@ conf:
 
 # Subroutine prototypes explicitely desired in Test::...-Modules!
 ## no critic (Subroutines::ProhibitSubroutinePrototypes)
-
-
-use strict;
-use warnings;
-
-use 5.010;                                         # uses some 5.10 features
-
-#<<<
-my $BASE_VERSION = "0.1"; use version; our $VERSION = qv( sprintf "$BASE_VERSION.%d", q$Revision: 609 $ =~ /(\d+)/xg );
-#>>>
 
 
 use English qw( -no_match_vars );

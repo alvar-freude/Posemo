@@ -4,8 +4,6 @@ package PostgreSQL::SecureMonitoring::Checks::Writeable;
 
  PostgreSQL::SecureMonitoring::Checks::Writeable -- writeable check with timeout
 
- $Id: Writeable.pm 672 2017-04-26 22:58:00Z alvar $
-
 =head1 SYNOPSIS
 
 ...
