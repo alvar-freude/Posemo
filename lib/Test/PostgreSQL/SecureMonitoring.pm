@@ -17,12 +17,11 @@ Version 0.1.0
 
 use version; our $VERSION = qv("v0.1.0");
 
+# Subroutine prototypes explicitely desired in Test::...-Modules!
+## no critic (Subroutines::ProhibitSubroutinePrototypes Modules::ProhibitAutomaticExportation)
+
 
 =head1 SYNOPSIS
-
-  use Test::PostgreSQL::SecureMonitoring; 
-  
-  
 
 =encoding utf8
 
@@ -32,16 +31,16 @@ use version; our $VERSION = qv("v0.1.0");
   my $result = result_ok($check, $clustername);
   my $result = result_ok($check, $clustername, $message);
   
-  warning($result, $message);                   # message always optional
+  warning_ok($result, $message);                 # message always optional
   no_warning_ok($result, $message);
   critical_ok($result, $message);
   no_critical_ok($result, $message);
   
   name_is($result, $name, $message);
   
-  result_is($result, 1, $message);              # you can check the reasult vakue with some builtin
+  result_is($result, 1, $message);              # you can check the reasult value with this builtin test
   is($result->{result}, 1, $message);           # use Test::More!
-  ok($result->{result} > 2, $message);          # you can check the resukt manually
+  ok($result->{result} > 2, $message);          # you can check the result manually
   
   result_eq_or_diff($result, $data, $message);
   
@@ -53,10 +52,208 @@ use version; our $VERSION = qv("v0.1.0");
 =head1 DESCRIPTION
 
 
+This Module is a helper module for Testing Posemo Checks.
+
+It is NO Test::Builder(::Module)-Subclass and some test subs 
+give more then one test result. 
+
+
 =cut
 
-use parent 'Test::Builder::Module';
+use base qw(Exporter);
+our @EXPORT = qw( result_ok no_warning_ok no_critical_ok name_is result_type_is result_is result_cmp);
+
+
+# use parent 'Test::Builder::Module';
+
+use Test::More;
+use Test::Exception;
+use Data::Dumper;
+use Test::PostgreSQL::Starter;
+
+use PostgreSQL::SecureMonitoring;
+
+
+=head2 result_ok( $check [, $clustername, $message] )
+
+Returns the result object for check $check in the $clustername cluster.
+
+=cut
+
+
+sub result_ok($;$$)
+   {
+   my $checkname   = shift;
+   my $clustername = shift;
+   my $message     = shift // ( "Result for $checkname on cluster " . ( $clustername // "unnamed" ) );
+
+   my $tps_conf = pg_read_conf_ok( $clustername, "Read conf (for $message)" );
+
+   my $result;
+
+   SKIP:
+      {
+      skip "Got no conf for $message", 3 unless $tps_conf;    ## no critic(ValuesAndExpressions::ProhibitMagicNumbers)
+
+      my ( $app, $check );
+
+      # Get Monitoring Obj
+      lives_ok(
+         sub {
+            $app = PostgreSQL::SecureMonitoring->new(
+                                                      database => "_posemo_tests",
+                                                      user     => "_posemo_tests",
+                                                      port     => $tps_conf->{port},
+                                                    );
+         },
+         "Posemo App Object (for $message)"
+              );
+
+      skip "Got no App Object for $message", 2 unless $app;
+
+      # Get Check Object
+      lives_ok( sub { $check = $app->new_check($checkname) }, "Check Object (for $message)" );
+
+      skip "Got no check object for $message", 1 unless $check;
+
+
+      # get result from check
+      lives_ok( sub { $result = $check->run_check }, "Run Check" );
+
+      } ## end SKIP:
+
+   ok( ref $result eq "HASH", "got Result for $message" ) or diag "Result is no hashref: " . Dumper($result);
+
+   return $result;
+   } ## end sub result_ok($;$$)
+
+
+
+=head2 warning_ok( $result [, $message] )
+
+Test passes, if there is a warning in the result
+
+=cut
+
+
+sub warning_ok($;$)
+   {
+   my $result  = shift;
+   my $message = shift;
+   return ok( $result->{warning}, $message );
+   }
+
+
+=head2 no_warning_ok( $result [, $message] )
+
+Test passes, if there is no warning in the result
+
+=cut
+
+
+sub no_warning_ok($;$)
+   {
+   my $result  = shift;
+   my $message = shift;
+   return ok( !$result->{warning}, $message );
+   }
+
+
+=head2 critical_ok( $result [, $message] )
+
+Test passes, if result is critical.
+
+=cut
+
+
+sub critical_ok($;$)
+   {
+   my $result  = shift;
+   my $message = shift;
+   return ok( $result->{critical}, $message );
+   }
+
+=head2 no_critical_ok( $result [, $message] )
+
+Test passes, if result is critical.
+
+=cut
+
+
+sub no_critical_ok($;$)
+   {
+   my $result  = shift;
+   my $message = shift;
+   return ok( !$result->{critical}, $message );
+   }
+
+
+=head2 name_is($result, $name [, $message])
+
+Checks if the name is the same as the result name.
+
+=cut
+
+sub name_is($$;$)
+   {
+   my $result  = shift;
+   my $name    = shift;
+   my $message = shift;
+
+   return is( $result->{check_name}, $name, $message );
+   }
+
+
+=head2 result_type_is($result, $type [, $message])
+
+Checks if the result_type is correct
+
+=cut
+
+sub result_type_is($$;$)
+   {
+   my $result  = shift;
+   my $type    = shift;
+   my $message = shift;
+
+   return is( $result->{result_type}, $type, $message );
+   }
+
+
+=head2 result_is($result, $expected [, $message])
+
+Compares the result with expected value.
+
+=cut
+
+sub result_is($$;$)
+   {
+   my $result   = shift;
+   my $expected = shift;
+   my $message  = shift;
+
+   return is( $result->{result}, $expected, $message );
+   }
+
+
+=head2 result_cmp($result, $operator, $expected [, $message])
+
+Compares the result with the operator and the expercted value, like cmp_ok.
+
+=cut
+
+sub result_cmp($$$;$)
+   {
+   my $result   = shift;
+   my $operator = shift;
+   my $expected = shift;
+   my $message  = shift;
+
+   return cmp_ok( $result->{result}, $operator, $expected, $message );
+   }
 
 
 
 1;
+
+

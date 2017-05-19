@@ -19,6 +19,7 @@ lib/PostgreSQL/SecureMonitoring/Install.pm
 lib/PostgreSQL/SecureMonitoring/Output/JSON.pm
 lib/Test/PostgreSQL/SecureMonitoring.pm
 lib/Test/PostgreSQL/Starter.pm
+LICENSE.txt
 MANIFEST			This list of files
 README.md
 t/000-load.t
@@ -30,6 +31,7 @@ t/400-checks-base.t
 t/501-alive.pg
 t/501-alive.t
 t/502-writeable.pg
+t/502-writeable.t
 t/510-backup-age.pg
 t/511-activity.pg
 t/801-security-definer.pg
