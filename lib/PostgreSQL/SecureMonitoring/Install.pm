@@ -19,12 +19,11 @@ use 5.010;
 
 =head1 DESCRIPTION
 
-see also: C<posemo-install.pl> and C<PostgreSQL::SecureMonitoring::Install::App>
-
 This module provides everything for installing Posemo: 
 It installs (optionally) all needed users and the database, SQL-Schema and
 all checks.
 
+TODO: see also: C<posemo-install.pl> and C<PostgreSQL::SecureMonitoring::Install::App>
 
 
 =cut

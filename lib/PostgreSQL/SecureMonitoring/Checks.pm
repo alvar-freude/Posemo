@@ -7,17 +7,15 @@ package PostgreSQL::SecureMonitoring::Checks;
 =head1 SYNOPSIS
 
 
- # a minimalistic check
+ package PostgreSQL::SecureMonitoring::Checks::Alive;  # by Default, the name of the check is build from this package name
  
- package PostgreSQL::SecureMonitoring::Checks::MyCheck;
+ use Moose;                                            # This is a Moose class ...
+ extends "PostgreSQL::SecureMonitoring::Checks";       # ... which extends our base check class
  
- use Moose;
- extends "PostgreSQL::SecureMonitoring::Checks";
+ sub _build_sql { return "SELECT true;"; }             # this sub simply returns the SQL for the check
  
- sub sql { return "SELECT true;"; }
+ 1;                                                    # every Perl module must return (end with) a true value
 
- # .... TODO: other methods
- 
 
 =head1 DESCRIPTION
 
@@ -50,7 +48,6 @@ At runtime it is called with this SQL:
   
 
 
-
 =head2 results
 
 
@@ -77,16 +74,13 @@ should report the database in the first column:
 
 Types of results:
 
- * Single value: skalar
+ * Single value: scalar
 
- * Multiple single values: Array of skalars
+ * Multiple single values: Array of scalars
 
  * Multiple rows with multiple values: array of arrayrefs
 
-
-
-Structure for output/result?
-
+Structure for output/result:
 
    [
       {
@@ -100,7 +94,7 @@ Structure for output/result?
             columns     => [qw(database total active idle), "idle in transaction", "other", ],
             critical    => 0,    # or 1
             warning     => 0,    # or 1
-            message     => "",   # warn/criot message or empty
+            message     => "",   # warn/crit message or empty
             error       => "",   # error message, e.g. when can't run the check
             },
          ],
@@ -210,6 +204,12 @@ has max_value            => ( is => "ro", isa => "Num",           predicate => "
 
 
 #>>>
+
+
+#
+# internal default builder methods
+# for the default values of the attributes with builder
+#
 
 sub _build_class
    {
@@ -334,9 +334,13 @@ This method installs the check on the server.
 
 Executes the SQL from sql_function on the server. 
 
-This method does not commit!.
+This method does not commit!
 
 No local error handling, don't disable RaiseError!
+
+Only for installation use, needs an DB connection with 
+superuser privileges
+
 
 =cut
 

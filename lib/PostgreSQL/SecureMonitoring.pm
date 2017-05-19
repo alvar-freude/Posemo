@@ -24,74 +24,16 @@ use version; our $VERSION = qv("v0.2.1");
 
 =head1 DESCRIPTION
 
-...
 
 Posemo base class.
 
+...
 
-
-
-
-... Wie kann ein Result aussehen?
-
-
-  Checks liefern zum beispiel:
-  
-    database_name  result_value
-
-
-Status: OK, warning, critical
-
-
-
-
-
-Ein Ausgabe-Modul kann auf alle Methoden / Attribute  aus check zugreifen:
-
-
-  
-
-
-
-
-## NEIN, kein Result-Hash!
-  result-hash
-  
-     {
-     name        
-     description  => "Check Description",
-     class        => 
-     state        => "OK", # String: OK, warning, critical
-     
-     }
-
-
-
-
-
-
-
-=head2 Default Values
-
-Default values for user, database and schema are 
 
 
 
 
 =head2 Config
-
-
-Paremeter for checks with options:
-
-
-Writeable
-
-   Timeout = 
-
-
-
-
-
 
 Config with Config::General.
 
