@@ -138,8 +138,9 @@ around 'execute' => sub {
    # get timing and catch error
    my ( $error, $timing );
    my $start = time;
+   my $result;
    eval {
-      $self->$orig();
+      $result = $self->$orig();
       return 1;
    } or $error = $EVAL_ERROR;
 
@@ -150,7 +151,9 @@ around 'execute' => sub {
    # On error, we should throw it again, AFTER setting statement_timeout to default.
    die "$error\n" if $error;
 
-   return $timing;
+   # Change the result: not true as in SQL, but the timing
+   $result->{result} = $timing;
+   return $result;
 };
 
 
