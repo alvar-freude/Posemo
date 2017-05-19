@@ -46,7 +46,7 @@ More documentation is on the TODO list … ;-)
 
 ## Prerequisites
 
-Posemo needs Perl 5 with Module::Build (only build/install time) DBI, DBD::Pg, Moose and some other modules. For development it is recommended to install a fresh Perl with [perlbrew](https://perlbrew.pl).
+Posemo needs (beside a PostgreSQL installation) Perl 5 with Module::Build (only build/install time) DBI, DBD::Pg, Moose and some other modules. For development it is recommended to install a fresh Perl with [perlbrew](https://perlbrew.pl).
 
 See and install all prerequisites:
 
@@ -54,6 +54,28 @@ See and install all prerequisites:
 perl Build.PL
 ./Build prereq_report       # show depencencies
 ./Build installdeps         # install all depencencies
+```
+
+## Test Driven Development
+
+At time of this writing there exists no executables beside the tests. So, you can not run an executable ans see results. You can only run some checks.
+
+For testing you need a local PostgreSQL installation. We use a new testing module for starting/stopping/... PostgreSQL instances called `Test::PostgreSQL::Starter`, which is included (but will be an extra CPAN module later).
+
+To start all the tests run:
+
+```
+./Build test               # at first time, you need to run perl Build.PL first 
+```
+
+Developers should set the environment variable `TEST_AUTHOR` to a true value.
+
+You may want start only some tests:
+
+```
+./Build test test_files=t/[01]*       verbose=1   # install test server, verbose output
+./Build test test_files=t/501-alive.* verbose=1   # runs tests of the alive check
+./Build test test_files=t/99*         verbose=1   # stop test server
 ```
 
 
