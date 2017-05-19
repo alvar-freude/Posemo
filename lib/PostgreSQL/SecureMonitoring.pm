@@ -206,44 +206,48 @@ sub host_desc
 
 Alvar C.H. FReude, C<< <"alvar at a-blast.org"> >>
 
-#
-#=head1 BUGS
-#
-#Please report any bugs or feature requests to C<bug-tls-check at rt.cpan.org>, or through
-#the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=TLS-Check>.  I will be notified, and then you'll
-#automatically be notified of progress on your bug as I make changes.
-#
-#
-#
-#
-#=head1 SUPPORT
-#
-#You can find documentation for this module with the perldoc command.
-#
-#    perldoc TLS::Check
-#
-#
+
+=head1 BUGS
+
+Please report any bugs or feature requests in the GitHub Repository:
+
+  http://github.com/alvar-freude/Posemo
+
+
+
+
+=head1 SUPPORT
+
+You can find documentation for this module and all others in this distribution with the perldoc command.
+
+    perldoc PostgreSQL::SecureMonitoring
+
+
+=begin TODO
+
 #You can also look for information at:
 #
 #=over 4
 #
 #=item * RT: CPAN's request tracker (report bugs here)
 #
-#L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=TLS-Check>
+#L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=...>
 #
 #=item * AnnoCPAN: Annotated CPAN documentation
 #
-#L<http://annocpan.org/dist/TLS-Check>
+#L<http://annocpan.org/dist/...>
 #
 #=item * CPAN Ratings
 #
-#L<http://cpanratings.perl.org/d/TLS-Check>
+#L<http://cpanratings.perl.org/d/...>
 #
 #=item * Search CPAN
 #
-#L<http://search.cpan.org/dist/TLS-Check/>
+#L<http://search.cpan.org/dist/.../>
 #
 #=back
+
+=end TODO
 
 
 =head1 ACKNOWLEDGEMENTS
@@ -251,44 +255,28 @@ Alvar C.H. FReude, C<< <"alvar at a-blast.org"> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2015 Alvar C.H. Freude, http://alvar.a-blast.org/
+Copyright 2016 - 2017 Alvar C.H. Freude, http://alvar.a-blast.org/
 
+Posemo is released under the L<PostgreSQL License|https://opensource.org/licenses/postgresql>, a liberal Open Source license, similar to the BSD or MIT licenses.
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of the the Artistic License (2.0). You may obtain a
-copy of the full license at:
+Copyright (c) 2016, 2017, Alvar C.H. Freude and contributors
 
-L<http://www.perlfoundation.org/artistic_license_2_0>
+Permission to use, copy, modify, and distribute this software and its
+documentation for any purpose, without fee, and without a written agreement
+is hereby granted, provided that the above copyright notice and this paragraph
+and the following two paragraphs appear in all copies.
 
-#Any use, modification, and distribution of the Standard or Modified
-#Versions is governed by this Artistic License. By using, modifying or
-#distributing the Package, you accept this license. Do not use, modify,
-#or distribute the Package, if you do not accept this license.
-#
-#If your Modified Version has been derived from a Modified Version made
-#by someone other than you, you are nevertheless required to ensure that
-#your Modified Version complies with the requirements of this license.
-#
-#This license does not grant you the right to use any trademark, service
-#mark, tradename, or logo of the Copyright Holder.
-#
-#This license includes the non-exclusive, worldwide, free-of-charge
-#patent license to make, have made, use, offer to sell, sell, import and
-#otherwise transfer the Package with respect to any patent claims
-#licensable by the Copyright Holder that are necessarily infringed by the
-#Package. If you institute patent litigation (including a cross-claim or
-#counterclaim) against any party alleging that the Package constitutes
-#direct or contributory patent infringement, then this Artistic License
-#to you shall terminate on the date that such litigation is filed.
-#
-#Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
-#AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
-#THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-#PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
-#YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
-#CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
-#CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
-#EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+IN NO EVENT SHALL THE AUTHOR BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT,
+SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS,
+ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF THE
+AUTHOR HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+THE AUTHOR SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, BUT NOT LIMITED
+TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+PURPOSE. THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS, AND THE
+AUTHOR HAS NO OBLIGATIONS TO PROVIDE MAINTENANCE, SUPPORT, UPDATES,
+ENHANCEMENTS, OR MODIFICATIONS.
+
 
 
 =cut
