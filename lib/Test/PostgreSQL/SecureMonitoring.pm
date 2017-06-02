@@ -61,7 +61,7 @@ give more then one test result.
 =cut
 
 use base qw(Exporter);
-our @EXPORT = qw( result_ok no_warning_ok no_critical_ok name_is result_type_is result_is result_cmp);
+our @EXPORT = qw( result_ok no_warning_ok no_critical_ok name_is result_type_is result_unit_is result_is result_cmp);
 
 
 # use parent 'Test::Builder::Module';
@@ -138,8 +138,8 @@ Test passes, if there is a warning in the result
 
 sub warning_ok($;$)
    {
-   my $result  = shift;
-   my $message = shift;
+   my $result = shift;
+   my $message = shift // "Result has warning";
    return ok( $result->{warning}, $message );
    }
 
@@ -153,8 +153,8 @@ Test passes, if there is no warning in the result
 
 sub no_warning_ok($;$)
    {
-   my $result  = shift;
-   my $message = shift;
+   my $result = shift;
+   my $message = shift // "Result has no warning";
    return ok( !$result->{warning}, $message );
    }
 
@@ -168,8 +168,8 @@ Test passes, if result is critical.
 
 sub critical_ok($;$)
    {
-   my $result  = shift;
-   my $message = shift;
+   my $result = shift;
+   my $message = shift // "Result is critical";
    return ok( $result->{critical}, $message );
    }
 
@@ -182,8 +182,8 @@ Test passes, if result is critical.
 
 sub no_critical_ok($;$)
    {
-   my $result  = shift;
-   my $message = shift;
+   my $result = shift;
+   my $message = shift // "Result is not crtitical";
    return ok( !$result->{critical}, $message );
    }
 
@@ -198,7 +198,7 @@ sub name_is($$;$)
    {
    my $result  = shift;
    my $name    = shift;
-   my $message = shift;
+   my $message = shift // "Check name is '$name'";
 
    return is( $result->{check_name}, $name, $message );
    }
@@ -214,10 +214,26 @@ sub result_type_is($$;$)
    {
    my $result  = shift;
    my $type    = shift;
-   my $message = shift;
+   my $message = shift // "Result type is '$type'";
 
    return is( $result->{result_type}, $type, $message );
    }
+
+=head2 result_unit_is($result, $unit[, $message])
+
+Checks if the result_unit is correct
+
+=cut
+
+sub result_unit_is($$;$)
+   {
+   my $result  = shift;
+   my $unit    = shift;
+   my $message = shift // "Result Unit is '$unit'";
+
+   return is( $result->{result_unit}, $unit, $message );
+   }
+
 
 
 =head2 result_is($result, $expected [, $message])
@@ -230,7 +246,7 @@ sub result_is($$;$)
    {
    my $result   = shift;
    my $expected = shift;
-   my $message  = shift;
+   my $message  = shift // "Result is '$expected'";
 
    return is( $result->{result}, $expected, $message );
    }
@@ -247,7 +263,7 @@ sub result_cmp($$$;$)
    my $result   = shift;
    my $operator = shift;
    my $expected = shift;
-   my $message  = shift;
+   my $message  = shift // "Comparere result with operator '$operator' to '$expected'";
 
    return cmp_ok( $result->{result}, $operator, $expected, $message );
    }
