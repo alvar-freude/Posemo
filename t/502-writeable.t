@@ -17,4 +17,14 @@ result_type_is $result, "single";
 result_cmp $result, "<", 1, "runtime of writeable check must be lower then 1 second";
 
 
+
+#
+# TODO: check writeable for Master/Slave
+#       => Start Master/Slave and run check ...
+
+
 done_testing();
+
+
+
+
