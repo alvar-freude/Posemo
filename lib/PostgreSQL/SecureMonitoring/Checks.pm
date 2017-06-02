@@ -402,9 +402,13 @@ sub execute
       }
 
    my $placeholders = join( ", ", @placeholders );
+   my %result = (
+                  check_name  => $self->name,
+                  result_unit => $self->result_unit,
+                  map { $ARG => $self->$ARG }
+                     grep { my $m = "has_$ARG"; $self->$m } qw(warning_level critical_level min_value max_value),
+                );
 
-
-   my %result = ( check_name => $self->name, );
 
    eval {
       # SELECT with FROM, because function with multiple OUT parameters will result in multiple columns
