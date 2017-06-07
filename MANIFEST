@@ -15,6 +15,7 @@ lib/PostgreSQL/SecureMonitoring/Checks/Activity.pm
 lib/PostgreSQL/SecureMonitoring/Checks/Alive.pm
 lib/PostgreSQL/SecureMonitoring/Checks/BackupAge.pm
 lib/PostgreSQL/SecureMonitoring/Checks/Writeable.pm
+lib/PostgreSQL/SecureMonitoring/ChecksHelper.pm
 lib/PostgreSQL/SecureMonitoring/Install.pm
 lib/PostgreSQL/SecureMonitoring/Output/JSON.pm
 lib/Test/PostgreSQL/SecureMonitoring.pm
@@ -33,6 +34,7 @@ t/501-alive.t
 t/502-writeable.pg
 t/502-writeable.t
 t/510-backup-age.pg
+t/510-backup-age.t
 t/511-activity.pg
 t/801-security-definer.pg
 t/900-perlcritic.t
