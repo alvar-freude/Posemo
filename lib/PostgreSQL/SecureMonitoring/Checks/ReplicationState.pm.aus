@@ -18,7 +18,7 @@ This check returns the age of a running backup in seconds or 0 if no backup is r
 use Moose;
 extends "PostgreSQL::SecureMonitoring::Checks";
 
-sub _build_sql {
+sub _build_code {
    return "SELECT true";
 
 =begin gammel

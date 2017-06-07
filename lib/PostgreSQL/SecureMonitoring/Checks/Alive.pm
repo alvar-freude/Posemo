@@ -20,7 +20,7 @@ which just returns true. So, if the server is alive, then it returns true.
 use Moose;
 extends "PostgreSQL::SecureMonitoring::Checks";
 
-sub _build_sql { return "SELECT true;"; }
+sub _build_code { return "SELECT true;"; }
 
 
 1;

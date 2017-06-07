@@ -58,7 +58,7 @@ Filter databases to exclude template DBs etc. via parameter
 
 =cut
 
-sub _build_sql
+sub _build_code
    {
    return q{
    WITH states AS 

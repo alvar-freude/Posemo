@@ -93,7 +93,7 @@ sub _build_message
    }
 
 
-sub _build_sql
+sub _build_code
    {
    my $self = shift;
    return qq{

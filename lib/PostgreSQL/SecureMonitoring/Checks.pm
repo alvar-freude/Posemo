@@ -175,12 +175,13 @@ Wie Speichern Result?
 
 # lazy / build functions
 
-foreach my $attr (qw(class name description sql install_sql sql_function sql_function_name result_type))
+foreach my $attr (qw(class name description code install_sql sql_function sql_function_name result_type))
    {
    my $builder = "_build_$attr";
    has $attr => ( is => "rw", isa => "Str", lazy => 1, builder => $builder, );
    }
 
+has enabled              => ( is => "ro", isa => "Bool",          default   => 1,); 
 has return_type          => ( is => "ro", isa => "Str",           default   => "boolean", );
 has result_unit          => ( is => "ro", isa => "Str",           default   => "", );
 has language             => ( is => "ro", isa => "Str",           default   => "sql", );
@@ -255,10 +256,10 @@ sub _build_sql_function_name
    return lc("${ \$self->schema }.$function_name");
    }
 
-sub _build_sql
+sub _build_code
    {
    my $self = shift;
-   die "The check (${ \$self->class }) must set his SQL (or SQL-Function)\n";
+   die "The check (${ \$self->class }) must set his Code (or SQL-Function)\n";
    }
 
 sub _build_install_sql
@@ -305,7 +306,7 @@ sub _build_sql_function
     RETURNS $setof $return_type
     AS   
     \$code\$
-      ${ \$self->sql }
+      ${ \$self->code }
     \$code\$
     LANGUAGE ${ \$self->language }
     ${ \$self->volatility }
