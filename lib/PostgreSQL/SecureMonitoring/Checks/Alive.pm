@@ -17,11 +17,10 @@ which just returns true. So, if the server is alive, then it returns true.
 =cut
 
 
-use Moose;
+use PostgreSQL::SecureMonitoring::ChecksHelper;
 extends "PostgreSQL::SecureMonitoring::Checks";
 
-sub _build_code { return "SELECT true;"; }
-
+check_has code => "SELECT true";
 
 1;
 

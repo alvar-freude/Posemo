@@ -22,3 +22,11 @@ max_statements = 2
 allowed_values = 0 1 2 100 1000
 
 
+# use strict/warnings is enabled by PostgreSQL::SecureMonitoring::ChecksHelper
+[TestingAndDebugging::RequireUseStrict]
+equivalent_modules = PostgreSQL::SecureMonitoring::ChecksHelper
+
+[TestingAndDebugging::RequireUseWarnings]
+equivalent_modules = PostgreSQL::SecureMonitoring::ChecksHelper
+
+

@@ -51,7 +51,7 @@ my $check_sql  = "INSERT INTO write_test VALUES ('$check_message') RETURNING dat
 =cut
 
 
-use Moose;
+use PostgreSQL::SecureMonitoring::ChecksHelper;
 extends "PostgreSQL::SecureMonitoring::Checks";
 
 use Time::HiRes qw(time);
@@ -60,20 +60,57 @@ use Sys::Hostname;
 use English qw( -no_match_vars );
 
 
-has '+parameters' => ( default => sub { [ [ msg => 'TEXT' ], ] } );
-has '+has_writes' => ( default => 1 );
-has '+return_type' => ( default => 'bool' );
-has '+result_unit' => ( default => 'seconds' );
-has '+volatility'  => ( default => 'VOLATILE' );   # this func changes data
+#has '+parameters' => ( default => sub { [ [ msg => 'TEXT' ], ] } );
+#has '+has_writes' => ( default => 1 );
+#has '+return_type' => ( default => 'bool' );
+#has '+result_unit' => ( default => 'seconds' );
+#has '+volatility'  => ( default => 'VOLATILE' );   # this func changes data
+#
+#has '+warning_level'  => ( default => 3 );
+#has '+critical_level' => ( default => 5 );
 
-has '+warning_level'  => ( default => 3 );
-has '+critical_level' => ( default => 5 );
+
+check_has
+   return_type    => "bool",
+   result_unit    => "seconds",
+   volatility     => "VOLATILE",
+   has_writes     => 1,
+   warning_level  => 3,
+   critical_level => 5,
+   parameters     => [ [ msg => 'TEXT' ], ],
+   ;
+
 
 # Attention: attribute message/timeout with it's builder MUST be declared lazy,
 # because it uses other attributes!
 
 has timeout => ( is => "ro", isa => "Int", builder => "_build_timeout", lazy => 1, );
 has msg     => ( is => "ro", isa => "Str", builder => "_build_message", lazy => 1, );
+
+
+
+# need a real build method for code and install_sql, because access to $self
+sub _build_code
+   {
+   my $self = shift;
+   return qq{
+         DELETE FROM ${ \$self->schema }.writeable WHERE age(date_inserted, now()) < '-1 day';
+         INSERT INTO ${ \$self->schema }.writeable VALUES (msg) RETURNING true;
+   };
+   }
+
+
+sub _build_install_sql
+   {
+   my $self = shift;
+
+   return qq{
+      CREATE TABLE ${ \$self->schema }.writeable (message text, date_inserted TIMESTAMP WITH TIME ZONE DEFAULT now());
+      ALTER TABLE ${ \$self->schema }.writeable OWNER TO ${ \$self->superuser };
+      REVOKE ALL ON ${ \$self->schema }.writeable FROM PUBLIC;
+      GRANT INSERT, DELETE ON ${ \$self->schema }.writeable TO ${ \$self->superuser };
+    };
+   }
 
 
 # Default timeout is the critical level (which is in seconds)
@@ -91,31 +128,6 @@ sub _build_message
    my $myhost = hostname;
    return "Written by $myhost to $dbhost via " . __PACKAGE__;
    }
-
-
-sub _build_code
-   {
-   my $self = shift;
-   return qq{
-         DELETE FROM ${ \$self->schema }.writeable WHERE age(date_inserted, now()) < '-1 day';
-         INSERT INTO ${ \$self->schema }.writeable VALUES (msg) RETURNING true;
-   };
-   }
-
-
-
-sub _build_install_sql
-   {
-   my $self = shift;
-
-   return qq{
-      CREATE TABLE ${ \$self->schema }.writeable (message text, date_inserted TIMESTAMP WITH TIME ZONE DEFAULT now());
-      ALTER TABLE ${ \$self->schema }.writeable OWNER TO ${ \$self->superuser };
-      REVOKE ALL ON ${ \$self->schema }.writeable FROM PUBLIC;
-      GRANT INSERT, DELETE ON ${ \$self->schema }.writeable TO ${ \$self->superuser };
-    };
-   }
-
 
 
 =head2 around execute

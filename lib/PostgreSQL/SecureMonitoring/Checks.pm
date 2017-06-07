@@ -181,22 +181,30 @@ foreach my $attr (qw(class name description code install_sql sql_function sql_fu
    has $attr => ( is => "rw", isa => "Str", lazy => 1, builder => $builder, );
    }
 
-has enabled              => ( is => "ro", isa => "Bool",          default   => 1,); 
 has return_type          => ( is => "ro", isa => "Str",           default   => "boolean", );
 has result_unit          => ( is => "ro", isa => "Str",           default   => "", );
 has language             => ( is => "ro", isa => "Str",           default   => "sql", );
 has volatility           => ( is => "ro", isa => "Str",           default   => "STABLE", );
-has app                  => ( is => "ro", isa => "Object",        required  => 1,          handles => [qw(dbh schema user superuser host port host_desc has_host has_port commit rollback)], );
-# has result               => ( is => "ro", isa => "ArrayRef[Any]", default   => sub { [] }, ); 
 has has_multiline_result => ( is => "ro", isa => "Bool",          default   => 0, );
 has has_writes           => ( is => "ro", isa => "Bool",          default   => 0, );
 has parameters           => ( is => "ro", isa => "ArrayRef[Any]", default   => sub { [] }, traits  => ['Array'], handles => { has_parameters => 'count', all_parameters => 'elements', } );
 
 # The following values can be set via config file etc as parameter
+has enabled              => ( is => "ro", isa => "Bool",          default   => 1,); 
 has warning_level        => ( is => "ro", isa => "Num",           predicate => "has_warning_level", );
 has critical_level       => ( is => "ro", isa => "Num",           predicate => "has_critical_level", );
 has min_value            => ( is => "ro", isa => "Num",           predicate => "has_min_value", );
 has max_value            => ( is => "ro", isa => "Num",           predicate => "has_max_value", );
+
+# Internal states
+has app                  => ( is => "ro", isa => "Object",        required  => 1,          handles => [qw(dbh schema user superuser host port host_desc has_host has_port commit rollback)], );
+# has result               => ( is => "ro", isa => "ArrayRef[Any]", default   => sub { [] }, ); 
+
+# attributes for attrs with builder method
+# the builder looks first here and when nothing found then uses his default
+has _code_attr           => ( is => "ro", isa => "Str",           predicate => "has_code_attr", );
+has _result_type_attr    => ( is => "ro", isa => "Str",           predicate => "has_result_type_attr", );
+
 
 # Parameters, which may be set from check, or should be set here.
 #has result_is_warning    => ( is => "rw", isa => "Bool",          default   => 0, );
@@ -259,6 +267,7 @@ sub _build_sql_function_name
 sub _build_code
    {
    my $self = shift;
+   return $self->_code_attr if $self->has_code_attr;
    die "The check (${ \$self->class }) must set his Code (or SQL-Function)\n";
    }
 
@@ -323,6 +332,8 @@ sub _build_sql_function
 sub _build_result_type
    {
    my $self = shift;
+
+   return $self->_result_type_attr if $self->has_result_type_attr;
    return $self->return_type;                      # result type is by default the same as the return type of the SQL function
    }
 
