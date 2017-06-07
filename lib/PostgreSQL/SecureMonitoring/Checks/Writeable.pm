@@ -60,16 +60,6 @@ use Sys::Hostname;
 use English qw( -no_match_vars );
 
 
-#has '+parameters' => ( default => sub { [ [ msg => 'TEXT' ], ] } );
-#has '+has_writes' => ( default => 1 );
-#has '+return_type' => ( default => 'bool' );
-#has '+result_unit' => ( default => 'seconds' );
-#has '+volatility'  => ( default => 'VOLATILE' );   # this func changes data
-#
-#has '+warning_level'  => ( default => 3 );
-#has '+critical_level' => ( default => 5 );
-
-
 check_has
    return_type    => "bool",
    result_unit    => "seconds",
