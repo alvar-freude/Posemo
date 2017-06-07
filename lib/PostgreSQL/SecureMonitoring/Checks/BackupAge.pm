@@ -22,7 +22,7 @@ extends "PostgreSQL::SecureMonitoring::Checks";
 has '+return_type' => ( default => 'integer' );
 has '+result_unit' => ( default => 'seconds' );
 
-sub _build_sql
+sub _build_code
    {
    return "SELECT CASE WHEN pg_is_in_backup()
                        THEN CAST(extract(EPOCH FROM statement_timestamp() - pg_backup_start_time()) AS integer)
