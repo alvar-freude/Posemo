@@ -89,7 +89,6 @@ sub _build_code
    };
    }
 
-
 sub _build_install_sql
    {
    my $self = shift;
@@ -130,7 +129,6 @@ the complete function, not single statements inside the function.
 
 =cut
 
-
 around 'execute' => sub {
    my $orig = shift;
    my $self = shift;
@@ -141,8 +139,8 @@ around 'execute' => sub {
    my ( $error, $timing );
    my $start = time;
    my $result;
-   eval {
-      $result = $self->$orig();
+   eval {                                          # catch errors
+      $result = $self->$orig();                    # Call original execute method here
       return 1;
    } or $error = $EVAL_ERROR;
 
@@ -153,7 +151,7 @@ around 'execute' => sub {
    # On error, we should throw it again, AFTER setting statement_timeout to default.
    die "$error\n" if $error;
 
-   # Change the result: not true as in SQL, but the timing
+   # Change the result: not true as from SQL, but the timing
    $result->{result} = $timing;
    return $result;
 };
@@ -161,6 +159,4 @@ around 'execute' => sub {
 
 
 1;
-
-
 
