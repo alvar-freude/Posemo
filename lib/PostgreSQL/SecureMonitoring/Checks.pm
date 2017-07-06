@@ -187,7 +187,12 @@ has language             => ( is => "ro", isa => "Str",           default   => "
 has volatility           => ( is => "ro", isa => "Str",           default   => "STABLE", );
 has has_multiline_result => ( is => "ro", isa => "Bool",          default   => 0, );
 has has_writes           => ( is => "ro", isa => "Bool",          default   => 0, );
-has parameters           => ( is => "ro", isa => "ArrayRef[Any]", default   => sub { [] }, traits  => ['Array'], handles => { has_parameters => 'count', all_parameters => 'elements', } );
+has parameters           => ( is => "ro", isa => "ArrayRef[Any]", default   => sub { [] }, traits  => ['Array'], 
+                                                                                           handles => 
+                                                                                             { 
+                                                                                             has_parameters => 'count', 
+                                                                                             all_parameters => 'elements', 
+                                                                                             }, );
 
 # The following values can be set via config file etc as parameter
 has enabled              => ( is => "ro", isa => "Bool",          default   => 1,); 
@@ -280,21 +285,25 @@ sub _build_sql_function
    {
    my $self = shift;
 
-   my @parameters;
-
+   my ( @parameters, @parameters_with_default );
    foreach my $par_ref ( $self->all_parameters )
       {
-      my $param = "$par_ref->[0] $par_ref->[1]";
+      my $param              = "$par_ref->[0] $par_ref->[1]";
+      my $param_with_default = $param;
       if ( defined $par_ref->[2] )
          {
          my $default = $par_ref->[2];
-         $default = qq{'$default'} unless looks_like_number($default);
-         $param .= " DEFAULT $default";
+
+         #         $default = qq{'$default'} unless looks_like_number($default);
+         $default = $self->dbh->quote($default) unless looks_like_number($default);
+         $param_with_default .= " DEFAULT $default";
          }
-      push @parameters, "$par_ref->[0] $par_ref->[1]";
+      push @parameters,              $param;
+      push @parameters_with_default, $param_with_default;
       }
 
-   my $parameters = join( ", ", @parameters );
+   my $parameters              = join( ", ", @parameters );
+   my $parameters_with_default = join( ", ", @parameters_with_default );
 
    my $setof = "";
    $setof = "SETOF" if $self->has_multiline_result;
@@ -311,7 +320,7 @@ sub _build_sql_function
       }
 
    return qq{$new_type
-  CREATE OR REPLACE FUNCTION ${ \$self->sql_function_name }($parameters)
+  CREATE OR REPLACE FUNCTION ${ \$self->sql_function_name }($parameters_with_default)
     RETURNS $setof $return_type
     AS   
     \$code\$
@@ -409,14 +418,16 @@ sub execute
 
    foreach my $par_ref ( $self->all_parameters )
       {
-      push @values,       $par_ref->[1];
+      push @values,       $par_ref->[2];
       push @placeholders, q{?};
       }
 
    my $placeholders = join( ", ", @placeholders );
    my %result = (
                   check_name  => $self->name,
+                  desciption  => $self->description,
                   result_unit => $self->result_unit,
+                  result_type => $self->result_type,
                   map { $ARG => $self->$ARG }
                      grep { my $m = "has_$ARG"; $self->$m } qw(warning_level critical_level min_value max_value),
                 );
@@ -425,14 +436,15 @@ sub execute
    eval {
       # SELECT with FROM, because function with multiple OUT parameters will result in multiple columns
       my $sth = $self->dbh->prepare("SELECT * FROM ${ \$self->sql_function_name }($placeholders);");
+      DEBUG "All values for execute: " . join( ", ", map { "'$_'" } @values );
       $sth->execute(@values);
 
       $result{columns} = $sth->{NAME};
 
       if ( $self->has_multiline_result )
          {
-         $result{result}      = @{ $sth->fetchall_arrayref };
-         $result{result_type} = "multiline";
+         $result{result}   = @{ $sth->fetchall_arrayref };
+         $result{row_type} = "multiline";
          }
       else
          {
@@ -440,13 +452,13 @@ sub execute
 
          if ( scalar @row <= 1 )
             {
-            $result{result}      = $row[0];
-            $result{result_type} = "single";
+            $result{result}   = $row[0];
+            $result{row_type} = "single";
             }
          else
             {
-            $result{result}      = \@row;
-            $result{result_type} = "list";
+            $result{result}   = \@row;
+            $result{row_type} = "list";
             }
          }
 
@@ -458,7 +470,7 @@ sub execute
       {
       $self->rollback;
       $result{error} = "Error executing SQL function ${ \$self->sql_function_name } from ${ \$self->class }: $EVAL_ERROR\n";
-      ERROR $result{error};
+      LOGDIE $result{error};
       };
 
    return \%result;
@@ -498,7 +510,7 @@ sub test_critical_warning
    my $self   = shift;
    my $result = shift;
 
-   if ( $result->{result_type} eq "single" and $self->return_type eq "boolean" )
+   if ( $result->{row_type} eq "single" and $self->return_type eq "boolean" )
       {
       return if $result->{result};
       $result->{message}  = "Failed ${ \$self->name } for host ${ \$self->host_desc }";
@@ -511,21 +523,21 @@ sub test_critical_warning
 
    my @values;
 
-   $result->{temp_return_type} = $self->return_type;
+   $result->{return_type} = $self->return_type;
 
-   if ( $result->{result_type} eq "single" )
+   if ( $result->{row_type} eq "single" )
       {
       @values = ( $result->{result} );
       }
-   elsif ( $result->{result_type} eq "list" )
+   elsif ( $result->{row_type} eq "list" )
       {
       @values = @{ $result->{result} };
       }
-   elsif ( $result->{result_type} eq "multiline" )
+   elsif ( $result->{row_type} eq "multiline" )
       {
       @values = map { splice( @$_, 1 ) } @{ $result->{result} };
       }
-   else { $result->{error} = "FATAL: Wrong result_type '${ \$self->result_type }' in critical/warning-check\n"; }
+   else { $result->{error} = "FATAL: Wrong row_type '${ \$self->result_type }' in critical/warning-check\n"; }
 
    my $message = "";
 
