@@ -61,7 +61,7 @@ give more then one test result.
 =cut
 
 use base qw(Exporter);
-our @EXPORT = qw( result_ok no_warning_ok no_critical_ok name_is result_type_is result_unit_is result_is result_cmp);
+our @EXPORT = qw( result_ok no_warning_ok no_critical_ok name_is result_type_is row_type_is result_unit_is result_is result_cmp);
 
 
 # use parent 'Test::Builder::Module';
@@ -218,6 +218,24 @@ sub result_type_is($$;$)
 
    return is( $result->{result_type}, $type, $message );
    }
+
+
+=head2 row_type_is($result, $type [, $message])
+
+Checks if the row_type is correct
+
+=cut
+
+sub row_type_is($$;$)
+   {
+   my $result  = shift;
+   my $type    = shift;
+   my $message = shift // "Row type is '$type'";
+
+   return is( $result->{row_type}, $type, $message );
+   }
+
+
 
 =head2 result_unit_is($result, $unit[, $message])
 
