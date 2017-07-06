@@ -1,11 +1,11 @@
 -- Start transaction and plan the tests.
 BEGIN;
-SELECT plan(5);
+SELECT plan(10);
 
 
 -- Run the tests.
 
-SELECT has_function( 'writeable'::name, ARRAY['text']::name[], 'function writeable exists' );
+SELECT has_function( 'writeable'::name, ARRAY['text', 'interval']::name[], 'function writeable exists' );
 
 
 SELECT is( (SELECT count(*) FROM writeable), 0::BIGINT, 'writeable table empty');
@@ -14,12 +14,20 @@ SELECT is( (SELECT count(*) FROM writeable), 1::BIGINT, 'writeable has one entry
 
 SELECT row_eq( $$ SELECT * FROM writeable $$, ROW('Textmeldung', NOW())::writeable, 'writeable has written the row'  );
 
+SELECT is( (SELECT writeable('Meldung 2 vor warten', '1 day')), true, 'writeable check 2 returns true value');
+SELECT is( (SELECT count(*) FROM writeable), 2::BIGINT, 'writeable has two entries');
+
+SELECT pg_sleep(2);
+
+SELECT is( (SELECT writeable('Meldung 3 nach Wartezeit', '1 second')), true, 'writeable check 3 after wait returns true value');
+SELECT is( (SELECT count(*) FROM writeable), 1::BIGINT, 'writeable has one entry, others removed according to retention time');
+
+SELECT row_eq( $$ SELECT * FROM writeable $$, ROW('Meldung 3 nach Wartezeit', NOW())::writeable, 'writeable contains the right row'  );
+
 
 
 -- Finish the tests and clean up.
 SELECT * FROM finish();
 ROLLBACK;
-
-SELECT 1;
 
 
