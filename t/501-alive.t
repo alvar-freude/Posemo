@@ -13,7 +13,8 @@ no_warning_ok $result;
 no_critical_ok $result;
 name_is $result,        "Alive";
 result_is $result,      1;
-result_type_is $result, "single";
+row_type_is $result,    "single";
+result_type_is $result, "boolean";
 
 done_testing();
 
