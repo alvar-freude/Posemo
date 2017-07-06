@@ -17,37 +17,6 @@ ready to accept write queries in time. When at least one streaming replication
 slave is configured as syncronous slave, COMMIT returns after at least one slave 
 got the data. When all slaves are gone (or too much behind), then this check fails.
 
-
-=head2 extras
-
-statement_timeout
-
-=> set statement_timeout to 1000;
-SET
-=> select pg_sleep(2);
-ERROR:  canceling statement due to statement timeout
-
-
-
---
-
-
-  CREATE USER monitoring PASSWORD 'mon1t0r-r!ng';
-  CREATE DATABASE monitoring OWNER monitoring;
-  
-
-  BEGIN;
-    CREATE TABLE write_test (message text, date_inserted TIMESTAMP WITH TIME ZONE DEFAULT now());
-    ALTER TABLE write_test OWNER TO monitoring;
-  COMMIT;
-
-
-
-my $delete_sql = "DELETE FROM write_test WHERE age(date_inserted, now()) < '-1 day';";
-my $check_sql  = "INSERT INTO write_test VALUES ('$check_message') RETURNING date_inserted;";
-
-
-
 =cut
 
 
@@ -61,31 +30,35 @@ use English qw( -no_match_vars );
 
 
 check_has
-   return_type    => "bool",
+   return_type    => "bool",                       # the SQL-functions returns true/false
+   result_type    => "float",                      # but the check itself returns seconds as float
    result_unit    => "seconds",
    volatility     => "VOLATILE",
    has_writes     => 1,
    warning_level  => 3,
    critical_level => 5,
-   parameters     => [ [ msg => 'TEXT' ], ],
+   parameters => [ [ message => 'TEXT' ], [ retention_period => 'INTERVAL', '1 day' ], ],
    ;
 
 
-# Attention: attribute message/timeout with it's builder MUST be declared lazy,
-# because it uses other attributes!
+# Extra attribute declaration
+# attribute message/timeout with it's builder MUST be declared lazy,
+# because builder method uses other attributes!
+# Retention_period has no default, because the default is encoded in the SQL function definition
 
-has timeout => ( is => "ro", isa => "Int", builder => "_build_timeout", lazy => 1, );
-has msg     => ( is => "ro", isa => "Str", builder => "_build_message", lazy => 1, );
+has retention_period => ( is => "ro", isa => "Str", );
+has timeout          => ( is => "ro", isa => "Int", builder => "_build_timeout", lazy => 1, );
+has message          => ( is => "ro", isa => "Str", builder => "_build_message", lazy => 1, );
 
 
-
-# need a real build method for code and install_sql, because access to $self
+# The code for building the check is given by the following method.
+# We need a real build method for code and install_sql, because access to $self.
 sub _build_code
    {
    my $self = shift;
    return qq{
-         DELETE FROM ${ \$self->schema }.writeable WHERE age(date_inserted, now()) < '-1 day';
-         INSERT INTO ${ \$self->schema }.writeable VALUES (msg) RETURNING true;
+         DELETE FROM ${ \$self->schema }.writeable WHERE age(statement_timestamp(), date_inserted) > retention_period;
+         INSERT INTO ${ \$self->schema }.writeable VALUES (message) RETURNING true;
    };
    }
 
