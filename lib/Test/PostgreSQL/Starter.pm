@@ -473,7 +473,7 @@ sub pg_dropcluster_ok($;$)
       return 0;
       }
 
-   if ( -d "$conf->{cluster_path}/$conf->{name}/postmaster.pid" )
+   if ( -f "$conf->{cluster_path}/$conf->{name}/postmaster.pid" )
       {
       $tb->ok( 0, $message );
       $tb->diag(
@@ -615,6 +615,13 @@ sub pg_stop_all_ok(;$)
    foreach my $cluster ( _all_cluster() )
       {
       my $conf = _read_conf($cluster);
+
+      unless ( -f "$conf->{cluster_path}/$cluster/postmaster.pid" )
+         {
+         $tb->diag("Skipping stopping cluster $cluster because it's not running (missing postmaster.pid).");
+         next;
+         }
+
       my $pg_ctl = _get_binary( $conf, "pg_ctl" );
       my $state
          = system(
@@ -628,7 +635,7 @@ sub pg_stop_all_ok(;$)
          $tb->diag("Check $conf->{cluster_path}/stdout.log and $conf->{cluster_path}/stderr.log");
          $ok = 0;
          }
-      }
+      } ## end foreach my $cluster ( _all_cluster...)
 
    $tb->ok( $ok, $message );
    return $ok;
@@ -637,7 +644,8 @@ sub pg_stop_all_ok(;$)
 
 sub _all_cluster
    {
-   return grep { -d } glob("cluster_path/*");
+   my $cluster_path = $ENV{POSTGRES_TEST_DIR} // "/tmp/_test-postgresql-starter";
+   return grep { -d } glob("$cluster_path/*");
    }
 
 
