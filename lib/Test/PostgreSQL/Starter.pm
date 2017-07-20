@@ -517,6 +517,13 @@ sub pg_dropcluster_if_exists_ok($;$)
    return pg_dropcluster_ok( $conf->{name}, $message );
    }
 
+=head2 pg_dropall($name, $message)
+
+Drop a named cluster, but don't thow an failure if it exists.
+
+=cut
+
+
 
 # * pg_start_ok($name, $message) (undef: all)
 # * pg_stop_ok($name, $message) (undef: all)
@@ -561,7 +568,7 @@ sub pg_start_ok(;$$)
    } ## end sub pg_start_ok(;$$)
 
 
-=head2 pg_stop_ok($name $message)
+=head2 pg_stop_ok($name, $message)
 
 Stops the cluster $name
 
@@ -570,7 +577,7 @@ Stops the cluster $name
 sub pg_stop_ok(;$$)
    {
    my $conf = _build_conf(shift);
-   my $message = shift // "Stopping Clusrer '$conf->{name}'";
+   my $message = shift // "Stopping Cluster '$conf->{name}'";
 
    my $tb = __PACKAGE__->builder;
 
@@ -598,6 +605,30 @@ sub pg_stop_ok(;$$)
    } ## end sub pg_stop_ok(;$$)
 
 
+=head2 pg_stop_if_running_ok($name, $message)
+
+Stops the cluster $name
+
+=cut
+
+
+sub pg_stop_if_running_ok(;$$)
+   {
+   my $conf = _build_conf(shift);
+   my $message = shift // "Stopping Cluster '$conf->{name}'";
+
+   if ( -f "$conf->{cluster_path}/$conf->{name}/postmaster.pid" )
+      {
+      return pg_stop_ok( $conf, $message );
+      }
+
+   my $tb = __PACKAGE__->builder;
+   $tb->skip("Skipping stopping cluster $conf->{name} because it's not running (missing postmaster.pid).");
+
+   return 1;
+
+   }
+
 
 =head2 pg_stop_all_ok()
 
@@ -608,39 +639,20 @@ Stopps all running clusters
 sub pg_stop_all_ok(;$)
    {
    my $message = shift // "Stopping all Clusters";
-   my $ok = 1;
 
    my $tb = __PACKAGE__->builder;
 
+   my $failed = 0;
+
    foreach my $cluster ( _all_cluster() )
       {
-      my $conf = _read_conf($cluster);
+      pg_stop_if_running_ok($cluster) or $failed++;
+      }
 
-      unless ( -f "$conf->{cluster_path}/$cluster/postmaster.pid" )
-         {
-         $tb->diag("Skipping stopping cluster $cluster because it's not running (missing postmaster.pid).");
-         next;
-         }
+   $tb->ok( $failed == 0, $message . " Failed: $failed" );
+   return $failed == 0;
 
-      my $pg_ctl = _get_binary( $conf, "pg_ctl" );
-      my $state
-         = system(
-         "$pg_ctl -D '$conf->{cluster_path}/$cluster' stop -m fast 1>$conf->{cluster_path}/stdout.log 2>$conf->{cluster_path}/stderr.log"
-         );
-
-      if ($state)
-         {
-         my $rc = $state >> 8;                     ## no critic (ValuesAndExpressions::ProhibitMagicNumbers)
-         $tb->diag("Error while calling pg_ctl -D '$conf->{cluster_path}/$cluster' stop -m fast. RC: $rc. OS_ERROR: $OS_ERROR");
-         $tb->diag("Check $conf->{cluster_path}/stdout.log and $conf->{cluster_path}/stderr.log");
-         $ok = 0;
-         }
-      } ## end foreach my $cluster ( _all_cluster...)
-
-   $tb->ok( $ok, $message );
-   return $ok;
-
-   } ## end sub pg_stop_all_ok(;$)
+   }
 
 sub _all_cluster
    {
