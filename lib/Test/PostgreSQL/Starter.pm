@@ -517,11 +517,29 @@ sub pg_dropcluster_if_exists_ok($;$)
    return pg_dropcluster_ok( $conf->{name}, $message );
    }
 
-=head2 pg_dropall($name, $message)
 
-Drop a named cluster, but don't thow an failure if it exists.
+=head2 pg_drop_all_ok($message)
+
+Drop all existing cluster.
 
 =cut
+
+sub pg_drop_all_ok(;$)
+   {
+   my $message = shift // "Dropping all Clusters";
+
+   my $tb = __PACKAGE__->builder;
+
+   my $failed = 0;
+
+   foreach my $cluster ( _all_cluster() )
+      {
+      pg_dropcluster_ok($cluster) or $failed++;
+      }
+
+   $tb->ok( $failed == 0, $message . " Failed: $failed" );
+   return $failed == 0;
+   }
 
 
 
@@ -653,6 +671,27 @@ sub pg_stop_all_ok(;$)
    return $failed == 0;
 
    }
+
+
+=head2 pg_stopdrop_all_ok($message)
+
+Stop and drop all existing cluster.
+
+=cut
+
+sub pg_stopdrop_all_ok(;$)
+   {
+   my $message = shift // "Stopping all Clusters";
+
+   my $failed = 0;
+
+   pg_stop_all_ok or $failed++;
+   pg_drop_all_ok or $failed++;
+
+   return $failed == 0;
+   }
+
+
 
 sub _all_cluster
    {
