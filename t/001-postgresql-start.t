@@ -32,22 +32,6 @@ sleep 2;
 my $result = qx( psql -p 15432 postgres -c "SELECT 'Bingo' || 'Yeah';" );
 
 like $result, qr(BingoYeah), "Query OK" or diag "Error with query; wrong result: '$result'";
-#
-#
-#$result = qx( psql -p 15432 postgres -c "CREATE USER postgres SUPERUSER;" );
-#like $result, qr( ( CREATE\s+(USER|ROLE) | ) )x, "User postgres installed" or diag "Error with query; wrong result: '$result'";
-#
-#$result = qx( psql -p 15432 postgres -c "CREATE USER _posemo_tests;" );
-#like $result, qr(CREATE (USER|ROLE)), "User _posemo_tests installed" or diag "Error with query; wrong result: '$result'";
-#
-##$result = qx( psql -p 15432 postgres -c "CREATE USER _posemo_tests;" );
-##like $result, qr(CREATE (USER|ROLE)), "User _posemo_tests installed" or diag "Error with query; wrong result: '$result'";
-#
-#$result = qx( psql -p 15432 postgres -c "CREATE DATABASE _posemo_tests OWNER _posemo_tests;" );
-#like $result, qr(CREATE DATABASE), "Database _posemo_tests installed" or diag "Error with query; wrong result: '$result'";
-
-#$result = qx( psql -p 15432 _posemo_tests -c "CREATE EXTENSION pgtap;" );
-#like $result, qr(CREATE EXTENSION), "Extension pgtap installed" or diag "Error with query; wrong result: '$result'";
 
 
 done_testing();
