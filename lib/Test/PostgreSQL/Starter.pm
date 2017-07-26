@@ -95,7 +95,9 @@ our @EXPORT = qw( pg_binary_ok
    pg_initdb_ok      pg_initdb_unless_exists_ok
    pg_dropcluster_ok pg_dropcluster_if_exists_ok
    pg_start_ok       pg_stop_ok
-   pg_stop_all_ok
+   pg_stop_all_ok    pg_stop_if_running_ok
+   pg_drop_all_ok
+   pg_stopdrop_all_ok
    );
 
 
@@ -681,12 +683,12 @@ Stop and drop all existing cluster.
 
 sub pg_stopdrop_all_ok(;$)
    {
-   my $message = shift // "Stopping all Clusters";
+   my $message = shift // "Stopping / dropping all Clusters";
 
    my $failed = 0;
 
-   pg_stop_all_ok or $failed++;
-   pg_drop_all_ok or $failed++;
+   pg_stop_all_ok("$message: stop part") or $failed++;
+   pg_drop_all_ok("$message: drop part") or $failed++;
 
    return $failed == 0;
    }
@@ -696,14 +698,12 @@ sub pg_stopdrop_all_ok(;$)
 sub _all_cluster
    {
    my $cluster_path = $ENV{POSTGRES_TEST_DIR} // "/tmp/_test-postgresql-starter";
-   return grep { -d } glob("$cluster_path/*");
+   return
+      grep { -d && s{^$cluster_path}{}x } glob("$cluster_path/*"); ## no critic (ControlStructures::ProhibitMutatingListFunctions)
    }
 
 
 =head1 CONFIGURATION
-
-
-
 
 Following text is WRONG!!!!!!
 
