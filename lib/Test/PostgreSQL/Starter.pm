@@ -45,6 +45,14 @@ possible, to run a lot of different test files to the running PostgreSQL
 servers without re-initialise them for every test. It's possible to 
 
 
+=head2 Tests
+
+...
+
+
+=head2 Environment
+
+...
 
 
 
@@ -106,16 +114,6 @@ use constant DEFAULT_PORT => 15432;                ## no critic (ValuesAndExpres
 
 my %conf;
 
-# NO!
-# => use import_extra
-
-#sub import
-#   {
-#   my $class = shift;
-#   %conf = @ARG;
-#   }
-
-
 
 # PG search paths, partly borrowed from Test::PostgreSQL
 my @search_paths = grep { -d } (
@@ -127,26 +125,19 @@ my @search_paths = grep { -d } (
    # ubuntu, debian; order by version
    ( reverse sort glob "/usr/lib/postgresql/*/bin" ),
 
-   # macport
+   # macports
    ( reverse sort glob "/opt/local/lib/postgresql*/bin" ),
 
    # Postgresapp.com
    ( reverse sort glob "/Applications/Postgres.app/Contents/Versions/*" ),
 
-   # BSDs and others;
+   # BSDs and others; should be already in PATH
    "/usr/local/bin",
                                );
 
-unshift @search_paths, $ENV{PGBINDIR} if $ENV{PGBINDIR};
-
 ## This config or environment variable is used to override the default, so it gets
 ## prefixed to the start of the search paths.
-#my $my_pg_home = $conf{pg_bindir} // $ENV{POSEMO_PGBINDIR};
-#unshift @search_paths, $my_pg_home if $my_pg_home;
-#
-## complete binary paths
-#my $pg_ctl = first { -x } map { "$ARG/pg_ctl" } @search_paths;
-#my $initdb = first { -x } map { "$ARG/initdb" } @search_paths;
+unshift @search_paths, $ENV{PGBINDIR} if $ENV{PGBINDIR};
 
 
 #
