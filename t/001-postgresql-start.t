@@ -18,6 +18,7 @@ use Test::More;
 
 pg_binary_ok();
 
+pg_stop_if_running_ok("test");
 pg_dropcluster_if_exists_ok("test", "Dropping an old cluster, if it exists.");
 
 pg_initdb_ok("test");
