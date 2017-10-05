@@ -8,13 +8,15 @@ package PostgreSQL::SecureMonitoring::ChecksHelper;
 
 In the check class:
 
- package PostgreSQL::SecureMonitoring::Checks::MyCheck;  # by Default, the name of the check is build from this package name
+ package PostgreSQL::SecureMonitoring::Checks::Seconds; # by Default, the name of the check is build from this package name
  
- use PostgreSQL::SecureMonitoring::ChecksHelper;       # This is a Moose class ...
- extends "PostgreSQL::SecureMonitoring::Checks";       # ... which extends our base check class
+ use PostgreSQL::SecureMonitoring::ChecksHelper;        # This is a Moose class ...
+ extends "PostgreSQL::SecureMonitoring::Checks";        # ... which extends our base check class
  
- 
- sub _build_sql { return "SELECT 1;"; }                # this sub simply returns the SQL for the check
+ check_has
+   return_type => 'integer',
+   result_unit => 'seconds',
+   code        => "SELECT date_part('seconds',  now());";
  
  1;                                                    # every Perl module must return (end with) a true value
 
@@ -35,32 +37,18 @@ use English qw( -no_match_vars );
 use Carp qw(croak);
 
 #
-# generate all subs;
 # TODO: write pod
 #
 
-### no critic (BuiltinFunctions::ProhibitStringyEval)
+
 #
-#my @subs = qw(enabled return_type result_unit language volatility has_multiline_result has_writes parameters
-#   warning_level critical_level min_value max_value);
+# export check_has sub and all from Moose
 #
-#
-#foreach my $sub (@subs)
-#   {
-#   eval qq{
-#
-#      sub set_$sub
-#         {
-#         my ( \$meta, \$value ) = \@ARG;
-#         \$meta->add_attribute( "+$sub", default => \$value, );
-#         return;
-#         }
-#      return 1;
-#      }
-#      or die "Error generating functionfor $sub: $EVAL_ERROR\n";
-#
-#   }
-#
+
+Moose::Exporter->setup_import_methods( with_meta => ["check_has"],
+                                       also      => 'Moose', );
+
+
 
 =head2 check_has
 
@@ -90,7 +78,7 @@ sub check_has
 
       $attr = $attr_map{$attr} if $attr_map{$attr};
 
-      $meta->find_attribute_by_name($attr) or croak "Attribute $attr not found!";
+      $meta->find_attribute_by_name($attr) or croak "Attribute '$attr' not found!";
 
       if ( ref $value )
          {
@@ -105,8 +93,6 @@ sub check_has
 
    return;
    } ## end sub check_has
-Moose::Exporter->setup_import_methods( with_meta => ["check_has"],
-                                       also      => 'Moose', );
 
 
 __PACKAGE__->meta->make_immutable;
