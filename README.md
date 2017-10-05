@@ -63,9 +63,16 @@ perl Build.PL
 ./Build installdeps         # install all depencencies
 ```
 
+Sometimes some CPAN modules install/test not correctly; then you may run installdeps multiple times or install missing modules manually:
+
+```
+cpan Missing::ModuleName
+```
+
+
 ## Test Driven Development
 
-At time of this writing there exists no executables beside the tests. So, you can not run an executable ans see results. You can only run some checks.
+At time of this writing there exists no executables beside the tests. So, you can not run an executable and see results. You can only run some checks.
 
 For testing you need a local PostgreSQL installation. We use a new testing module for starting/stopping/... PostgreSQL instances called `Test::PostgreSQL::Starter`, which is included (but will be an extra CPAN module later).
 
