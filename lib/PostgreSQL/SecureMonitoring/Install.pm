@@ -3,7 +3,6 @@ package PostgreSQL::SecureMonitoring::Install;
 use Moose;
 use 5.010;
 
-
 =head1 NAME
 
  PostgreSQL::SecureMonitoring::Install - Install all functions from all Checks etc.
@@ -30,13 +29,12 @@ TODO: see also: C<posemo-install.pl> and C<PostgreSQL::SecureMonitoring::Install
 
 use English qw( -no_match_vars );
 use FindBin qw($Bin);
+use List::Util qw(uniqstr);
 
 use Log::Log4perl::EasyCatch;
 
-
 use Moose;
 extends "PostgreSQL::SecureMonitoring";
-
 
 =head1 METHODS
 
@@ -113,8 +111,6 @@ has installation_database => ( is => "ro", isa => "Str",  default => "postgres",
 
 #>>> no perltidy
 
-
-
 =head2 install
 
 installs database and all checks
@@ -134,7 +130,6 @@ sub install
       $installed_non_rollbackable = 1;
       }
 
-
    eval {
       # Transaction starts here!
 
@@ -152,8 +147,7 @@ sub install
       TRACE "install check functions done";
 
       return $self->commit;
-      }
-      or do
+      } or do
       {
       $self->rollback;
       my $rb_extra = $installed_non_rollbackable ? ", but database and superuser creation not rollbackable!" : " everything!";
@@ -164,8 +158,6 @@ sub install
 
    return 1;
    } ## end sub install
-
-
 
 =head2 install_basics
 
@@ -191,8 +183,6 @@ sub install_basics
    return 1;
    }
 
-
-
 =head2 install_checks
 
 Installs all available checks. 
@@ -206,6 +196,8 @@ sub install_checks
    my $self = shift;
 
    INFO "Install all checks";
+   my @checks = _get_all_checks();
+   TRACE "Checks: " . join( " - ", @checks );
    foreach my $check_name ( _get_all_checks() )
       {
       INFO "  => Check $check_name";
@@ -218,9 +210,10 @@ sub install_checks
 
 sub _get_all_checks
    {
+
    # my ($path) = __FILE__ =~ m{ ^ (.*)/Install [.] pm $ }x;
    # return map { _file2checkname($ARG); } <$path/Checks/*.pm>;
-   return map { _file2checkname($ARG); } map { <$ARG/PostgreSQL/SecureMonitoring/Checks/*.pm> } @INC;
+   return uniqstr( map { _file2checkname($ARG); } map { <$ARG/PostgreSQL/SecureMonitoring/Checks/*.pm> } @INC );
    }
 
 sub _file2checkname
@@ -229,7 +222,6 @@ sub _file2checkname
    my ($check_name) = $file =~ m{ ([^/]+) [.] pm $ }x;
    return $check_name;
    }
-
 
 sub _do_drop_user
    {
@@ -274,7 +266,6 @@ sub _do_create_superuser
    return $self;
    }
 
-
 sub _do_drop_database
    {
    my $self = shift;
@@ -286,7 +277,6 @@ sub _do_drop_database
 
    return $self;
    }
-
 
 sub _do_create_database
    {
@@ -333,8 +323,6 @@ sub _do_install_schema
 
    } ## end sub _do_install_schema
 
-
-
 =head2 dbi_user, dbi_passwd
 
 Overrides the user and passwd in PostgreSQL::SecureMonitoring: for 
@@ -353,8 +341,6 @@ sub dbi_passwd
    my $self = shift;
    return $self->superpasswd;
    }
-
-
 
 =head1 AUTHOR
 
