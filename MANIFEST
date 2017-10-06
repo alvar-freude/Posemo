@@ -28,6 +28,7 @@ t/001-postgresql-start.t
 t/003-init-db.t
 t/005-postgres-started.pg
 t/150-install.t
+t/210-checks-helper.t
 t/400-checks-base.t
 t/501-alive.pg
 t/501-alive.t
