@@ -18,10 +18,6 @@ row_type_is $result,    "single";
 result_cmp $result, "<", 1, "runtime of writeable check must be lower then 1 second";
 
 
-#use Data::Dumper;
-#use 5.010;
-#diag Dumper $result;
-
 
 
 #
