@@ -238,7 +238,6 @@ sub _build_name
    ( my $name = $self->class ) =~ s{ $package :: }{}ox;
 
    return _camel_case_to_words($name);
-
    }
 
 sub _build_description
@@ -418,7 +417,8 @@ sub execute
 
    foreach my $par_ref ( $self->all_parameters )
       {
-      push @values,       $par_ref->[2];
+      my ( $name, $type, $default ) = @$par_ref;
+      push @values, $self->$name // $default;
       push @placeholders, q{?};
       }
 

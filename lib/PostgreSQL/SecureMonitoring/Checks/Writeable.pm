@@ -46,9 +46,9 @@ check_has
 # because builder method uses other attributes!
 # Retention_period has no default, because the default is encoded in the SQL function definition
 
-has retention_period => ( is => "ro", isa => "Str", );
-has timeout          => ( is => "ro", isa => "Int", builder => "_build_timeout", lazy => 1, );
-has message          => ( is => "ro", isa => "Str", builder => "_build_message", lazy => 1, );
+has retention_period => ( is => "ro", isa => "Str", predicate => "has_retention_period", );
+has timeout          => ( is => "ro", isa => "Int", builder   => "_build_timeout", lazy => 1, );
+has message          => ( is => "ro", isa => "Str", builder   => "_build_message", lazy => 1, predicate => "has_message", );
 
 
 # The code for building the check is given by the following method.
@@ -88,7 +88,7 @@ sub _build_message
    my $self   = shift;
    my $dbhost = $self->host // "<local>";
    my $myhost = hostname;
-   return "Written by $myhost to $dbhost via " . __PACKAGE__;
+   return "Written by $myhost to $dbhost via ${ \$self->name }";
    }
 
 
