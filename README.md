@@ -22,18 +22,34 @@ And be aware: THERE WILL BE DRAGONS!
 
 Posemo is a modular framework for creating Monitoring Checks for PostgreSQL. It is simple to add a new check. Usually just have to write the SQL for the check and add some configuration.
 
-Posemo is a modern Perl application using Moose; at installation it generates PostgerSQL functions for every check. These functions are called by an unprivileged user who can only call there functions, nothing else. But since they are `SECURITY DEFINER` functions, they run with more privileges (usually as superuser). You need a superuser for installation, but checks can run (from remote or local) by an unprivileged user. Therefore, **the monitoring server has no access to your databases, no access to PostgreSQL internals – it can only call some predefined functions.**
+Posemo is a modern Perl application using Moose; at installation it generates PostgerSQL functions for every check. These functions are called by an unprivileged user who can only call there functions, nothing else. But since they are `SECURITY DEFINER` functions, they run with more privileges (usually as superuser). You need a superuser for installation, but checks can run (from remote or local) by an unprivileged user. Therefore, **the monitoring server need no access to your databases, no access to PostgreSQL internals – it can only call some predefined functions.**
 
 
 For a simple check you may look below at the *Alive* Check, which simply returns true if the server is reachable. It uses a lot of defaults from `PostgreSQL::SecureMonitoring::Checks` and sugar from `PostgreSQL::SecureMonitoring::ChecksHelper`:
 
-```
-package PostgreSQL::SecureMonitoring::Checks::BackupAge;  # by Default, the name of the check is build from this package name
+```perl
+package PostgreSQL::SecureMonitoring::Checks::Alive;      # by Default, the name of the check is build from this package name
+
 
 use PostgreSQL::SecureMonitoring::ChecksHelper;           # enables Moose, exports sugar functions; enables strict&warnings
 extends "PostgreSQL::SecureMonitoring::Checks";           # We extend our base class ::Checks
 
-check_has                                                 # all options and Code/SQL for the check
+check_has code => "SELECT true";                          # This is our check SQL!
+
+1;                                                        # every Perl module must return (end with) a true value
+```
+
+
+A more advanced check is *BackupAge* check, which checks how long a backup is running and returns the seconds as integer:
+
+
+```perl
+package PostgreSQL::SecureMonitoring::Checks::BackupAge;  # same as above ...
+
+use PostgreSQL::SecureMonitoring::ChecksHelper;
+extends "PostgreSQL::SecureMonitoring::Checks";
+
+check_has                                                 # here more options and Code/SQL for the check
    return_type => 'integer',
    result_unit => 'seconds',
    code        => "SELECT CASE WHEN pg_is_in_backup()
@@ -42,7 +58,7 @@ check_has                                                 # all options and Code
                                END 
                           AS backup_age;";
 
-1;                                                        # every Perl module must return (end with) a true value
+1;
 
 ```
 
@@ -53,7 +69,7 @@ More documentation is on the TODO list … ;-)
 
 ## Prerequisites
 
-Posemo needs (beside a PostgreSQL installation) Perl 5 with Module::Build (only build/install time) DBI, DBD::Pg, Moose and some other modules. For development it is recommended to install a fresh Perl with [perlbrew](https://perlbrew.pl).
+Posemo needs (beside a PostgreSQL installation) Perl 5 with Module::Build (only at build/install time) DBI, DBD::Pg, Moose and some other modules. For development it is recommended to install a fresh Perl with [perlbrew](https://perlbrew.pl).
 
 See and install all prerequisites:
 
