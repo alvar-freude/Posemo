@@ -20,24 +20,25 @@ use 5.010;
 
 
 
-Config with Config::General.
+=head2 Configuration
+
+The config file is parsed via L<Config::Any|Config::Any> and therefore understands each supported config file format. 
+The following examples are writtem in the apache style format, parsed via L<Config::General|Config::General>. 
 
 
   #
   # Example config file
   #
-
-
-
-  Default values, can be overwritten by Hostgroups (see below)
+    
+  # Default values, can be overwritten by Hostgroups (see below)
   # Definition of Hosts to monitor
-  # eigther name ONE host:
+  # eihter name ONE host:
   
   host = database.internal.project.tld
 
-  # user      = monitoring                      # Minitoring user (unprivileged)
+  # user      = monitoring                      # Monitoring user (unprivileged)
   # passwd    =                                 # Password for this user; default: empty
-  # schema    = public                          # SQL schema name
+  # schema    = public                          # SQL schema name for our 
   # database  = monitoring                      # Name of monitoring DB"
   # port      =                                 # Port number for server to monitor
   
@@ -64,7 +65,7 @@ Config with Config::General.
     
   </HostGroup>
   
-
+  
   <HostGroup
 
 
@@ -78,6 +79,10 @@ Extra Checks für HostGroups:
   * ermitteln dann da Zeug 
 
 
+# check: http://search.cpan.org/~mbp/Data-Processor-0.4.3/lib/Data/Processor.pm
+# Check: http://search.cpan.org/~sonnen/Data-Validate-0.09/Validate.pm
+# check: http://search.cpan.org/~cmo/Config-Validate-0.2.6/lib/Config/Validate.pm
+
 
 
 =cut
@@ -87,8 +92,15 @@ use FindBin qw($Bin);
 
 use Log::Log4perl::EasyCatch;
 
+use Config::Validate;
+
+
 
 use Moose;
+has configfile => ( is => "ro", isa => "Str", default => "$Bin/../conf/posemo.conf", documentation => "Configuration file" );
+has log_config => ( is => "ro", isa => "Str", default => $DEFAULT_LOG_CONFIG, documentation => "Alternative logging config" );
+
+with "MooseX::Getopt";
 
 
 

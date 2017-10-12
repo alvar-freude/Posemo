@@ -54,7 +54,6 @@ use Moose;
 
 #<<< no perltidy
 
-has configfile  => ( is => "ro", isa => "Str", default   => "$Bin/../conf/posemo.conf", documentation => "Configuration file" );
 has log_config  => ( is => "ro", isa => "Str", default   => $DEFAULT_LOG_CONFIG,        documentation => "Alternative logging config" );
 has user        => ( is => "ro", isa => "Str", default   => "monitoring",               documentation => "User, running the tests" );
 has passwd      => ( is => "ro", isa => "Str",                                          documentation => "Password for monitoring user" );

@@ -68,6 +68,8 @@ my $builder = Module::Build->new(
       'Readonly'               => 1.03,
       'IO::All'                => 0.84,
       'File::HomeDir'          => 1.00,
+      'Config::Validate'       => '0.6.6',
+      # 'Data::Validate'         => 0.09,
 
       # not available in ubuntu 12.04 LTS, shipped in extlib:
       # 'MooseX::SimpleConfig'   => 0.10,
