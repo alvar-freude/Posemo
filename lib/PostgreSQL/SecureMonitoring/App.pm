@@ -89,18 +89,43 @@ Extra Checks für HostGroups:
 
 use English qw( -no_match_vars );
 use FindBin qw($Bin);
-
 use Log::Log4perl::EasyCatch;
 
-use Config::Validate;
+use Config::Any;
+use PostgreSQL::SecureMonitoring;
 
 
 
 use Moose;
+
+# TODO: Pfade wie bei TLS-Check!
 has configfile => ( is => "ro", isa => "Str", default => "$Bin/../conf/posemo.conf", documentation => "Configuration file" );
 has log_config => ( is => "ro", isa => "Str", default => $DEFAULT_LOG_CONFIG, documentation => "Alternative logging config" );
 
 with "MooseX::Getopt";
+
+
+=head2 read_config
+
+reads the config file
+
+=cut
+
+
+sub read_config
+   {
+   my $self = shift;
+
+   DEBUG "load config file: ${ \$self->configfile }";
+   my $conf = Config::Any->load_files( { files => [ $self->configfile ], use_ext => 1, } );
+   
+   # $conf = $conf->{$self->configfile};
+
+   use Data::Dumper;
+   TRACE "Conf: ", Dumper($conf);
+
+   return $conf;
+   }
 
 
 

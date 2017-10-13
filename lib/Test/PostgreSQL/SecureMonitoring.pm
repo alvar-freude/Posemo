@@ -106,10 +106,10 @@ sub result_ok($;$$)
                                                       port     => $tps_conf->{port},
                                                     );
          },
-         "Posemo App Object (for $message)"
+         "Posemo Object (for $message)"
               );
 
-      skip "Got no App Object for $message", 2 unless $app;
+      skip "Got no Object for $message", 2 unless $app;
 
       # Get Check Object
       lives_ok( sub { $check = $app->new_check($checkname) }, "Check Object (for $message)" );
