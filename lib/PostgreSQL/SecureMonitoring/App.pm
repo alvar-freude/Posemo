@@ -89,8 +89,7 @@ Extra Checks für HostGroups:
 
 use English qw( -no_match_vars );
 use FindBin qw($Bin);
-use Log::Log4perl::EasyCatch;
-
+use Log::Log4perl::EasyCatch;                      # log_config => ;
 use Config::Any;
 use PostgreSQL::SecureMonitoring;
 
@@ -100,26 +99,50 @@ use Moose;
 
 # TODO: Pfade wie bei TLS-Check!
 has configfile => ( is => "ro", isa => "Str", default => "$Bin/../conf/posemo.conf", documentation => "Configuration file" );
-has log_config => ( is => "ro", isa => "Str", default => $DEFAULT_LOG_CONFIG, documentation => "Alternative logging config" );
+has log_config => ( is => "rw", isa => "Str", default => $DEFAULT_LOG_CONFIG, documentation => "Alternative logging config" );
+has conf => ( is => "ro", isa => "HashRef[]", builder => "_build_conf" );
 
 with "MooseX::Getopt";
+with 'MooseX::ListAttributes';
 
 
-=head2 read_config
+
+sub BUILD
+   {
+   my $self = shift;
+
+   # Re-Init loggig, if there is an alternative log config
+   if ( $self->log_config ne $DEFAULT_LOG_CONFIG )
+      {
+      Log::Log4perl->init( $self->log_config );
+      DEBUG "Logging initialised with non-default config " . $self->log_config;
+      }
+   else
+      {
+      DEBUG "Logging initialised with default config: $DEFAULT_LOG_CONFIG.";
+      }
+
+
+   return $self;
+   }
+
+
+
+=head2 _build_conf
 
 reads the config file
 
 =cut
 
 
-sub read_config
+sub _build_conf
    {
    my $self = shift;
 
    DEBUG "load config file: ${ \$self->configfile }";
-   my $conf = Config::Any->load_files( { files => [ $self->configfile ], use_ext => 1, } );
-   
-   # $conf = $conf->{$self->configfile};
+   my $conf = Config::Any->load_files( { files => [ $self->configfile ], use_ext => 1, flatten_to_hash => 1 } );
+
+   $conf = $conf->{ $self->configfile };
 
    use Data::Dumper;
    TRACE "Conf: ", Dumper($conf);
