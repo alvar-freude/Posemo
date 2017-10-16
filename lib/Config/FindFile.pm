@@ -91,6 +91,7 @@ our @EXPORT_OK = qw(search_conf);
 
 use 5.010;                                         # "defined or" operator exists sind perl 5.10!
 
+
 sub search_conf
    {
    my $name = shift;
@@ -124,3 +125,6 @@ sub search_conf
    # return;
 
    } ## end sub search_conf
+
+
+1;
