@@ -12,7 +12,7 @@ use PostgreSQL::SecureMonitoring::App;
 
 
 
-my $app = PostgreSQL::SecureMonitoring::App->new( configfile => "$Bin/conf/example.conf" );
+my $app = PostgreSQL::SecureMonitoring::App->new( configfile => "$Bin/../conf/example.conf" );
 
 
 my $conf = $app->read_config;

@@ -89,18 +89,25 @@ Extra Checks für HostGroups:
 
 use English qw( -no_match_vars );
 use FindBin qw($Bin);
-use Log::Log4perl::EasyCatch;                      # log_config => ;
+
 use Config::Any;
+
+use Config::FindFile qw(search_conf);
+
+use Log::Log4perl::EasyCatch log_config => search_conf("posemo-logging.properties");
 use PostgreSQL::SecureMonitoring;
 
 
 
 use Moose;
 
-# TODO: Pfade wie bei TLS-Check!
-has configfile => ( is => "ro", isa => "Str", default => "$Bin/../conf/posemo.conf", documentation => "Configuration file" );
-has log_config => ( is => "rw", isa => "Str", default => $DEFAULT_LOG_CONFIG, documentation => "Alternative logging config" );
-has conf => ( is => "ro", isa => "HashRef[]", builder => "_build_conf" );
+#<<<
+
+has configfile => ( is => "ro", isa => "Str",       default => search_conf("posemo.conf"),               documentation => "Configuration file", );
+has log_config => ( is => "rw", isa => "Str",                                                            documentation => "Alternative logging config", );
+has conf       => ( is => "ro", isa => "HashRef[]", builder => "_build_conf",                            documentation => "Complete configuration (usually don't use at CLI)", );
+
+#>>>
 
 with "MooseX::Getopt";
 with 'MooseX::ListAttributes';
@@ -111,7 +118,11 @@ sub BUILD
    {
    my $self = shift;
 
-   # Re-Init loggig, if there is an alternative log config
+   # manually handle logging conf attribute:
+   # CLI has prio; when not set, set attribute via configfile
+   $self->log_config( $self->conf->{log_config} ) if ( not $self->log_config ) and $self->conf->{log_config};
+
+   # Re-Init loggig, if the above results in an alternative log config beside the default
    if ( $self->log_config ne $DEFAULT_LOG_CONFIG )
       {
       Log::Log4perl->init( $self->log_config );
@@ -119,21 +130,16 @@ sub BUILD
       }
    else
       {
-      DEBUG "Logging initialised with default config: $DEFAULT_LOG_CONFIG.";
+      DEBUG "Logging still initialised with default config: $DEFAULT_LOG_CONFIG.";
       }
 
-
    return $self;
-   }
+   } ## end sub BUILD
 
 
 
-=head2 _build_conf
-
-reads the config file
-
-=cut
-
+#  _build_conf
+# reads / initializes the config file
 
 sub _build_conf
    {
@@ -147,6 +153,7 @@ sub _build_conf
    use Data::Dumper;
    TRACE "Conf: ", Dumper($conf);
 
+   # TODO: validate!
    return $conf;
    }
 
