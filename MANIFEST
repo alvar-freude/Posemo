@@ -5,6 +5,7 @@ conf/logging.properties
 extlib/MooseX/SimpleConfig.pm
 extra-dummy-tests/insert-and-delete.pl
 ignore.txt
+lib/Config/FindFile.pm
 lib/Log/Log4perl/EasyCatch.pm
 lib/MooseX/DBI.pm
 lib/MooseX/ListAttributes.pm
@@ -29,6 +30,8 @@ t/003-init-db.t
 t/005-postgres-started.pg
 t/150-install.t
 t/210-checks-helper.t
+t/220-app-conf.t
+t/221-config-findfile.t
 t/400-checks-base.t
 t/501-alive.pg
 t/501-alive.t
@@ -44,6 +47,7 @@ t/920-manifest.t
 t/930-pod-coverage.t
 t/931-pod.t
 t/990-postgresql-stop.t
+t/conf/example.conf
 t/log-test.properties
 t/perlcriticrc
 t/perltidyrc
