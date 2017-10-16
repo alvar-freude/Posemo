@@ -85,15 +85,16 @@ use FindBin qw($Bin);
 use File::HomeDir;
 use File::ShareDir;
 
-use lib qw(Exporter);
+use base qw(Exporter);
 
 our @EXPORT_OK = qw(search_conf);
 
+use 5.010;                                         # "defined or" operator exists sind perl 5.10!
 
 sub search_conf
    {
-   my $name   = shift;
-   my $module = shift;
+   my $name = shift;
+   my $module = shift // caller;
 
    # 1. Look on development place
    my $file = "$Bin/../conf/$name";
