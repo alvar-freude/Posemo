@@ -86,10 +86,9 @@ use File::HomeDir;
 use File::ShareDir;
 
 use base qw(Exporter);
-
 our @EXPORT_OK = qw(search_conf);
 
-use 5.010;                                         # "defined or" operator exists sind perl 5.10!
+use 5.010;                                         # "defined or" operator exists since perl 5.10!
 
 
 sub search_conf
