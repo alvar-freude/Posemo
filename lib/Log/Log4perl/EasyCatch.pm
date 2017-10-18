@@ -103,71 +103,81 @@ Include a default log config and optionally write it?
 
 my $imported_logdir;
 
+
 sub import
    {
-   if ( $ARG[0] && $ARG[0] eq "log_config" )
+   # die "phase: ${^GLOBAL_PHASE} ...";
+   if ( $ARG[1] && $ARG[1] eq "log_config" )
       {
-      shift;
-      $imported_logdir = shift;
+      my ( $label, $log_config ) = splice( @ARG, 1, 2 );
+      $imported_logdir = $log_config;
       }
 
    __PACKAGE__->export_to_level( 1, @ARG );
+
+   _log_init();
 
    return;
    }
 
 
+
 my $initialised;
 
-if ( not $initialised and not $COMPILING )
+sub _log_init
    {
+   if ( not $initialised and not $COMPILING )
+      {
+      $initialised = 1;
 
-   no warnings qw(once);                           ## no critic (TestingAndDebugging::ProhibitNoWarnings)
-   Readonly our $DEFAULT_LOG_CONFIG => $imported_logdir // $ENV{LOG_CONFIG} // "$Bin/../conf/logging.properties";
+      no warnings qw(once);                        ## no critic (TestingAndDebugging::ProhibitNoWarnings)
+      Readonly our $DEFAULT_LOG_CONFIG => $imported_logdir // $ENV{LOG_CONFIG} // "$Bin/../conf/logging.properties";
 
+      # log dir should be created by appender, we don't know the directory location!
+      #-d "$Bin/../logs" or mkdir "$Bin/../logs" or die "Can't create missing logfile dir : $OS_ERROR\n";
 
-   # log dir should be created by appender!
-   # -d "$Bin/../logs" or mkdir "$Bin/../logs" or die "Kann fehlendes logs-Verzeichnis nicht anlegen: $OS_ERROR\n";
+      Log::Log4perl->init_once($DEFAULT_LOG_CONFIG);    # allows logging before reading config
+      Log::Log4perl->appender_thresholds_adjust( $LOG_TRESHOLD_SILENT, ['SCREEN'] )
+         if $ENV{HARNESS_ACTIVE};
 
-   Log::Log4perl->init_once($DEFAULT_LOG_CONFIG);  # allows logging before reading config
-   Log::Log4perl->appender_thresholds_adjust( $LOG_TRESHOLD_SILENT, ['SCREEN'] )
-      if $ENV{HARNESS_ACTIVE};
+      TRACE "Log INIT with default config ('$DEFAULT_LOG_CONFIG') OK";
 
-   # catch and log all exceptions
-   $SIG{__DIE__} = sub {                           ## no critic (Variables::RequireLocalizedPunctuationVars)
-      my @messages = @_;
-      chomp $messages[-1];
+      # catch and log all exceptions
+      $SIG{__DIE__} = sub {                        ## no critic (Variables::RequireLocalizedPunctuationVars)
+         my @messages = @_;
+         chomp $messages[-1];
 
-      if ($EXCEPTIONS_BEING_CAUGHT)
-         {
-         TRACE "Exception caught (executing eval): ", @messages;
-         }
-      elsif ( not defined $EXCEPTIONS_BEING_CAUGHT )
-         {
-         TRACE "Exception in Parsing module, eval, or main program: ", @messages;
-         }
-      else                                         # when $EXCEPTIONS_BEING_CAUGHT == 0
-         {
+         if ($EXCEPTIONS_BEING_CAUGHT)
+            {
+            TRACE "Exception caught (executing eval): ", @messages;
+            }
+         elsif ( not defined $EXCEPTIONS_BEING_CAUGHT )
+            {
+            TRACE "Exception in Parsing module, eval, or main program: ", @messages;
+            }
+         else                                      # when $EXCEPTIONS_BEING_CAUGHT == 0
+            {
+            local $Log::Log4perl::caller_depth = $Log::Log4perl::caller_depth + 1;
+            LOGDIE "Uncaught exception! ", @messages;
+            }
+
+         return;
+      };
+
+      # Log all warnings as errors in the log!
+      $SIG{__WARN__} = sub {                       ## no critic (Variables::RequireLocalizedPunctuationVars)
+         my @messages = @_;
          local $Log::Log4perl::caller_depth = $Log::Log4perl::caller_depth + 1;
-         LOGDIE "Uncaught exception! ", @messages;
-         }
+         chomp $messages[-1];
+         ERROR "Perl warning: ", @messages;
+         return;
+      };
 
-      return;
-   };
+      } ## end if ( not $initialised ...)
 
-   # Log all warnings as errors in the log!
-   $SIG{__WARN__} = sub {                          ## no critic (Variables::RequireLocalizedPunctuationVars)
-      my @messages = @_;
-      local $Log::Log4perl::caller_depth = $Log::Log4perl::caller_depth + 1;
-      chomp $messages[-1];
-      ERROR "Perl warning: ", @messages;
-      return;
-   };
+   return;
 
-   $initialised = 1;
-
-   } ## end if ( not $initialised ...)
-
+   } ## end sub _log_init
 
 =head2 get_log_dir($application)
 

@@ -47,7 +47,8 @@ See App.pm
 use English qw( -no_match_vars );
 use FindBin qw($Bin);
 
-use Log::Log4perl::EasyCatch;
+use Config::FindFile qw(search_conf);
+use Log::Log4perl::EasyCatch ( log_config => search_conf("posemo-logging.properties") );
 
 
 use Moose;

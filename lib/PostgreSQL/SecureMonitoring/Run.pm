@@ -1,4 +1,4 @@
-package PostgreSQL::SecureMonitoring::App;
+package PostgreSQL::SecureMonitoring::Run;
 
 use Moose;
 use 5.010;
@@ -6,7 +6,7 @@ use 5.010;
 
 =head1 NAME
 
- PostgreSQL::SecureMonitoring::App - Application class for PostgreSQL Secure Monitoring
+ PostgreSQL::SecureMonitoring::Run - Application/Execution class for PostgreSQL Secure Monitoring
 
 
 =head1 SYNOPSIS
@@ -93,8 +93,8 @@ use FindBin qw($Bin);
 use Config::Any;
 
 use Config::FindFile qw(search_conf);
+use Log::Log4perl::EasyCatch ( log_config => search_conf("posemo-logging.properties") );
 
-use Log::Log4perl::EasyCatch log_config => search_conf("posemo-logging.properties");
 use PostgreSQL::SecureMonitoring;
 
 
@@ -103,9 +103,11 @@ use Moose;
 
 #<<<
 
-has configfile => ( is => "ro", isa => "Str",       default => search_conf("posemo.conf"),               documentation => "Configuration file", );
+# conf must be lazy, because in the builder must be called after initualization of all other attributes!
+
+has configfile => ( is => "ro", isa => "Str",          default => search_conf("posemo.conf"),            documentation => "Configuration file", );
 has log_config => ( is => "rw", isa => "Str",                                                            documentation => "Alternative logging config", );
-has conf       => ( is => "ro", isa => "HashRef[]", builder => "_build_conf",                            documentation => "Complete configuration (usually don't use at CLI)", );
+has conf       => ( is => "ro", isa => "HashRef[Any]", builder => "_build_conf",              lazy => 1, documentation => "Complete configuration (usually don't use at CLI)", );
 
 #>>>
 
@@ -118,12 +120,28 @@ sub BUILD
    {
    my $self = shift;
 
-   # manually handle logging conf attribute:
-   # CLI has prio; when not set, set attribute via configfile
-   $self->log_config( $self->conf->{log_config} ) if ( not $self->log_config ) and $self->conf->{log_config};
+   # Log config logic:
+   #
+   # When log_config set (via CLI or ->new parameter): take this!
+   # When not: take from config file, if this exists.
+   # When not: take nothing, and don't re-initialise below
+   # never set an empty log_config!
 
-   # Re-Init loggig, if the above results in an alternative log config beside the default
-   if ( $self->log_config ne $DEFAULT_LOG_CONFIG )
+   if ( not $self->log_config )
+      {
+      if ( $self->conf->{log_config} )
+         {
+         $self->log_config( $self->conf->{log_config} );
+         TRACE "Use log config from main config file: " . $self->log_config;
+         }
+      }
+   else
+      {
+      TRACE "Use log config from (CLI) parameter: " . $self->log_config;
+      }
+
+   # re-initialise logging, when log config is set and is not the default one
+   if ( $self->log_config and $self->log_config ne $DEFAULT_LOG_CONFIG )
       {
       Log::Log4perl->init( $self->log_config );
       DEBUG "Logging initialised with non-default config " . $self->log_config;
@@ -137,7 +155,6 @@ sub BUILD
    } ## end sub BUILD
 
 
-
 #  _build_conf
 # reads / initializes the config file
 
@@ -148,7 +165,7 @@ sub _build_conf
    DEBUG "load config file: ${ \$self->configfile }";
    my $conf = Config::Any->load_files( { files => [ $self->configfile ], use_ext => 1, flatten_to_hash => 1 } );
 
-   $conf = $conf->{ $self->configfile };
+   $conf = $conf->{ $self->configfile } or die "No config loaded, tried with ${ \$self->configfile }!\n";
 
    use Data::Dumper;
    TRACE "Conf: ", Dumper($conf);

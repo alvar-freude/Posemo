@@ -17,7 +17,7 @@ use Config::FindFile qw(search_conf);
 throws_ok { search_conf("neverfound.conf"); } qr{UUUPS, FATAL: configfile neverfound[.]conf not found},
    "Config not found exception";
 
-lives_ok { search_conf("logging.properties"); } "found logging propertiees";
+lives_ok { search_conf("posemo-logging.properties"); } "found logging propertiees";
 
 
 # TODO:

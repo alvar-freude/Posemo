@@ -18,15 +18,17 @@ my $min_pc = 0.18;
 eval "use Pod::Coverage $min_pc";
 plan skip_all => "Pod::Coverage $min_pc required for testing POD coverage"
    if $@;
-   
+
 plan tests => scalar all_modules();
 
-# Don't enforce POD for the default methods in Checks
-pod_coverage_ok( 
-   $ARG, m{::Checks::} ? 
-      { trustme => [qr/^(sql|sql_function|sql_function_name|return_type|language|name)$/] } 
-    : {} )
+# Don't enforce POD for BUILD and the default methods in Checks
+
+my %skip_param = ( also_private => [qw(BUILD)], );
+my %skip_param_for_checks = ( %skip_param, trustme => [qr/^(sql|sql_function|sql_function_name|return_type|language|name)$/], );
+
+pod_coverage_ok(
+                 $ARG, m{::Checks::}
+                 ? \%skip_param_for_checks
+                 : \%skip_param
+               )
    foreach all_modules();
-
-
-

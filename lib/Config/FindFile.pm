@@ -6,7 +6,7 @@ use 5.010;
 
 =head1 NAME
 
-Config::FindFile -  
+Config::FindFile - find (config) files at typical config directories
 
 
 =head1 VERSION
@@ -75,7 +75,7 @@ C</etc>
 Modules ShareDir (e.g. for a pre-packaged default config file)
 
 
-=back 4
+=back
 
 
 =cut
@@ -89,7 +89,6 @@ use base qw(Exporter);
 our @EXPORT_OK = qw(search_conf);
 
 use 5.010;                                         # "defined or" operator exists since perl 5.10!
-
 
 sub search_conf
    {
@@ -119,7 +118,7 @@ sub search_conf
    $file = "$distconfdir/$name";
    return $file if -f $file;
 
-   die "UUUPS, FATAL: configfile $name not found. Last try was <$file>.";
+   die "UUUPS, FATAL: configfile $name not found. Last try was <$file>.\n";
 
    # return;
 
