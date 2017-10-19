@@ -29,7 +29,6 @@ TODO: see also: C<posemo-install.pl> and C<PostgreSQL::SecureMonitoring::Install
 
 use English qw( -no_match_vars );
 use FindBin qw($Bin);
-use List::Util qw(uniqstr);
 
 use Config::FindFile qw(search_conf);
 use Log::Log4perl::EasyCatch ( log_config => search_conf("posemo-logging.properties") );
@@ -197,9 +196,9 @@ sub install_checks
    my $self = shift;
 
    INFO "Install all checks";
-   my @checks = _get_all_checks();
+   my @checks = $self->get_all_checks();
    TRACE "Checks: " . join( " - ", @checks );
-   foreach my $check_name ( _get_all_checks() )
+   foreach my $check_name (@checks)
       {
       INFO "  => Check $check_name";
       my $check = $self->new_check($check_name);
@@ -207,21 +206,6 @@ sub install_checks
       }
 
    return 1;
-   }
-
-sub _get_all_checks
-   {
-
-   # my ($path) = __FILE__ =~ m{ ^ (.*)/Install [.] pm $ }x;
-   # return map { _file2checkname($ARG); } <$path/Checks/*.pm>;
-   return uniqstr( map { _file2checkname($ARG); } map { <$ARG/PostgreSQL/SecureMonitoring/Checks/*.pm> } @INC );
-   }
-
-sub _file2checkname
-   {
-   my $file = shift;
-   my ($check_name) = $file =~ m{ ([^/]+) [.] pm $ }x;
-   return $check_name;
    }
 
 sub _do_drop_user

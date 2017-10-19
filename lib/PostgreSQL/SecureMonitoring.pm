@@ -46,6 +46,7 @@ See App.pm
 
 use English qw( -no_match_vars );
 use FindBin qw($Bin);
+use List::Util qw(uniqstr);
 
 use Config::FindFile qw(search_conf);
 use Log::Log4perl::EasyCatch ( log_config => search_conf("posemo-logging.properties") );
@@ -104,6 +105,34 @@ sub _build_name
    {
    my $self = shift;
    return $self->host;
+   }
+
+
+=head2 get_all_checks
+
+Returns a list of all installed checks. A check is installed, when it is found as module. Therefore it 
+should be installed in C<@INC> in C<PostgreSQL/SecureMonitoring/Checks>.
+
+C<get_all_checks> can be called as function or method (instance and class method).
+
+The results are cached, so changes during the runtime are not recognised.
+
+=cut
+
+my @all_checks;
+
+sub get_all_checks
+   {
+   @all_checks = uniqstr( map { _file2checkname($ARG); } map { <$ARG/PostgreSQL/SecureMonitoring/Checks/*.pm> } @INC )
+      unless @all_checks;
+   return @all_checks;
+   }
+
+sub _file2checkname
+   {
+   my $file = shift;
+   my ($check_name) = $file =~ m{ ([^/]+) [.] pm $ }x;
+   return $check_name;
    }
 
 
