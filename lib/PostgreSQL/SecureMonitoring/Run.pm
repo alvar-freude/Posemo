@@ -69,7 +69,17 @@ The following examples are writtem in the apache style format, parsed via L<Conf
   <HostGroup
 
 
+The following options of Gonfig::General are enabled:
 
+  -LowerCaseNames     => 1,
+  -AutoTrue           => 1,
+  -UseApacheInclude   => 1,
+  -IncludeRelative    => 1,
+  -IncludeDirectories => 1,
+  -IncludeGlob        => 1,
+
+So all options may be written in lowe/upper case mixed. If you use another config file format 
+(YAML, JSON, ...), then you should write all attribute names in lowercase.
 
 
 
@@ -100,7 +110,6 @@ use PostgreSQL::SecureMonitoring;
 
 
 use Moose;
-
 #<<<
 
 # conf must be lazy, because in the builder must be called after initualization of all other attributes!
@@ -163,7 +172,23 @@ sub _build_conf
    my $self = shift;
 
    DEBUG "load config file: ${ \$self->configfile }";
-   my $conf = Config::Any->load_files( { files => [ $self->configfile ], use_ext => 1, flatten_to_hash => 1 } );
+   my $conf = Config::Any->load_files(
+                                       {
+                                         files           => [ $self->configfile ],
+                                         use_ext         => 1,
+                                         flatten_to_hash => 1,
+                                         driver_args     => {
+                                                          General => {
+                                                                       -LowerCaseNames     => 1,
+                                                                       -AutoTrue           => 1,
+                                                                       -UseApacheInclude   => 1,
+                                                                       -IncludeRelative    => 1,
+                                                                       -IncludeDirectories => 1,
+                                                                       -IncludeGlob        => 1,
+                                                                     }
+                                                        }
+                                       }
+                                     );
 
    $conf = $conf->{ $self->configfile } or die "No config loaded, tried with ${ \$self->configfile }!\n";
 
@@ -172,7 +197,40 @@ sub _build_conf
 
    # TODO: validate!
    return $conf;
+   } ## end sub _build_conf
+
+
+
+=head2 all_host_groups
+
+Returns a list of all host groups in the config file, ordered by the "order" config option   .
+
+The array contains only the names of the groups
+
+=cut
+
+sub all_host_groups
+   {
+   my $self = shift;
+
+   my $grp = $self->conf->{hostgroup};
+   my @all_host_groups = sort { ( $grp->{$a}{order} // 0 ) <=> ( $grp->{$b}{order} // 0 ) } keys %$grp;
+
+   return @all_host_groups;
    }
+
+
+=head2 all_hosts
+
+Returns a list of hashrefs with informations of all hosts in all host groups.
+
+Each hashref contains everything for calling the ->new constructor. Keys beginning 
+with underscore are internals, e.g. special parameters for specific tests via 
+C<_check_params>.
+
+So it's easy to loop over all hosts and all checks and setup the constructor easily.
+
+=cut
 
 
 
