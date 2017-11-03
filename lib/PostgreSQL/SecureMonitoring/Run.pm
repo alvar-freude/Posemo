@@ -233,5 +233,20 @@ So it's easy to loop over all hosts and all checks and setup the constructor eas
 =cut
 
 
+sub all_hosts
+   {
+   my $self = shift;
+   
+   my @hosts;
+   
+   
+  
+   
+   
+   
+   }
+
+
+
 
 1;
