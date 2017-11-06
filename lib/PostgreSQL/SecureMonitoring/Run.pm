@@ -236,16 +236,13 @@ So it's easy to loop over all hosts and all checks and setup the constructor eas
 sub all_hosts
    {
    my $self = shift;
-   
-   my @hosts;
-   
-   
-  
-   
-   
-   
-   }
 
+   # my @hosts;
+
+   # TODO: Everything
+
+   return;
+   }
 
 
 

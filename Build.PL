@@ -70,7 +70,7 @@ my $builder = Module::Build->new(
       'Config::General'  => 2.50,
       'Readonly'         => 1.03,
       'IO::All'          => 0.84,
-      'Config::Validate' => '0.6.6',
+      'Config::Validate' => '0.2.6',
 
       # ' Data::Validate '         => 0.09, ??? oder das da oben?
       'File::HomeDir'  => 1.00,                    # used by Config::FindFile
