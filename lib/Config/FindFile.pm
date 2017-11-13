@@ -43,10 +43,6 @@ C<$file_name:> config file name without path.
 
 C<$module_name:> Module name for searching via L<File::ShareDir|File::ShareDir>
 
-TODO:
-Take module name from caller, when not given.
-
-
 C<search_conf> returns the first matching file in the search list below.
 
 It dies, when no suitable (config) file is found.
@@ -72,8 +68,16 @@ C</etc>
 
 =item 5. 
 
-Modules ShareDir (e.g. for a pre-packaged default config file)
+Modules ShareDir (e.g. for a pre-packaged default config file).
 
+Usually you module should place here a default config file; this may be empty.
+
+
+=item 6.
+
+Folder C<conf> relative to current dir.
+
+Last fallack; but see one above!
 
 =back
 
@@ -99,7 +103,7 @@ sub search_conf
    my $file = "$Bin/../conf/$name";
    return $file if -f $file;
 
-   # 2. look in users home dir
+   # 2. look in users home dir, but look for hidden file!
    $file = File::HomeDir->my_home() . "/.$name";
    return $file if -f $file;
 
@@ -111,7 +115,7 @@ sub search_conf
    $file = "/etc/$name";
    return $file if -f $file;
 
-   # and othervise look in applications share dir
+   # and othervise look in applications share dir or local relative dir conf
    my $distconfdir = eval { return File::ShareDir::module_dir($module) } // "conf";
 
    # warn "Share-Dir-Eval-Error: $EVAL_ERROR" if $EVAL_ERROR;
