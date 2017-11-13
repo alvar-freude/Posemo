@@ -372,7 +372,7 @@ sub install
 
    if ( $self->install_sql )
       {
-      TRACE "\$self->sql_name}: call extra SQL for installation " . $self->install_sql;
+      TRACE "${ \$self->sql_name }: call extra SQL for installation " . $self->install_sql;
       $self->dbh->do( $self->install_sql );
       }
 
