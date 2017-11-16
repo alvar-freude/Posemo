@@ -99,6 +99,7 @@ Extra Checks für HostGroups:
 
 use English qw( -no_match_vars );
 use FindBin qw($Bin);
+use Carp qw(croak);
 
 use Config::Any;
 
@@ -112,7 +113,7 @@ use PostgreSQL::SecureMonitoring;
 use Moose;
 #<<<
 
-# conf must be lazy, because in the builder must be called after initualization of all other attributes!
+# conf must be lazy, because in the builder must be called after initialization of all other attributes!
 
 has configfile => ( is => "ro", isa => "Str",          default => search_conf("posemo.conf"),            documentation => "Configuration file", );
 has log_config => ( is => "rw", isa => "Str",                                                            documentation => "Alternative logging config", );
@@ -200,7 +201,6 @@ sub _build_conf
    } ## end sub _build_conf
 
 
-
 =head2 all_host_groups
 
 Returns a list of all host groups in the config file, ordered by the "order" config option   .
@@ -228,22 +228,106 @@ Each hashref contains everything for calling the ->new constructor. Keys beginni
 with underscore are internals, e.g. special parameters for specific tests via 
 C<_check_params>.
 
-So it's easy to loop over all hosts and all checks and setup the constructor easily.
+It is a flat, "denormalised" list. 
+So it's easy to loop over all hosts and all checks and setup the constructor.
+
 
 =cut
-
 
 sub all_hosts
    {
    my $self = shift;
 
-   # my @hosts;
+   my $conf = $self->conf;
 
-   # TODO: Everything
+   # Default parameters for all hosts
+   my %defaults = _create_parameters($conf);
+   my @hosts;
 
-   return;
+   # main section of conf
+   push @hosts, _create_hosts_conf( $conf->{hosts}, \%defaults ) if $conf->{hosts};
+
+   # host group sections
+   foreach my $group ( $self->all_host_groups )
+      {
+      my %group_defaults = ( %defaults, _create_parameters( $conf->{hostgroup}{$group}, $group ) );
+      push @hosts, _create_hosts_conf( $conf->{hostgroup}{$group}{hosts}, \%group_defaults );
+      }
+
+   return \@hosts;
+   } ## end sub all_hosts
+
+
+
+my @host_options          = qw(user passwd schema database port enabled warning_level critical_level min_value max_value);
+my @other_options         = qw(hosts hostgroup check order);
+my %allowed_host_options  = map { $ARG => 1 } @host_options;
+my %allowed_other_options = map { $ARG => 1 } @other_options;
+my %allowed_options       = ( %allowed_host_options, %allowed_other_options );
+
+sub _create_parameters
+   {
+   my $conf        = shift;
+   my $hostgroup   = shift // "_GLOBAL";
+   my $hostmessage = shift // "";
+
+   $hostmessage = " and host '$hostmessage'" if $hostmessage;
+
+   my %params = ( _hostgroup => $hostgroup );
+
+   foreach my $option ( keys %$conf )
+      {
+      TRACE "Config option '$option' for hostgroup '$hostgroup'$hostmessage";
+      die "Unknown or not allowed option '$option' in hostgroup '$hostgroup'$hostmessage\n"
+         unless $allowed_options{$option};
+      $params{$option} = $conf->{$option} if $allowed_host_options{$option};
+      }
+
+   # set all check options without test if they are allowed here.
+   @{ $params{_check_params} }{ keys %{ $conf->{check} } } = @{ $conf->{check} }{ keys %{ $conf->{check} } };
+
+   return %params;
+   } ## end sub _create_parameters
+
+
+
+#
+# _create_hosts_conf( $host_conf_entry, $defaults )
+#
+# $host_conf_entry may be a string (space delimetered) or a arrayref
+#
+
+sub _create_hosts_conf
+   {
+   my $host_conf_entry = shift;
+   my $defaults        = shift;
+   my $group           = shift;
+
+   # handle something like: host = host1 host2 host3
+   return _split_hosts( $host_conf_entry, $defaults ) unless ref $host_conf_entry;
+
+   return map {
+      { %$defaults, host => $ARG->{host}, _create_parameters( $ARG, $group ) }
+   } @$host_conf_entry;
    }
 
 
+#
+# simple variant: split a single host config line
+# with one or more hosts, separated by whitespace
+#
+
+sub _split_hosts
+   {
+   my $host_conf_entry = shift;
+   my $defaults        = shift;
+
+   die "Don't separate host names via comma! (at '$host_conf_entry')\n" if $host_conf_entry =~ m{,};
+
+   return map {
+      { %$defaults, host => $_ }
+   } split( qw(\s+), $host_conf_entry );
+
+   }
 
 1;
