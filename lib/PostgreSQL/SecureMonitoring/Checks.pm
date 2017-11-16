@@ -121,9 +121,15 @@ each value in the performance data
 
 
 
+=head2 TODO
+
+TODO: SQL schema handling; 
+should be: default empty and user should have an search_path? (to "monitorin")???
+
 
 
 =cut
+
 
 use Moose;
 use namespace::autoclean;
