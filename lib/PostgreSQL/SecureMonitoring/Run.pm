@@ -238,6 +238,7 @@ sub all_hosts
    {
    my $self = shift;
 
+   TRACE "get all hosts";
    my $conf = $self->conf;
 
    # Default parameters for all hosts
@@ -250,8 +251,9 @@ sub all_hosts
    # host group sections
    foreach my $group ( $self->all_host_groups )
       {
+      TRACE "Next group: '$group'";
       my %group_defaults = ( %defaults, _create_parameters( $conf->{hostgroup}{$group}, $group ) );
-      push @hosts, _create_hosts_conf( $conf->{hostgroup}{$group}{hosts}, \%group_defaults );
+      push @hosts, _create_hosts_conf( $conf->{hostgroup}{$group}{hosts}, \%group_defaults, $group );
       }
 
    return \@hosts;
@@ -307,7 +309,7 @@ sub _create_hosts_conf
    return _split_hosts( $host_conf_entry, $defaults ) unless ref $host_conf_entry;
 
    return map {
-      { %$defaults, host => $ARG->{host}, _create_parameters( $ARG, $group ) }
+      { %$defaults, host => $ARG->{hosts}, _create_parameters( $ARG, $group, $ARG->{hosts} ) }
    } @$host_conf_entry;
    }
 
