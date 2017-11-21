@@ -63,7 +63,7 @@ has schema      => ( is => "ro", isa => "Str", default   => "public",           
 has database    => ( is => "ro", isa => "Str", default   => "monitoring",               documentation => "Name of monitoring DB", );
 has host        => ( is => "ro", isa => "Str", predicate => "has_host",                 documentation => "Hostname/IP to monitor", );
 has port        => ( is => "ro", isa => "Int", predicate => "has_port",                 documentation => "Port number for server to monitor", );
-has name        => ( is => "ro", isa => "Str", builder  => "_build_name", lazy => 1,    documentation => "Name of the host, for Report (Default: Host)", );
+has name        => ( is => "ro", isa => "Str", builder   => "_build_name", lazy => 1,   documentation => "Name of the host, for Report (Default: Host)", );
 
 #>>>
 
