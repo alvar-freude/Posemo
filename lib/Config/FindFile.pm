@@ -24,20 +24,20 @@ use version; our $VERSION = qv("1.0.0");
 =encoding utf8
 
  use Config::FindFile qw(search_conf);
- 
+
  my $app_config_file = search_conf("myapp.conf");
  my $log_config_file = search_conf("myapp-log.conf");
 
 
 =head1 DESCRIPTION
 
-This little helper module exports one sub C<search_conf>, which helps to finds a 
+This little helper module exports one sub C<search_conf>, which helps to finds a
 named config in some typical paths for config files.
 
 
 =head2 search_conf( $file_name [, $module_name] )
 
-Parameter: 
+Parameter:
 
 C<$file_name:> config file name without path.
 
@@ -49,7 +49,7 @@ It dies, when no suitable (config) file is found.
 
 =over 4
 
-=item 1. 
+=item 1.
 
 For development etc: Relative to the executable direktory: C<$Bin/../conf>
 
@@ -66,7 +66,7 @@ C</usr/local/etc>
 C</etc>
 
 
-=item 5. 
+=item 5.
 
 Modules ShareDir (e.g. for a pre-packaged default config file).
 
@@ -79,6 +79,13 @@ Folder C<conf> relative to current dir.
 
 Last fallack; but see one above!
 
+
+=item 7.
+
+Current working directory (via CWD::getcwd), truncated at /lib/.
+
+Helpful for some editors and syntax check.
+
 =back
 
 
@@ -88,6 +95,7 @@ use English qw( -no_match_vars );
 use FindBin qw($Bin);
 use File::HomeDir;
 use File::ShareDir;
+use Cwd;
 
 use base qw(Exporter);
 our @EXPORT_OK = qw(search_conf);
@@ -122,7 +130,12 @@ sub search_conf
    $file = "$distconfdir/$name";
    return $file if -f $file;
 
-   die "UUUPS, FATAL: configfile $name not found. Last try was <$file>.\n";
+
+   (my $cwd_without_lib = getcwd) =~ s{/lib/.*}{};
+   $file = "$cwd_without_lib/conf/$name";
+   return $file if -f $file;
+
+   die "UUUPS, FATAL: configfile $name not found. Last try was <$file>\n";
 
    # return;
 
