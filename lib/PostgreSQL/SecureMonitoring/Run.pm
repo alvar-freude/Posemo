@@ -22,34 +22,34 @@ use 5.010;
 
 =head2 Configuration
 
-The config file is parsed via L<Config::Any|Config::Any> and therefore understands each supported config file format. 
-The following examples are writtem in the apache style format, parsed via L<Config::General|Config::General>. 
+The config file is parsed via L<Config::Any|Config::Any> and therefore understands each supported config file format.
+The following examples are writtem in the apache style format, parsed via L<Config::General|Config::General>.
 
 
   #
   # Example config file
   #
-    
+
   # Default values, can be overwritten by Hostgroups (see below)
   # Definition of Hosts to monitor
   # eihter name ONE host:
-  
+
   host = database.internal.project.tld
 
   # user      = monitoring                      # Monitoring user (unprivileged)
   # passwd    =                                 # Password for this user; default: empty
-  # schema    = public                          # SQL schema name for our 
+  # schema    = public                          # SQL schema name for our
   # database  = monitoring                      # Name of monitoring DB"
   # port      =                                 # Port number for server to monitor
-  
-  
-  
+
+
+
   # or more complex definition with host groups
   <HostGroup Elephant>
     Order = 10                                  # Sort order for this group
     Hosts = loc1_db1 loc1_db2 loc2_db1 loc2_db2 # Short version for hosts, all with default parameters from above
   </HostGroup>
-    
+
   <HostGroup Mammut>
     Order = 20
     <Hosts>
@@ -62,10 +62,10 @@ The following examples are writtem in the apache style format, parsed via L<Conf
       port = 5434
       # ....
     </Hosts>
-    
+
   </HostGroup>
-  
-  
+
+
   <HostGroup
 
 
@@ -78,7 +78,7 @@ The following options of Gonfig::General are enabled:
   -IncludeDirectories => 1,
   -IncludeGlob        => 1,
 
-So all options may be written in lowe/upper case mixed. If you use another config file format 
+So all options may be written in lowe/upper case mixed. If you use another config file format
 (YAML, JSON, ...), then you should write all attribute names in lowercase.
 
 
@@ -86,7 +86,7 @@ So all options may be written in lowe/upper case mixed. If you use another confi
 Extra Checks für HostGroups:
 
   * Kriegen eine Liste an Hosts, das sind check-Objete für jeden Host!
-  * ermitteln dann da Zeug 
+  * ermitteln dann da Zeug
 
 
 # check: http://search.cpan.org/~mbp/Data-Processor-0.4.3/lib/Data/Processor.pm
@@ -224,11 +224,11 @@ sub all_host_groups
 
 Returns a list of hashrefs with informations of all hosts in all host groups.
 
-Each hashref contains everything for calling the ->new constructor. Keys beginning 
-with underscore are internals, e.g. special parameters for specific tests via 
+Each hashref contains everything for calling the ->new constructor. Keys beginning
+with underscore are internals, e.g. special parameters for specific tests via
 C<_check_params>.
 
-It is a flat, "denormalised" list. 
+It is a flat, "denormalised" list.
 So it's easy to loop over all hosts and all checks and setup the constructor.
 
 
@@ -242,7 +242,7 @@ sub all_hosts
    my $conf = $self->conf;
 
    # Default parameters for all hosts
-   my %defaults = _create_parameters($conf);
+   my %defaults = _parameter_for_one_host($conf);
    my @hosts;
 
    # main section of conf
@@ -252,7 +252,7 @@ sub all_hosts
    foreach my $group ( $self->all_host_groups )
       {
       TRACE "Next group: '$group'";
-      my %group_defaults = ( %defaults, _create_parameters( $conf->{hostgroup}{$group}, $group ) );
+      my %group_defaults = _parameter_for_one_host( $conf->{hostgroup}{$group}, \%defaults, $group );
       push @hosts, _create_hosts_conf( $conf->{hostgroup}{$group}{hosts}, \%group_defaults, $group );
       }
 
@@ -267,15 +267,16 @@ my %allowed_host_options  = map { $ARG => 1 } @host_options;
 my %allowed_other_options = map { $ARG => 1 } @other_options;
 my %allowed_options       = ( %allowed_host_options, %allowed_other_options );
 
-sub _create_parameters
+sub _parameter_for_one_host
    {
    my $conf        = shift;
+   my $defaults    = shift // {};
    my $hostgroup   = shift // "_GLOBAL";
    my $hostmessage = shift // "";
 
    $hostmessage = " and host '$hostmessage'" if $hostmessage;
 
-   my %params = ( _hostgroup => $hostgroup );
+   my %params = ( %$defaults, _hostgroup => $hostgroup );
 
    foreach my $option ( keys %$conf )
       {
@@ -289,7 +290,7 @@ sub _create_parameters
    @{ $params{_check_params} }{ keys %{ $conf->{check} } } = @{ $conf->{check} }{ keys %{ $conf->{check} } };
 
    return %params;
-   } ## end sub _create_parameters
+   } ## end sub _parameter_for_one_host
 
 
 
@@ -308,8 +309,10 @@ sub _create_hosts_conf
    # handle something like: host = host1 host2 host3
    return _split_hosts( $host_conf_entry, $defaults ) unless ref $host_conf_entry;
 
-   return map {
-      { %$defaults, host => $ARG->{hosts}, _create_parameters( $ARG, $group, $ARG->{hosts} ) }
+   return map {                                    ## no critic (BuiltinFunctions::ProhibitComplexMappings)
+      {
+         ( %$defaults, host => $ARG->{hosts}, _parameter_for_one_host( $ARG, $defaults, $group, $ARG->{hosts} ), )
+      }
    } @$host_conf_entry;
    }
 
@@ -326,9 +329,9 @@ sub _split_hosts
 
    die "Don't separate host names via comma! (at '$host_conf_entry')\n" if $host_conf_entry =~ m{,};
 
-   return map {
-      { %$defaults, host => $_ }
-   } split( qw(\s+), $host_conf_entry );
+   return map {                                    ## no critic (BuiltinFunctions::ProhibitComplexMappings)
+      { ( %$defaults, host => $_ ) }
+   } split( qr{\s+}, $host_conf_entry );
 
    }
 
