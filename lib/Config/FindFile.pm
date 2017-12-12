@@ -131,7 +131,7 @@ sub search_conf
    return $file if -f $file;
 
 
-   (my $cwd_without_lib = getcwd) =~ s{/lib/.*}{};
+   ( my $cwd_without_lib = getcwd ) =~ s{/lib/.*}{}x;
    $file = "$cwd_without_lib/conf/$name";
    return $file if -f $file;
 
