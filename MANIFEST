@@ -6,6 +6,7 @@ conf/posemo-logging.properties
 conf/posemo.conf
 extlib/MooseX/SimpleConfig.pm
 extra-dummy-tests/insert-and-delete.pl
+extra-dummy-tests/performance_hash_slices_loops.pl
 ignore.txt
 lib/Config/FindFile.pm
 lib/Log/Log4perl/EasyCatch.pm
