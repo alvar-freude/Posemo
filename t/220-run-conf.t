@@ -26,31 +26,87 @@ my @host_groups = $app->all_host_groups;
 cmp_deeply( \@host_groups, [qw(Elephant Mammut ApplicationTests)], "Hostgroups found" );
 
 
-use Data::Dumper;
-diag Dumper $app->conf;
+#use Data::Dumper;
+#diag Dumper $app->conf;
 
 
 #diag Dumper $app->all_hosts;
 
-my $outer_defaults = {
-   user     => "monitoring",
-   passwd   => "",
-   schema   => "public",
-   database => "monitoring",
-   port     => "",
+my %outer_defaults = (
+                       user     => "monitoring",
+                       passwd   => "default-blah",
+                       schema   => "public",
+                       database => "monitoring",
+                       port     => "54321",
+                     );
 
-                     };
 
+my %outer_check_params = (
+                           Alive     => { enabled => 0 },
+                           Writeable => { timeout => 5000, },
+                         );
+
+my %elephant_defaults = ( %outer_defaults, _hostgroup => "Elephant" );
+
+my %elephant_check_params = ( %outer_check_params, Writeable => { enabled => 1, timeout => 100, } );
+my %mammut_check_params = ( %outer_check_params, Trunk => { timeout => 123, } );
+
+
+my %app_defaults = ( %outer_defaults, _hostgroup => "ApplicationTests", schema => "posemo_monitoring", );
 
 my $expected_hosts = [
+   {
+      %outer_defaults,
+      _hostgroup    => "_GLOBAL",
+      host          => "database.internal.project.tld",
+      _check_params => { %outer_check_params, },
+   },
+
+   (
+      map {
+         {
+            %elephant_defaults,
+               host          => $_,
+               _check_params => { %elephant_check_params, },
+         }
+         } qw(loc1_db1 loc1_db2 loc2_db1 loc2_db2),
+   ),
+   {
+      %outer_defaults,
+      _hostgroup    => "Mammut",
+      host          => "loc1_db1",
+      port          => 5433,
+      _check_params => { %outer_check_params, Trunk => { timeout => 123, }, },
+   },
+
+   {
+      %outer_defaults,
+      _hostgroup    => "Mammut",
+      host          => "loc1_db2",
+      port          => 5434,
+      _check_params => { %outer_check_params, Trunk => { timeout => 123, }, },
+   },
+
+   {
+      %app_defaults,
+      host          => "db_lion",
+      enabled       => 0,
+      _check_params => { %outer_check_params, ApplicationLion => { enabled => 1, } },
+   },
+
+   {
+      %app_defaults,
+      host          => "db_tiger",
+      enabled       => 0,
+      _check_params => { %outer_check_params, ApplicationTiger => { enabled => 1, critical_level => 1000, } },
+   },
 
 
 ];
 
-
 my $all_hosts = $app->all_hosts;
 
-eq_or_diff $all_hosts, $expected_hosts, "Alle Hosts aus Test";
+eq_or_diff $all_hosts, $expected_hosts, "All host configs in test config";
 
 
 done_testing();
