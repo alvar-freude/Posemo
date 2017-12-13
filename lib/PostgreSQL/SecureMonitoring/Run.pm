@@ -100,6 +100,7 @@ Extra Checks für HostGroups:
 use English qw( -no_match_vars );
 use FindBin qw($Bin);
 use Carp qw(croak);
+use Storable qw(dclone);
 
 use Config::Any;
 
@@ -276,7 +277,7 @@ sub _parameter_for_one_host
 
    $hostmessage = " and host '$hostmessage'" if $hostmessage;
 
-   my %params = ( %$defaults, _hostgroup => $hostgroup );
+   my %params = ( %{ dclone($defaults) }, _hostgroup => $hostgroup );
 
    foreach my $option ( keys %$conf )
       {
