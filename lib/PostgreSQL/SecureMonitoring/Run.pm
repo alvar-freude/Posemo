@@ -117,7 +117,7 @@ use Moose;
 # conf must be lazy, because in the builder must be called after initialization of all other attributes!
 
 has configfile => ( is => "ro", isa => "Str",          default => search_conf("posemo.conf"),            documentation => "Configuration file", );
-has log_config => ( is => "rw", isa => "Str",                                                            documentation => "Alternative logging config", );
+has log_config => ( is => "rw", isa => "Str",                                                              documentation => "Alternative logging config", );
 has conf       => ( is => "ro", isa => "HashRef[Any]", builder => "_build_conf",              lazy => 1, documentation => "Complete configuration (usually don't use at CLI)", );
 
 #>>>
@@ -267,6 +267,7 @@ my @other_options         = qw(hosts hostgroup check order);
 my %allowed_host_options  = map { $ARG => 1 } @host_options;
 my %allowed_other_options = map { $ARG => 1 } @other_options;
 my %allowed_options       = ( %allowed_host_options, %allowed_other_options );
+
 
 sub _parameter_for_one_host
    {

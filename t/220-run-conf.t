@@ -84,7 +84,7 @@ my $expected_hosts = [
       _hostgroup    => "Mammut",
       host          => "loc1_db2",
       port          => 5434,
-      _check_params => { %outer_check_params, Trunk => { timeout => 123, }, },
+      _check_params => { %outer_check_params, Trunk => { timeout => 456, }, },
    },
 
    {
