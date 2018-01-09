@@ -154,6 +154,7 @@ sub BUILD
    # re-initialise logging, when log config is set and is not the default one
    if ( $self->log_config and $self->log_config ne $DEFAULT_LOG_CONFIG )
       {
+      die "Given log-config ${ \$self->log_config } does not exist\n" unless -f $self->log_config;
       Log::Log4perl->init( $self->log_config );
       DEBUG "Logging initialised with non-default config " . $self->log_config;
       }

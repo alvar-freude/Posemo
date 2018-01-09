@@ -11,15 +11,40 @@ use Test::Deep;
 
 use Test::Differences;
 
-
 use_ok("PostgreSQL::SecureMonitoring::Run");
 
 # use Carp qw(verbose);
 
+throws_ok sub { my $app = PostgreSQL::SecureMonitoring::Run->new( configfile => "$Bin/conf/does-not-exists.conf" ); },
+   qr(No config loaded, tried with .*conf/does-not-exists.conf), "not existing config file";
+
+throws_ok sub { my $app = PostgreSQL::SecureMonitoring::Run->new( log_config => "$Bin/conf/does-not-exists.conf" ); },
+   qr(Given log-config .*conf/does-not-exists.conf does not exist), "given log_config, but does not exist";
+
+throws_ok sub { my $app = PostgreSQL::SecureMonitoring::Run->new( configfile => "$Bin/conf/test-nonexistent-logging.conf" ); },
+   qr(Given log-config /tmp/does/not/exist.conf.never does not exist), "log_config from file, but does not exist";
+
+
+use Config::FindFile qw(search_conf);
+my $default_log_config = search_conf("posemo-logging.properties");
+
+lives_ok sub {
+   my $app
+      = PostgreSQL::SecureMonitoring::Run->new( log_config => $default_log_config, configfile => "$Bin/conf/test-example.conf" );
+}, "New run object with explicit default log conf";
+
+
+lives_ok sub {
+   my $app = PostgreSQL::SecureMonitoring::Run->new( configfile => "$Bin/conf/test-example.conf",
+                                                     log_config => "$Bin/conf/posemo-test-logging.properties", );
+}, "App OK with Other logging properties";
+
+
+
 my $app;
 
-lives_ok { $app = PostgreSQL::SecureMonitoring::Run->new( configfile => "$Bin/conf/test-example.conf" ); }
-"New run object created";
+lives_ok sub { $app = PostgreSQL::SecureMonitoring::Run->new( configfile => "$Bin/conf/test-example.conf" ); },
+   "New run object created";
 
 my @host_groups = $app->all_host_groups;
 
@@ -110,3 +135,4 @@ eq_or_diff $all_hosts, $expected_hosts, "All host configs in test config";
 
 
 done_testing();
+

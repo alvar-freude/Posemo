@@ -50,7 +50,9 @@ t/920-manifest.t
 t/930-pod-coverage.t
 t/931-pod.t
 t/990-postgresql-stop.t
+t/conf/posemo-test-logging.properties
 t/conf/test-example.conf
+t/conf/test-nonexistent-logging.conf
 t/log-test.properties
 t/perlcriticrc
 t/perltidyrc
