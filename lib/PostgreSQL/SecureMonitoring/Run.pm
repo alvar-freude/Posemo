@@ -203,6 +203,24 @@ sub _build_conf
    } ## end sub _build_conf
 
 
+=head2 run
+
+Runs all tests! Takes them including parameters from config file.
+
+=cut
+
+
+sub run
+   {
+   my $self = shift;
+
+   foreach my $dontknowhowtocallit ( @{ $self->all_hosts } )
+      {
+      }
+
+   }
+
+
 =head2 all_host_groups
 
 Returns a list of all host groups in the config file, ordered by the "order" config option   .
