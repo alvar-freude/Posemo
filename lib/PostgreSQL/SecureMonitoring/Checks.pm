@@ -432,7 +432,7 @@ sub execute
    my $placeholders = join( ", ", @placeholders );
    my %result = (
                   check_name  => $self->name,
-                  desciption  => $self->description,
+                  description => $self->description,
                   result_unit => $self->result_unit,
                   result_type => $self->result_type,
                   map { $ARG => $self->$ARG }
