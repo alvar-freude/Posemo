@@ -232,7 +232,7 @@ sub run
          my $check = $posemo->new_check( $check_name, $host->{_check_params} );
          my $result = $check->run_check;
 
-         push @results, $result;
+         push @hosts_results, $result;
 
          }
 
