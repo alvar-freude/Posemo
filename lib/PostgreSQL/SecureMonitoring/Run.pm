@@ -214,16 +214,32 @@ sub run
    {
    my $self = shift;
 
-   foreach my $dontknowhowtocallit ( @{ $self->all_hosts } )
+   foreach my $host ( @{ $self->all_hosts } )
       {
+      DEBUG "Prepare running all checks for host $host->{host} in hostgroup $host->{_hostgroup}";
+      my %host_params = map { $ARG => $host->{$ARG} } grep { not m{^_} } keys %$host;
+      my $posemo = PostgreSQL::SecureMonitoring->new(%host_params);
+
+      # run all checks
+      foreach my $check_name ( $posemo->get_all_checks_ordered() )
+         {
+         DEBUG "Prepare and run check $check_name";
+         my $check = $posemo->new_check( $check_name, $host->{_check_params} );
+         my $result = $check->run_check;
+
+         # ...
+
+         }
+
       }
 
-   }
+   return;
+   } ## end sub run
 
 
 =head2 all_host_groups
 
-Returns a list of all host groups in the config file, ordered by the "order" config option   .
+Returns a list of all host groups in the config file, ordered by the "order" config option.
 
 The array contains only the names of the groups
 

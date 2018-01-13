@@ -108,24 +108,46 @@ sub _build_name
    }
 
 
-=head2 get_all_checks
+=head2 get_all_checks, get_all_checks_ordered
 
 Returns a list of all installed checks. A check is installed, when it is found as module. Therefore it 
 should be installed in C<@INC> in C<PostgreSQL/SecureMonitoring/Checks>.
 
-C<get_all_checks> can be called as function or method (instance and class method).
+Both can be called as instance and class method.
 
 The results are cached, so changes during the runtime are not recognised.
+
+C<get_all_checks_ordered> returns an ordered and filtered list of all checks: 
+Sort order is by return value of an object method "order" (string order, default check name). 
+And grep for "enabled_on_this_platform" (default true).
+
+
 
 =cut
 
 my @all_checks;
+my @all_checks_ordered;
 
 sub get_all_checks
    {
    @all_checks = uniqstr( map { _file2checkname($ARG); } map { <$ARG/PostgreSQL/SecureMonitoring/Checks/*.pm> } @INC )
       unless @all_checks;
    return @all_checks;
+   }
+
+sub get_all_checks_ordered
+   {
+   my $self = shift;
+
+   #<<<
+   @all_checks_ordered
+      = sort { "PostgreSQL::SecureMonitoring::Checks::$a"->order cmp "PostgreSQL::SecureMonitoring::Checks::$b"->order }
+        grep { _load_module("PostgreSQL::SecureMonitoring::Checks::$ARG") and "PostgreSQL::SecureMonitoring::Checks::$ARG"->enabled_on_this_platform } 
+        $self->get_all_checks
+      unless @all_checks_ordered;
+   #>>>
+
+   return @all_checks_ordered;
    }
 
 sub _file2checkname
@@ -148,14 +170,25 @@ sub new_check
    {
    my $self       = shift;
    my $check_name = shift;
+   my $params     = shift;
 
-   TRACE "Load PostgreSQL::SecureMonitoring::Checks::$check_name";
-   eval "require PostgreSQL::SecureMonitoring::Checks::$check_name;"    ## no critic (BuiltinFunctions::ProhibitStringyEval)
-      or die "Can't use check $check_name: $EVAL_ERROR\n";
-
-   my $check = "PostgreSQL::SecureMonitoring::Checks::$check_name"->new( app => $self );
+   my $module = "PostgreSQL::SecureMonitoring::Checks::$check_name";
+   _load_module($module);
+   my $check = $module->new( app => $self, %$params );
 
    return $check;
+   }
+
+sub _load_module
+   {
+   my $module = shift;
+
+   TRACE "Load $module";
+
+   eval "use $module; return 1;"                   ## no critic (BuiltinFunctions::ProhibitStringyEval)
+      or die "Can't load module $module: $EVAL_ERROR\n";
+
+   return 1;
    }
 
 
