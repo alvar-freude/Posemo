@@ -214,12 +214,17 @@ sub run
    {
    my $self = shift;
 
+   my @results;
+
    foreach my $host ( @{ $self->all_hosts } )
       {
       DEBUG "Prepare running all checks for host $host->{host} in hostgroup $host->{_hostgroup}";
       my %host_params = map { $ARG => $host->{$ARG} } grep { not m{^_} } keys %$host;
       my $posemo = PostgreSQL::SecureMonitoring->new(%host_params);
 
+      my @hosts_results;
+
+      # TODO: catch errors.
       # run all checks
       foreach my $check_name ( $posemo->get_all_checks_ordered() )
          {
@@ -227,13 +232,20 @@ sub run
          my $check = $posemo->new_check( $check_name, $host->{_check_params} );
          my $result = $check->run_check;
 
-         # ...
+         push @results, $result;
 
          }
 
-      }
+      push @results, { host => $host, results => \@results };
 
-   return;
+      # TODO: results as attribute with traits
+
+      #       # .................
+      #      $self->add_result( { host => $host, } )
+
+      } ## end foreach my $host ( @{ $self...})
+
+   return \@results;
    } ## end sub run
 
 
