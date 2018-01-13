@@ -429,7 +429,6 @@ sub execute
       push @placeholders, q{?};
       }
 
-   my $placeholders = join( ", ", @placeholders );
    my %result = (
                   check_name  => $self->name,
                   description => $self->description,
@@ -439,6 +438,7 @@ sub execute
                      grep { my $m = "has_$ARG"; $self->$m } qw(warning_level critical_level min_value max_value),
                 );
 
+   my $placeholders = join( ", ", @placeholders );
 
    eval {
       # SELECT with FROM, because function with multiple OUT parameters will result in multiple columns
