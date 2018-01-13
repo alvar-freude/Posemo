@@ -573,6 +573,40 @@ sub test_critical_warning
    } ## end sub test_critical_warning
 
 
+=head2 order
+
+Returns a string for sort order (string sort!). May be overridden in check with an other string. 
+
+Defauls is check name.
+
+=cut
+
+sub order
+   {
+   return shift->name;
+   }
+
+
+=head2 enabled_on_this_platform
+
+Flag, if the check is enabled. 
+
+May be overridden in check, to disable some checks on some 
+platforms or based on other (non config!) state. When the decision 
+is about the configuration or something similar, the attribute 
+"enabled" should used/overridden.
+
+When a check module sets C<enabled_on_this_platform> to false, then 
+the check will not run, because C<get_all_checks_ordered> removes it.
+
+=cut
+
+sub enabled_on_this_platform
+   {
+   return 1;
+   }
+
+
 
 __PACKAGE__->meta->make_immutable;
 
