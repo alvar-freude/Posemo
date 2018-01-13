@@ -235,7 +235,9 @@ has _result_type_attr    => ( is => "ro", isa => "Str",           predicate => "
 
 sub _build_class
    {
-   return blessed(shift);
+   my $self = shift;
+   return $self unless ref $self;
+   return blessed($self);
    }
 
 sub _build_name
