@@ -403,9 +403,6 @@ sub run_check
    INFO "Run check ${ \$self->name } for host ${ \$self->host_desc }";
 
    my $result = $self->execute();
-
-   $result->{result_unit} = $self->result_unit;
-
    $self->test_critical_warning($result);
 
    TRACE "Finished check ${ \$self->name } for host ${ \$self->host_desc }";
