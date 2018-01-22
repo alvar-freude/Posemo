@@ -1,0 +1,18 @@
+TODO for PostgreSQL Secure Monitoring:
+
+Put extra non monitoring specific modules into their own CPAN distribution:
+
+  * Config::FindFile
+  * Log::Log4perl::EasyCatch
+  * MooseX::DBI
+  * MooseX::ListAttributes
+  * Test::PostgreSQL::Starter
+
+
+
+
+More Checks
+
+
+
+

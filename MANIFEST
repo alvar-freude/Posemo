@@ -56,3 +56,4 @@ t/conf/test-nonexistent-logging.conf
 t/log-test.properties
 t/perlcriticrc
 t/perltidyrc
+TODO.txt
