@@ -1,9 +1,5 @@
 package PostgreSQL::SecureMonitoring::Run;
 
-use Moose;
-use 5.010;
-
-
 =head1 NAME
 
  PostgreSQL::SecureMonitoring::Run - Application/Execution class for PostgreSQL Secure Monitoring
@@ -97,10 +93,15 @@ Extra Checks für HostGroups:
 
 =cut
 
+use Moose;
+
 use English qw( -no_match_vars );
 use FindBin qw($Bin);
 use Carp qw(croak);
 use Storable qw(dclone);
+use Time::HiRes qw(time);
+use Sys::Hostname;
+use Module::Loaded;
 
 use Config::Any;
 
@@ -109,21 +110,63 @@ use Log::Log4perl::EasyCatch ( log_config => search_conf("posemo-logging.propert
 
 use PostgreSQL::SecureMonitoring;
 
+use IO::All -utf8;
 
-
-use Moose;
 #<<<
 
 # conf must be lazy, because in the builder must be called after initialization of all other attributes!
 
 has configfile => ( is => "ro", isa => "Str",          default => search_conf("posemo.conf"),            documentation => "Configuration file", );
-has log_config => ( is => "rw", isa => "Str",                                                              documentation => "Alternative logging config", );
+has log_config => ( is => "rw", isa => "Str",                                                            documentation => "Alternative logging config", );
 has conf       => ( is => "ro", isa => "HashRef[Any]", builder => "_build_conf",              lazy => 1, documentation => "Complete configuration (usually don't use at CLI)", );
+has outfile    => ( is => "ro", isa => "Str",          default => q{-},                                  documentation => "Output file name; - for STDOUT (default)" );
+
+has results => 
+      (
+      traits   => ['Array'],
+      is       => 'ro',
+      isa      => 'ArrayRef[Any]',
+      default  => sub { [] },
+      handles  => 
+         {
+         all_results    => 'elements',
+         add_result     => 'push',
+         },
+      );
+
 
 #>>>
 
 with "MooseX::Getopt";
 with 'MooseX::ListAttributes';
+
+
+
+=head2 import
+
+Simple import method for importing "output => 'SomeOutput'"
+
+Default outoput type is JSON.
+
+
+=cut
+
+sub import
+   {
+   my $class  = shift;
+   my %params = @ARG;
+
+   my $output = $params{output} // "JSON";
+
+   with "PostgreSQL::SecureMonitoring::Output::$output";
+
+   # TODO: more with with "with" parameter?
+
+   # There is an error with t/00-load.t, so don't immutable if Test::More loaded
+   __PACKAGE__->meta->make_immutable unless is_loaded("Test::More");
+
+   return;
+   }
 
 
 
@@ -203,18 +246,58 @@ sub _build_conf
    } ## end sub _build_conf
 
 
+
 =head2 run
 
-Runs all tests! Takes them including parameters from config file.
+Runs everything: calls run_checks, measures time and writes output to file or STDOUT ...
 
 =cut
-
 
 sub run
    {
    my $self = shift;
 
-   my @results;
+   my $posemo_version = $PostgreSQL::SecureMonitoring::VERSION;
+   my $hostname       = hostname;
+   my $starttime      = time;
+   my $message = "PostgreSQL Secure Monitoring version $posemo_version, running on host $hostname at " . localtime($starttime);
+
+   DEBUG $message;
+
+   $self->run_checks;
+   my $runtime = time - $starttime;
+
+   DEBUG "All Checks Done. Runtime: $runtime seconds.";
+
+   $self->output_as_string(
+                            {
+                              message        => $message,
+                              posemo_version => $posemo_version,
+                              runtime        => $runtime,
+                              hostname       => $hostname,
+                              result         => $self->result,
+                            }
+                          );
+
+   return;
+   } ## end sub run
+
+
+
+=head2 run_checks
+
+Runs all tests! Takes them including parameters from config file.
+
+Everything will be executed in order and single threaded.
+It might be possible to override this method and run one process for every host.
+
+
+=cut
+
+
+sub run_checks
+   {
+   my $self = shift;
 
    foreach my $host ( @{ $self->all_hosts } )
       {
@@ -229,30 +312,49 @@ sub run
       foreach my $check_name ( $posemo->get_all_checks_ordered() )
          {
          DEBUG "Prepare and run check $check_name";
-         my $check = $posemo->new_check( $check_name, $host->{_check_params} );
-         my $result = $check->run_check;
+
+         my $result;
+         eval {
+            my $check = $posemo->new_check( $check_name, $host->{_check_params} );
+            $result = $check->run_check;
+            return 1;
+         } or $result->{error} = "FATAL error in Check: $EVAL_ERROR";
 
          push @hosts_results, $result;
 
          }
 
-      push @results, { host => $host, results => \@results };
-
-      # TODO: results as attribute with traits
-
-      #       # .................
-      #      $self->add_result( { host => $host, } )
+      $self->add_result( { host => $host, results => \@hosts_results } );
 
       } ## end foreach my $host ( @{ $self...})
 
-   return \@results;
-   } ## end sub run
+   return $self;
+   } ## end sub run_checks
+
+
+=head2 write_result()
+
+Writes the final result. 
+
+It adds dome meta information to the result, calls the output method and 
+writes everything to disk or STDOUT etc, depending on ->outfile attriute.
+
+=cut
+
+sub write_result
+   {
+   my $self = shift;
+
+   # TODO.
+   # ...
+
+   return;
+   }
 
 
 =head2 all_host_groups
 
 Returns a list of all host groups in the config file, ordered by the "order" config option.
-
 The array contains only the names of the groups
 
 =cut

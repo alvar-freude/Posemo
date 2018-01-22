@@ -477,7 +477,7 @@ sub execute
       {
       $self->rollback;
       $result{error} = "Error executing SQL function ${ \$self->sql_function_name } from ${ \$self->class }: $EVAL_ERROR\n";
-      LOGDIE $result{error};
+      ERROR $result{error};
       };
 
    return \%result;
