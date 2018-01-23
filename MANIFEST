@@ -1,9 +1,11 @@
 .project
+bin/posemo_json.pl
 Build.PL
 Changes
 conf/example.conf
 conf/posemo-logging.properties
 conf/posemo.conf
+conf/simple-local.conf
 extlib/MooseX/SimpleConfig.pm
 extra-dummy-tests/insert-and-delete.pl
 extra-dummy-tests/performance_hash_slices_loops.pl
