@@ -9,7 +9,18 @@ package PostgreSQL::SecureMonitoring::Run;
 
 =encoding utf8
 
-...
+
+   use PostgreSQL::SecureMonitoring::Run;
+   
+   # or:
+   use PostgreSQL::SecureMonitoring::Run output => "JSON";
+
+   my $posemo = PostgreSQL::SecureMonitoring::Run->new_with_options();
+   $posemo->run;
+
+   # or:
+   PostgreSQL::SecureMonitoring::Run->new_with_options->run;
+   
 
 
 =head1 DESCRIPTION
@@ -134,6 +145,17 @@ has results =>
          },
       );
 
+has errcount => 
+      (
+      traits  => ['Counter'],
+      is      => 'ro',
+      isa     => 'Num',
+      default => 0,
+      handles => 
+         {
+         inc_error   => 'inc',
+         },
+      );
 
 #>>>
 
@@ -269,15 +291,20 @@ sub run
 
    DEBUG "All Checks Done. Runtime: $runtime seconds.";
 
-   $self->output_as_string(
-                            {
-                              message        => $message,
-                              posemo_version => $posemo_version,
-                              runtime        => $runtime,
-                              hostname       => $hostname,
-                              result         => $self->result,
-                            }
-                          );
+   my $output = $self->output_as_string(
+                                         {
+                                           message        => $message,
+                                           posemo_version => $posemo_version,
+                                           runtime        => $runtime,
+                                           hostname       => $hostname,
+                                           result         => $self->result,
+                                           error_count    => $self->errcount,
+                                           configfile     => $self->configfile,
+                                           global_id      => $self->conf->{global_id},
+                                         }
+                                       );
+
+   io( $self->outfile )->print($output);
 
    return;
    } ## end sub run
@@ -318,7 +345,7 @@ sub run_checks
             my $check = $posemo->new_check( $check_name, $host->{_check_params} );
             $result = $check->run_check;
             return 1;
-         } or $result->{error} = "FATAL error in Check: $EVAL_ERROR";
+         } or do { $self->inc_error; $result->{error} = "FATAL error in Check: $EVAL_ERROR"; };
 
          push @hosts_results, $result;
 
@@ -410,12 +437,11 @@ sub all_hosts
    } ## end sub all_hosts
 
 
-
 my @host_options          = qw(user passwd schema database port enabled warning_level critical_level min_value max_value);
 my @other_options         = qw(hosts hostgroup check order);
 my %allowed_host_options  = map { $ARG => 1 } @host_options;
 my %allowed_other_options = map { $ARG => 1 } @other_options;
-my %allowed_options       = ( %allowed_host_options, %allowed_other_options );
+my %allowed_options       = ( global_id => 1, %allowed_host_options, %allowed_other_options );
 
 
 sub _parameter_for_one_host
