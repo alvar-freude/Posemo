@@ -15,6 +15,8 @@ Version 0.5.0
 
 use version; our $VERSION = qv("v0.5.0");
 
+#use English qw( -no_match_vars );
+
 
 =head1 SYNOPSIS
 
@@ -33,14 +35,14 @@ use version; our $VERSION = qv("v0.5.0");
 
 =head1 DESCRIPTION
 
-This role provides cached DBI handles. 
+This role provides cached DBI handles.
 
 [...] (doc TODO)
 
 
 =cut
 
-has dbh => ( is => "ro", isa => "DBI::db", lazy_build => 1, handles => [qw(rollback)] );
+has dbh => ( is => "ro", isa => "DBI::db", lazy_build => 1, handles => [qw(rollback)], predicate => "has_dbh", );
 has _committed => ( is => "rw", isa => "Bool", );
 has _is_my_dbh => ( is => "rw", isa => "Bool", );
 
@@ -51,7 +53,11 @@ sub _build_dbh
    {
    my $self = shift;
 
-   my $dbh = DBI->connect_cached( $self->dbi_dsn, $self->dbi_user, $self->dbi_passwd, $self->dbi_options )
+   my $dbh;
+   eval {
+      $dbh = DBI->connect_cached( $self->dbi_dsn, $self->dbi_user, $self->dbi_passwd, $self->dbi_options );
+      return 1;
+      }
       or die "Can't get DB handle: $DBI::errstr\n";
 
    $self->_is_my_dbh(1);
