@@ -25,6 +25,23 @@ use Moose::Role;
 
 use JSON;
 
+
+=head2 Additional attributes
+
+=over 4
+
+=item * pretty
+
+Flag (boolean), if the output should be formatted pretty or compact (default).
+
+
+=back
+
+=cut
+
+has pretty => ( is => "ro", isa => "Bool", default => 0, );
+
+
 =head1 METHODS
 
 =head2 output_as_string
@@ -39,7 +56,9 @@ sub output_as_string
    my $self            = shift;
    my $complete_result = shift;
 
-   return encode_json($complete_result);
+   my $json = JSON->new->pretty($self->pretty);
+
+   return $json->encode($complete_result);
    }
 
 1;
