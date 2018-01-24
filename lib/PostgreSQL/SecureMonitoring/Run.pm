@@ -292,17 +292,17 @@ sub run
    DEBUG "All Checks Done. Runtime: $runtime seconds.";
 
    my $output = $self->output_as_string(
-                                         {
-                                           message        => $message,
-                                           posemo_version => $posemo_version,
-                                           runtime        => $runtime,
-                                           hostname       => $hostname,
-                                           result         => $self->result,
-                                           error_count    => $self->errcount,
-                                           configfile     => $self->configfile,
-                                           global_id      => $self->conf->{global_id},
-                                         }
-                                       );
+      {
+        message        => $message,
+        posemo_version => $posemo_version . "",   # convert to string!
+        runtime        => $runtime,
+        hostname       => $hostname,
+        result         => $self->results,
+        error_count    => $self->errcount,
+        configfile     => $self->configfile,
+        global_id      => $self->conf->{global_id},
+      }
+   );
 
    io( $self->outfile )->print($output);
 
@@ -332,11 +332,10 @@ sub run_checks
       my %host_params = map { $ARG => $host->{$ARG} } grep { not m{^_} } keys %$host;
       my $posemo = PostgreSQL::SecureMonitoring->new(%host_params);
 
-      my @hosts_results;
+      my @host_results;
 
-      # TODO: catch errors.
       # run all checks
-      foreach my $check_name ( $posemo->get_all_checks_ordered() )
+      foreach my $check_name ( $posemo->get_all_checks_ordered )
          {
          DEBUG "Prepare and run check $check_name";
 
@@ -347,11 +346,11 @@ sub run_checks
             return 1;
          } or do { $self->inc_error; $result->{error} = "FATAL error in Check: $EVAL_ERROR"; };
 
-         push @hosts_results, $result;
+         push @host_results, $result;
 
          }
 
-      $self->add_result( { host => $host, results => \@hosts_results } );
+      $self->add_result( { host => $host->{host}, results => \@host_results } );
 
       } ## end foreach my $host ( @{ $self...})
 

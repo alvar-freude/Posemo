@@ -183,7 +183,8 @@ Wie Speichern Result?
 
 # lazy / build functions
 
-foreach my $attr (qw(class name description code install_sql sql_function sql_function_name result_type))
+
+foreach my $attr (qw(class name description code install_sql sql_function sql_function_name result_type order))
    {
    my $builder = "_build_$attr";
    has $attr => ( is => "rw", isa => "Str", lazy => 1, builder => $builder, );
@@ -355,6 +356,12 @@ sub _build_result_type
    return $self->return_type;                      # result type is by default the same as the return type of the SQL function
    }
 
+sub _build_order
+   {
+   return shift->name;
+   }
+
+
 =head1 METHODS
 
 
@@ -402,13 +409,26 @@ sub run_check
 
    INFO "Run check ${ \$self->name } for host ${ \$self->host_desc }";
 
-   my $result = $self->execute();
-   $self->test_critical_warning($result);
+   my $result = $self->enabled ? $self->execute : {};
+
+   $result->{check_name}  = $self->name;
+   $result->{description} = $self->description;
+   $result->{result_unit} = $self->result_unit;
+   $result->{result_type} = $self->result_type;
+
+   foreach my $attr (qw(warning_level critical_level min_value max_value))
+      {
+      my $method = "has_$attr";
+      next unless $self->$method;
+      $result->{$attr} = $self->$attr;
+      }
+
+   $self->test_critical_warning($result) if $self->enabled;
 
    TRACE "Finished check ${ \$self->name } for host ${ \$self->host_desc }";
 
    return $result;
-   }
+   } ## end sub run_check
 
 =head2 execute
 
@@ -429,14 +449,7 @@ sub execute
       push @placeholders, q{?};
       }
 
-   my %result = (
-                  check_name  => $self->name,
-                  description => $self->description,
-                  result_unit => $self->result_unit,
-                  result_type => $self->result_type,
-                  map { $ARG => $self->$ARG }
-                     grep { my $m = "has_$ARG"; $self->$m } qw(warning_level critical_level min_value max_value),
-                );
+   my %result;
 
    my $placeholders = join( ", ", @placeholders );
 
@@ -475,9 +488,9 @@ sub execute
       return 1;
       } or do
       {
-      $self->rollback;
       $result{error} = "Error executing SQL function ${ \$self->sql_function_name } from ${ \$self->class }: $EVAL_ERROR\n";
       ERROR $result{error};
+      eval { $self->rollback if $self->has_dbh; return 1; } or ERROR "Error in rollback: $EVAL_ERROR";
       };
 
    return \%result;
@@ -573,23 +586,12 @@ sub test_critical_warning
    } ## end sub test_critical_warning
 
 
-=head2 order
-
-Returns a string for sort order (string sort!). May be overridden in check with an other string. 
-
-Defauls is check name.
-
-=cut
-
-sub order
-   {
-   return shift->name;
-   }
-
 
 =head2 enabled_on_this_platform
 
-Flag, if the check is enabled. 
+B<Usually you should not use this flag.>
+
+Flag, if the check is globally enabled on the current platform. 
 
 May be overridden in check, to disable some checks on some 
 platforms or based on other (non config!) state. When the decision 
@@ -598,6 +600,10 @@ is about the configuration or something similar, the attribute
 
 When a check module sets C<enabled_on_this_platform> to false, then 
 the check will not run, because C<get_all_checks_ordered> removes it.
+
+This should only be dependent on the platform, the application is 
+running, not the PostgreSQL server. 
+
 
 =cut
 

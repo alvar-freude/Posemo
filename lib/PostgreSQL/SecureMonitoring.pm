@@ -121,8 +121,6 @@ C<get_all_checks_ordered> returns an ordered and filtered list of all checks:
 Sort order is by return value of an object method "order" (string order, default check name). 
 And grep for "enabled_on_this_platform" (default true).
 
-
-
 =cut
 
 my @all_checks;
@@ -139,11 +137,16 @@ sub get_all_checks_ordered
    {
    my $self = shift;
 
+   my %checks = map {
+      _load_module("PostgreSQL::SecureMonitoring::Checks::$ARG");
+      $ARG => "PostgreSQL::SecureMonitoring::Checks::$ARG"->new( app => $self );
+   } $self->get_all_checks;
+
    #<<<
-   @all_checks_ordered
-      = sort { "PostgreSQL::SecureMonitoring::Checks::$a"->order cmp "PostgreSQL::SecureMonitoring::Checks::$b"->order }
-        grep { _load_module("PostgreSQL::SecureMonitoring::Checks::$ARG") and "PostgreSQL::SecureMonitoring::Checks::$ARG"->enabled_on_this_platform } 
-        $self->get_all_checks
+   @all_checks_ordered =
+        sort { $checks{$a}->order cmp $checks{$b}->order }
+        grep { $checks{$ARG}->enabled_on_this_platform }
+        keys %checks
       unless @all_checks_ordered;
    #>>>
 
