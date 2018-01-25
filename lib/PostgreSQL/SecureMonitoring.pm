@@ -104,7 +104,7 @@ sub BUILD
 sub _build_name
    {
    my $self = shift;
-   return $self->host;
+   return $self->host // "<no host>";
    }
 
 
