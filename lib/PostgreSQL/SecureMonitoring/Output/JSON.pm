@@ -56,7 +56,7 @@ sub output_as_string
    my $self            = shift;
    my $complete_result = shift;
 
-   my $json = JSON->new->pretty($self->pretty);
+   my $json = JSON->new->pretty( $self->pretty );
 
    return $json->encode($complete_result);
    }
