@@ -30,7 +30,7 @@ use English qw( -no_match_vars );
 
 
 check_has
-   description    => 'Try to write and commit before timeout.',
+   description    => 'Tries to write something and measures time.',
    return_type    => "bool",                       # the SQL-functions returns true/false
    result_type    => "float",                      # but the check itself returns seconds as float
    result_unit    => "seconds",
