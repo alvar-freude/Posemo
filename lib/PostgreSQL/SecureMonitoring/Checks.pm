@@ -137,6 +137,7 @@ use namespace::autoclean;
 use Scalar::Util qw(looks_like_number);
 use List::Util qw(any);
 use English qw( -no_match_vars );
+use Data::Dumper;
 
 use Config::FindFile qw(search_conf);
 use Log::Log4perl::EasyCatch ( log_config => search_conf("posemo-logging.properties") );
@@ -211,7 +212,7 @@ has min_value            => ( is => "ro", isa => "Num",           predicate => "
 has max_value            => ( is => "ro", isa => "Num",           predicate => "has_max_value", );
 
 # Internal states
-has app                  => ( is => "ro", isa => "Object",        required  => 1,          handles => [qw(dbh schema user superuser host port host_desc has_host has_port commit rollback)], );
+has app                  => ( is => "ro", isa => "Object",        required  => 1,          handles => [qw(dbh has_dbh schema user superuser host port host_desc has_host has_port commit rollback)], );
 # has result               => ( is => "ro", isa => "ArrayRef[Any]", default   => sub { [] }, ); 
 
 # attributes for attrs with builder method
@@ -400,6 +401,7 @@ sub install
 
 Executes the check, takes the result, checks for critical/warning and returns the result...
 
+Disabled checks are NOT skipped, this is the job of the caller!
 
 =cut
 
@@ -409,7 +411,15 @@ sub run_check
 
    INFO "Run check ${ \$self->name } for host ${ \$self->host_desc }";
 
-   my $result = $self->enabled ? $self->execute : {};
+   # my $result = $self->enabled ? $self->execute : {};
+   my $result = eval { return $self->execute; };
+
+   unless ($result)
+      {
+      $result->{error} = "Error executing SQL function ${ \$self->sql_function_name } from ${ \$self->class }: $EVAL_ERROR\n";
+      ERROR $result->{error};
+      eval { $self->rollback if $self->has_dbh; return 1; } or ERROR "Error in rollback: $EVAL_ERROR";
+      }
 
    $result->{check_name}  = $self->name;
    $result->{description} = $self->description;
@@ -423,16 +433,20 @@ sub run_check
       $result->{$attr} = $self->$attr;
       }
 
-   $self->test_critical_warning($result) if $self->enabled;
+   # skip critical/warning test, when no real result!
+   $self->test_critical_warning($result) if $self->enabled and not $result->{error};
 
    TRACE "Finished check ${ \$self->name } for host ${ \$self->host_desc }";
+   TRACE "Result: " . Dumper($result);
 
    return $result;
    } ## end sub run_check
 
 =head2 execute
 
-Executes the check inside the PostgreSQL server and return the result
+Executes the check inside the PostgreSQL server and returns the result.
+
+Throws exception on error!
 
 =cut
 
@@ -453,45 +467,38 @@ sub execute
 
    my $placeholders = join( ", ", @placeholders );
 
-   eval {
-      # SELECT with FROM, because function with multiple OUT parameters will result in multiple columns
-      my $sth = $self->dbh->prepare("SELECT * FROM ${ \$self->sql_function_name }($placeholders);");
-      DEBUG "All values for execute: " . join( ", ", map { "'$_'" } @values );
-      $sth->execute(@values);
+   # SELECT with FROM, because function with multiple OUT parameters will result in multiple columns
+   TRACE "Prepare: SELECT * FROM ${ \$self->sql_function_name }($placeholders);";
+   my $sth = $self->dbh->prepare("SELECT * FROM ${ \$self->sql_function_name }($placeholders);");
+   DEBUG "All values for execute: " . join( ", ", map { "'$_'" } @values );
+   $sth->execute(@values);
 
-      $result{columns} = $sth->{NAME};
+   $result{columns} = $sth->{NAME};
 
-      if ( $self->has_multiline_result )
+   if ( $self->has_multiline_result )
+      {
+      $result{result}   = @{ $sth->fetchall_arrayref };
+      $result{row_type} = "multiline";
+      }
+   else
+      {
+      my @row = $sth->fetchrow_array;
+
+      if ( scalar @row <= 1 )
          {
-         $result{result}   = @{ $sth->fetchall_arrayref };
-         $result{row_type} = "multiline";
+         $result{result}   = $row[0];
+         $result{row_type} = "single";
          }
       else
          {
-         my @row = $sth->fetchrow_array;
-
-         if ( scalar @row <= 1 )
-            {
-            $result{result}   = $row[0];
-            $result{row_type} = "single";
-            }
-         else
-            {
-            $result{result}   = \@row;
-            $result{row_type} = "list";
-            }
+         $result{result}   = \@row;
+         $result{row_type} = "list";
          }
+      }
 
-      $sth->finish;
+   $sth->finish;
 
-      $self->commit if $self->has_writes;
-      return 1;
-      } or do
-      {
-      $result{error} = "Error executing SQL function ${ \$self->sql_function_name } from ${ \$self->class }: $EVAL_ERROR\n";
-      ERROR $result{error};
-      eval { $self->rollback if $self->has_dbh; return 1; } or ERROR "Error in rollback: $EVAL_ERROR";
-      };
+   $self->commit if $self->has_writes;
 
    return \%result;
    } ## end sub execute

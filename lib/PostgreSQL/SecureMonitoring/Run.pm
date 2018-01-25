@@ -113,6 +113,7 @@ use Storable qw(dclone);
 use Time::HiRes qw(time);
 use Sys::Hostname;
 use Module::Loaded;
+use Data::Dumper;
 
 use Config::Any;
 
@@ -260,7 +261,6 @@ sub _build_conf
 
    $conf = $conf->{ $self->configfile } or die "No config loaded, tried with ${ \$self->configfile }!\n";
 
-   use Data::Dumper;
    TRACE "Conf: ", Dumper($conf);
 
    # TODO: validate!
@@ -278,6 +278,8 @@ Runs everything: calls run_checks, measures time and writes output to file or ST
 sub run
    {
    my $self = shift;
+
+   return $self->list_attributes if $self->show_options;
 
    my $posemo_version = $PostgreSQL::SecureMonitoring::VERSION;
    my $hostname       = hostname;
@@ -318,7 +320,6 @@ Runs all tests! Takes them including parameters from config file.
 Everything will be executed in order and single threaded.
 It might be possible to override this method and run one process for every host.
 
-
 =cut
 
 
@@ -332,6 +333,8 @@ sub run_checks
       my %host_params = map { $ARG => $host->{$ARG} } grep { not m{^_} } keys %$host;
       my $posemo = PostgreSQL::SecureMonitoring->new(%host_params);
 
+      TRACE "Host Params: " . Dumper( \%host_params );
+
       my @host_results;
 
       # run all checks
@@ -341,14 +344,22 @@ sub run_checks
 
          my $result;
          eval {
-            my $check = $posemo->new_check( $check_name, $host->{_check_params} );
-            $result = $check->run_check;
+            my $check_params = { %host_params, %{ $host->{_check_params}{$check_name} // {} } };
+            TRACE "Check Params: " . Dumper($check_params);
+
+            my $check = $posemo->new_check( $check_name, $check_params );
+
+            if ( $check->enabled ) { $result = $check->run_check; }
+            else                   { DEBUG "SKIP Check ${ \$check->name } for host ${ \$check->host_desc }: not enabled"; }
+
             return 1;
-         } or do { $self->inc_error; $result->{error} = "FATAL error in Check: $EVAL_ERROR"; };
+            }
+            or
+            do { $self->inc_error; $result->{error} = "FATAL error in check $check_name for host $host->{host}: $EVAL_ERROR"; };
 
-         push @host_results, $result;
+         push @host_results, $result if $result;
 
-         }
+         } ## end foreach my $check_name ( $posemo...)
 
       $self->add_result( { host => $host->{host}, results => \@host_results } );
 
@@ -360,7 +371,7 @@ sub run_checks
 
 =head2 write_result()
 
-Writes the final result. 
+Writes the final result.
 
 It adds dome meta information to the result, calls the output method and 
 writes everything to disk or STDOUT etc, depending on ->outfile attriute.
@@ -431,6 +442,8 @@ sub all_hosts
       my %group_defaults = _parameter_for_one_host( $conf->{hostgroup}{$group}, \%defaults, $group );
       push @hosts, _create_hosts_conf( $conf->{hostgroup}{$group}{hosts}, \%group_defaults, $group );
       }
+
+   TRACE "All Hosts: " . Dumper( \@hosts );
 
    return \@hosts;
    } ## end sub all_hosts
