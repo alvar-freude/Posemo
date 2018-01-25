@@ -63,6 +63,7 @@ Can called multiple times.
 my %attr_map = (
                  code        => "_code_attr",
                  result_type => "_result_type_attr",
+                 description => "_description_attr",
                );
 
 sub check_has

@@ -20,7 +20,9 @@ which just returns true. So, if the server is alive, then it returns true.
 use PostgreSQL::SecureMonitoring::ChecksHelper;
 extends "PostgreSQL::SecureMonitoring::Checks";
 
-check_has code => "SELECT true";
+check_has
+   description => 'Checks if server is alive.',
+   code        => "SELECT true";
 
 1;
 

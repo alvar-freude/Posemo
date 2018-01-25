@@ -38,6 +38,7 @@ use PostgreSQL::SecureMonitoring::ChecksHelper;
 extends "PostgreSQL::SecureMonitoring::Checks";
 
 check_has
+   description          => 'Counts running and idling connections.',
    has_multiline_result => 1,
 
    # complex return type

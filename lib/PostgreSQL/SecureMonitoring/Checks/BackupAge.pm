@@ -24,6 +24,7 @@ use PostgreSQL::SecureMonitoring::ChecksHelper;
 extends "PostgreSQL::SecureMonitoring::Checks";
 
 check_has
+   description => 'Checks if a backup is running and how long.',
    return_type => 'integer',
    result_unit => 'seconds',
    code        => "SELECT CASE WHEN pg_is_in_backup()
