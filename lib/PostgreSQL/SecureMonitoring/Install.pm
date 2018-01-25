@@ -111,6 +111,10 @@ has installation_database => ( is => "ro", isa => "Str",  default => "postgres",
 
 #>>> no perltidy
 
+with "MooseX::Getopt";
+with 'MooseX::ListAttributes';
+
+
 =head2 install
 
 installs database and all checks
@@ -120,6 +124,8 @@ installs database and all checks
 sub install
    {
    my $self = shift;
+
+   return $self->list_attributes if $self->show_options;
 
    my $installed_non_rollbackable = 0;
    INFO "Install Posemo and Checks";
