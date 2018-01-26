@@ -164,6 +164,22 @@ with "MooseX::Getopt";
 with 'MooseX::ListAttributes';
 
 
+# Option constants
+#   Public: listed in the result at host level
+#   Host Options: may be set per host
+#   other: optins not passed to new check etc.
+#
+# TODO:
+# warning_level etc. is not really useful at host level, only at check-level!
+# add a new "level_options" ...
+
+my @public_options        = qw( port user database schema );
+my @host_options          = ( @public_options, qw( passwd enabled warning_level critical_level min_value max_value ) );
+my @other_options         = qw( hosts hostgroup check order );
+my %allowed_host_options  = map { $ARG => 1 } @host_options;
+my %allowed_other_options = map { $ARG => 1 } @other_options;
+my %allowed_options       = ( global_id => 1, %allowed_host_options, %allowed_other_options );
+
 
 =head2 import
 
@@ -361,7 +377,10 @@ sub run_checks
 
          } ## end foreach my $check_name ( $posemo...)
 
-      $self->add_result( { host => $host->{host}, results => \@host_results } );
+      # add (defined) host options
+      my %this_host_params = map { $ARG => $host_params{$ARG} } grep { defined $host_params{$ARG} } @public_options;
+      $host_params{results} = \@host_results;
+      $self->add_result( \%this_host_params );
 
       } ## end foreach my $host ( @{ $self...})
 
@@ -447,13 +466,6 @@ sub all_hosts
 
    return \@hosts;
    } ## end sub all_hosts
-
-
-my @host_options          = qw(user passwd schema database port enabled warning_level critical_level min_value max_value);
-my @other_options         = qw(hosts hostgroup check order);
-my %allowed_host_options  = map { $ARG => 1 } @host_options;
-my %allowed_other_options = map { $ARG => 1 } @other_options;
-my %allowed_options       = ( global_id => 1, %allowed_host_options, %allowed_other_options );
 
 
 sub _parameter_for_one_host
