@@ -260,8 +260,8 @@ sub host_desc
    my $self = shift;
 
    my $port;
-   if    ( $self->has_port ) { $port = ":" . $self->port; }
-   elsif ( $ENV{PGPORT} )    { $port = ":" . $ENV{PGPORT}; }
+   if    ( $self->has_port ) { $port = q{:} . $self->port; }
+   elsif ( $ENV{PGPORT} )    { $port = q{:} . $ENV{PGPORT}; }
    else                      { $port = ""; }
 
    return $self->host . $port if $self->has_host;
