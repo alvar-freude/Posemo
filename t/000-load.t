@@ -19,7 +19,7 @@ Test Numbering:
   4xx: checks base & helper classes
   5xx: checks phase 1
   6xx: 
-  7xx: 
+  7xx: complete runs and similar
   8xx: Bugs
   9xx: Style etc
 
