@@ -379,7 +379,8 @@ sub run_checks
 
       # add (defined) host options
       my %this_host_params = map { $ARG => $host_params{$ARG} } grep { defined $host_params{$ARG} } @public_options;
-      $host_params{results} = \@host_results;
+      $this_host_params{results}   = \@host_results;
+      $this_host_params{hostgroup} = $host->{_hostgroup};
       $self->add_result( \%this_host_params );
 
       } ## end foreach my $host ( @{ $self...})
