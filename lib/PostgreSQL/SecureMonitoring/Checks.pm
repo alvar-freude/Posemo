@@ -479,7 +479,7 @@ sub execute
 
    if ( $self->has_multiline_result )
       {
-      $result{result}   = @{ $sth->fetchall_arrayref };
+      $result{result}   = $sth->fetchall_arrayref;
       $result{row_type} = "multiline";
       }
    else
