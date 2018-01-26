@@ -38,6 +38,7 @@ t/150-install.t
 t/210-checks-helper.t
 t/215-config-findfile.t
 t/220-run-conf.t
+t/221-run-json.t
 t/400-checks-base.t
 t/501-alive.pg
 t/501-alive.t
@@ -54,6 +55,7 @@ t/930-pod-coverage.t
 t/931-pod.t
 t/990-postgresql-stop.t
 t/conf/posemo-test-logging.properties
+t/conf/simple.conf
 t/conf/test-example.conf
 t/conf/test-nonexistent-logging.conf
 t/log-test.properties
