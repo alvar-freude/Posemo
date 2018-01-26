@@ -589,7 +589,7 @@ sub test_critical_warning
       INFO "Warning values: @warn in check ${ \$self->name } for host ${ \$self->host_desc }";
       }
 
-   $result->{message} = $message;
+   $result->{message} = $message if $message;
 
    return;
    } ## end sub test_critical_warning
