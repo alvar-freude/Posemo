@@ -281,6 +281,8 @@ sub _do_create_database
 
    INFO "INSTALL: create monitoring database '${ \$self->database }'";
    $dbh->do("CREATE DATABASE ${ \$self->database } OWNER ${ \$self->superuser };");
+   # grants will be set later!
+
    DEBUG "create DB done";
 
    return $self;
