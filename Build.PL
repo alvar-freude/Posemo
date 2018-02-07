@@ -40,8 +40,8 @@ my $builder = Module::Build->new(
       'Test::More'                        => 0,
       'Test::Exception'                   => 0.25,
       'TAP::Parser::SourceHandler::pgTAP' => 3.25,
-
-      'Config::Tiny' => 2.20,
+      'Test::Differences'                 => 0.64,
+      'Config::Tiny'                      => 2.20,
 
       # 'Test::MockObject'     => 1.20140408,
       # 'Test::File'           => 1.41,
@@ -64,10 +64,9 @@ my $builder = Module::Build->new(
       'Config::General'           => 2.50,
       'Readonly'                  => 1.03,
       'IO::All'                   => 0.84,
-
-      'File::HomeDir'  => 1.00,                    # used by Config::FindFile
-      'File::ShareDir' => 1.102,                   # used by Config::FindFile
-                                                   # 'Config::Tiny'   => "2.23",                  # used by Test::PostgreSQL::Starter
+      'File::HomeDir'             => 1.00,         # used by Config::FindFile
+      'File::ShareDir'            => 1.102,        # used by Config::FindFile
+      'JSON'                      => 2.94,
 
       # currently not used:
       # 'Config::Validate'  => '0.2.6',
