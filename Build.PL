@@ -10,7 +10,7 @@
 use 5.014;
 use strict;
 use warnings FATAL => 'all';
-eval { use Module::Build; return 1; } or die "Please install perl module Module::Build for installation. Stopped.\n";
+eval " use Module::Build; return 1; " or die "Please install perl module Module::Build for installation. Stopped.\n";
 
 my $builder = Module::Build->new(
    module_name       => 'Posemo',
@@ -53,16 +53,17 @@ my $builder = Module::Build->new(
    # usually it should work with older versions of this modules, but this
    # is not tested.
    requires => {
-      'DBI'                    => 1.633,
-      'DBD::Pg'                => '3.5.1',
-      'Moose'                  => 2.0401,
-      'MooseX::Getopt'         => 0.37,
-      'MooseX::SimpleConfig'   => 0.11,
-      'MooseX::ConfigFromFile' => 0.04,
-      'Log::Log4perl'          => 1.29,
-      'Config::General'        => 2.50,
-      'Readonly'               => 1.03,
-      'IO::All'                => 0.84,
+      'DBI'                       => 1.633,
+      'DBD::Pg'                   => '3.5.1',
+      'Moose'                     => 2.0401,
+      'MooseX::Getopt'            => 0.37,
+      'MooseX::Types::Path::Tiny' => 0.012,        # missing(??) dependency in MooseX::ConfigFromFile
+      'MooseX::SimpleConfig'      => 0.11,
+      'MooseX::ConfigFromFile'    => 0.04,
+      'Log::Log4perl'             => 1.29,
+      'Config::General'           => 2.50,
+      'Readonly'                  => 1.03,
+      'IO::All'                   => 0.84,
 
       'File::HomeDir'  => 1.00,                    # used by Config::FindFile
       'File::ShareDir' => 1.102,                   # used by Config::FindFile
