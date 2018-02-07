@@ -7,7 +7,6 @@ conf/example.conf
 conf/posemo-logging.properties
 conf/posemo.conf
 conf/simple-local.conf
-extlib/MooseX/SimpleConfig.pm
 extra-dummy-tests/insert-and-delete.pl
 extra-dummy-tests/performance_hash_slices_loops.pl
 ignore.txt
@@ -38,7 +37,6 @@ t/150-install.t
 t/210-checks-helper.t
 t/215-config-findfile.t
 t/220-run-conf.t
-t/221-run-json.t
 t/400-checks-base.t
 t/501-alive.pg
 t/501-alive.t
@@ -47,6 +45,7 @@ t/502-writeable.t
 t/510-backup-age.pg
 t/510-backup-age.t
 t/511-activity.pg
+t/701-run-json.t
 t/801-security-definer.pg
 t/900-perlcritic.t
 t/910-boilerplate.t
