@@ -22,7 +22,15 @@ This module provides everything for installing Posemo:
 It installs (optionally) all needed users and the database, SQL-Schema and
 all checks.
 
-TODO: see also: C<posemo-install.pl> and C<PostgreSQL::SecureMonitoring::Install::App>
+run via: C<posemo_install.pl>
+
+
+TODO: docs cleanup!
+
+TODO: 
+generate SQL output instead of directly connecting to DB! 
+For this, wrap dbh object in other class, outputs the SQL in do-method and handles begin/commit!
+
 
 
 =cut
