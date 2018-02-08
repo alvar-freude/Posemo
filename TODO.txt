@@ -10,9 +10,23 @@ Put extra non monitoring specific modules into their own CPAN distribution:
 
 
 
+Revoke login right on admin user (install.pm)
+
 
 More Checks
 
 
+SQL to STDOUT (or file?) output.
+
+until this, use a dump:
+
+  * Start test DB: 
+    
+  * install code, e.g. via:
+    bin/posemo_install.pl --create_database --create_superuser --superuser=posemo_admin --port=15432 --installation_user=freude --create_user --user=posemo
+    
+  * pg_dump -s -p 15432 monitoring
+  
+  * install it
 
 
