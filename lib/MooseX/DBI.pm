@@ -55,7 +55,16 @@ sub _build_dbh
 
    my $dbh;
    eval {
-      $dbh = DBI->connect_cached( $self->dbi_dsn, $self->dbi_user, $self->dbi_passwd, $self->dbi_options );
+      if ( $self->dbi_dsn eq "-" )
+         {
+         # Dummy connection: prints everything to STDOUT!
+         # TODO!
+         die "TODO: build pseudo DBI object for printing to STDOUT ...";
+         }
+      else
+         {
+         $dbh = DBI->connect_cached( $self->dbi_dsn, $self->dbi_user, $self->dbi_passwd, $self->dbi_options );
+         }
       return 1;
       }
       or die "Can't get DB handle: $DBI::errstr\n";
@@ -66,7 +75,7 @@ sub _build_dbh
    #   warn "Ping-result: $ping\n";
 
    return $dbh;
-   }
+   } ## end sub _build_dbh
 
 
 =head2 ->commit

@@ -209,11 +209,15 @@ DSN: Build from database, host and port
 
 Options always fixed: RaiseError on, AutoCommit off
 
+When host is "-", then the complete DSN is set to "-" (means STDOUT)
+
 =cut
 
 sub dbi_dsn
    {
    my $self = shift;
+   
+   return "-" if $self->has_host and $self->host eq "-";
 
    my $host_str = $self->has_host ? ";host=${ \$self->host }" : "";
    my $port_str = $self->has_port ? ";port=${ \$self->port }" : "";
