@@ -55,11 +55,11 @@ sub _build_dbh
 
    my $dbh;
    eval {
-      if ( $self->dbi_dsn eq "-" )
+      if ( $self->dbi_dsn eq q{-} )
          {
          # Dummy connection: prints everything to STDOUT!
          # TODO!
-         die "TODO: build pseudo DBI object for printing to STDOUT ...";
+         die "TODO: build pseudo DBI object for printing to STDOUT ...\n";
          }
       else
          {

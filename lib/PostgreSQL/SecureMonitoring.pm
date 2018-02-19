@@ -216,8 +216,8 @@ When host is "-", then the complete DSN is set to "-" (means STDOUT)
 sub dbi_dsn
    {
    my $self = shift;
-   
-   return "-" if $self->has_host and $self->host eq "-";
+
+   return q{-} if $self->has_host and $self->host eq q{-};
 
    my $host_str = $self->has_host ? ";host=${ \$self->host }" : "";
    my $port_str = $self->has_port ? ";port=${ \$self->port }" : "";
