@@ -48,7 +48,7 @@ lives_ok sub { $app = PostgreSQL::SecureMonitoring::Run->new( configfile => "$Bi
 
 my @host_groups = $app->all_host_groups;
 
-cmp_deeply( \@host_groups, [qw(Elephant Mammut ApplicationTests)], "Hostgroups found" );
+cmp_deeply( \@host_groups, [qw(Elephant Mammut SingleWithName MultiWithName ApplicationTests)], "Hostgroups found" );
 
 
 #use Data::Dumper;
@@ -74,8 +74,6 @@ my %outer_check_params = (
 my %elephant_defaults = ( %outer_defaults, _hostgroup => "Elephant" );
 
 my %elephant_check_params = ( %outer_check_params, Writeable => { enabled => 1, timeout => 100, } );
-my %mammut_check_params = ( %outer_check_params, Trunk => { timeout => 123, } );
-
 
 my %app_defaults = ( %outer_defaults, _hostgroup => "ApplicationTests", schema => "posemo_monitoring", );
 
@@ -113,6 +111,29 @@ my $expected_hosts = [
    },
 
    {
+      %outer_defaults,
+      _hostgroup    => "SingleWithName",
+      host          => "123.45.67.89",
+      _name         => "my_db_host_name",
+      _check_params => { %outer_check_params, Writeable => { enabled => 1, timeout => 999, }, },
+   }, 
+
+   {
+      %outer_defaults,
+      _hostgroup    => "MultiWithName",
+      host          => "1.1.1.1",
+      _name         => "master_server",
+      _check_params => { %outer_check_params, },
+   },
+   {
+      %outer_defaults,
+      _hostgroup    => "MultiWithName",
+      host          => "2.2.2.2",
+      _name         => "slave_server",
+      _check_params => { %outer_check_params, },
+   },
+
+   {
       %app_defaults,
       host          => "db_lion",
       enabled       => 0,
@@ -122,6 +143,13 @@ my $expected_hosts = [
    {
       %app_defaults,
       host          => "db_tiger",
+      enabled       => 0,
+      _check_params => { %outer_check_params, ApplicationTiger => { enabled => 1, critical_level => 1000, } },
+   },
+
+   {
+      %app_defaults,
+      host          => "db_snowtiger",
       enabled       => 0,
       _check_params => { %outer_check_params, ApplicationTiger => { enabled => 1, critical_level => 1000, } },
    },

@@ -167,7 +167,7 @@ with 'MooseX::ListAttributes';
 # Option constants
 #   Public: listed in the result at host level
 #   Host Options: may be set per host
-#   other: optins not passed to new check etc.
+#   other: options not passed to new check etc.
 #
 # TODO:
 # warning_level etc. is not really useful at host level, only at check-level!
@@ -175,7 +175,7 @@ with 'MooseX::ListAttributes';
 
 my @public_options        = qw( port user database schema );
 my @host_options          = ( @public_options, qw( passwd enabled warning_level critical_level min_value max_value ) );
-my @other_options         = qw( hosts hostgroup check order );
+my @other_options         = qw( hosts hostgroup check order name );
 my %allowed_host_options  = map { $ARG => 1 } @host_options;
 my %allowed_other_options = map { $ARG => 1 } @other_options;
 my %allowed_options       = ( global_id => 1, %allowed_host_options, %allowed_other_options );
@@ -322,7 +322,7 @@ sub run
       }
    );
 
-   io( $self->outfile )->print($output);
+   $self->write_result($output);
 
    return;
    } ## end sub run
@@ -381,6 +381,8 @@ sub run_checks
       my %this_host_params = map { $ARG => $host_params{$ARG} } grep { defined $host_params{$ARG} } @public_options;
       $this_host_params{results}   = \@host_results;
       $this_host_params{hostgroup} = $host->{_hostgroup};
+      $this_host_params{host}      = $host->{host};
+      $this_host_params{name}      = $host->{_name} if defined $host->{_name};
       $self->add_result( \%this_host_params );
 
       } ## end foreach my $host ( @{ $self...})
@@ -393,17 +395,16 @@ sub run_checks
 
 Writes the final result.
 
-It adds dome meta information to the result, calls the output method and 
-writes everything to disk or STDOUT etc, depending on ->outfile attriute.
+May be overridden by output modules, e.g. don't write file, instead write it to a database ...
 
 =cut
 
 sub write_result
    {
-   my $self = shift;
+   my $self   = shift;
+   my $output = shift;
 
-   # TODO.
-   # ...
+   io( $self->outfile )->print($output);
 
    return;
    }
@@ -469,6 +470,10 @@ sub all_hosts
    } ## end sub all_hosts
 
 
+# TODO: Cleanup!
+#  * variable and sub names
+#  * logical structure and call tree
+
 sub _parameter_for_one_host
    {
    my $conf        = shift;
@@ -491,13 +496,50 @@ sub _parameter_for_one_host
    # set all check options without test if they are allowed here.
    @{ $params{_check_params} }{ keys %{ $conf->{check} } } = @{ $conf->{check} }{ keys %{ $conf->{check} } };
 
+   # Set host and name of the target machine.
+   #
+   if ( defined $conf->{name} )
+      {
+      TRACE "And set config option  Host $conf->{hosts} and name $conf->{name}";
+      $params{_name} = $conf->{name};
+      $params{host}  = $conf->{hosts};
+      }
+   else
+      {
+      _split_host_and_name( $conf->{hosts}, \%params );
+      }
+
    return %params;
    } ## end sub _parameter_for_one_host
 
 
+sub _split_host_and_name
+   {
+   my $in_host    = shift;
+   my $out_params = shift;
+
+   TRACE "Set config option for unsplitted Host $in_host";
+   my ( $host, $name ) = split( qr{=}, $in_host );
+   if ($name)
+      {
+      TRACE "Splitted: Host: $host; name: $name";
+      $out_params->{host}  = $host;
+      $out_params->{_name} = $name;
+      }
+   else
+      {
+      TRACE "nothing to split for $in_host ";
+      $out_params->{host} = $in_host;
+      }
+
+   return;
+
+   } ## end sub _split_host_and_name
+
+
 
 #
-# _create_hosts_conf( $host_conf_entry, $defaults )
+# _create_hosts_conf( $host_conf_entry, $defaults [, $group] )
 #
 # $host_conf_entry may be a string (space delimetered) or a arrayref
 #
@@ -511,12 +553,22 @@ sub _create_hosts_conf
    # handle something like: host = host1 host2 host3
    return _split_hosts( $host_conf_entry, $defaults ) unless ref $host_conf_entry;
 
-   return map {                                    ## no critic (BuiltinFunctions::ProhibitComplexMappings)
+   my @hosts;
+   foreach my $single_entry (@$host_conf_entry)
       {
-         ( %$defaults, host => $ARG->{hosts}, _parameter_for_one_host( $ARG, $defaults, $group, $ARG->{hosts} ), )
+      die "Don't separate host names via comma! (at '$single_entry->{hosts}')\n" if $single_entry->{hosts} =~ m{,};
+      foreach my $single_host ( split( qr{\s+}, $single_entry->{hosts} ) )
+         {
+         my %conf = %$single_entry;
+         $conf{hosts} = $single_host;
+         TRACE "Handling $single_host";
+         push @hosts, { _parameter_for_one_host( \%conf, $defaults, $group, $single_host ), };
+         }
       }
-   } @$host_conf_entry;
-   }
+
+   return @hosts;
+
+   } ## end sub _create_hosts_conf
 
 
 #
@@ -531,10 +583,21 @@ sub _split_hosts
 
    die "Don't separate host names via comma! (at '$host_conf_entry')\n" if $host_conf_entry =~ m{,};
 
-   return map {                                    ## no critic (BuiltinFunctions::ProhibitComplexMappings)
-      { ( %$defaults, host => $_ ) }
-   } split( qr{\s+}, $host_conf_entry );
+   my @hosts;
 
-   }
+   foreach my $single_host ( split( qr{\s+}, $host_conf_entry ) )
+      {
+      my %conf = %$defaults;
+      _split_host_and_name( $single_host, \%conf );
+      push @hosts, \%conf;
+      }
+
+   return @hosts;
+
+   #   return map {                                    ## no critic (BuiltinFunctions::ProhibitComplexMappings)
+   #      { ( %$defaults, host => $_ ) }
+   #   } split( qr{\s+}, $host_conf_entry );
+
+   } ## end sub _split_hosts
 
 1;
