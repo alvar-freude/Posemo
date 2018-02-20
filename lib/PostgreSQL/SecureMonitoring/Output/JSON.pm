@@ -44,14 +44,14 @@ has pretty => ( is => "ro", isa => "Bool", default => 0, );
 
 =head1 METHODS
 
-=head2 output_as_string
+=head2 generate_output
 
 Implements the output mechanism, here plain JSON.
 
 =cut
 
 
-sub output_as_string
+sub generate_output
    {
    my $self            = shift;
    my $complete_result = shift;

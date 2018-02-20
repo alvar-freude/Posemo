@@ -309,7 +309,7 @@ sub run
 
    DEBUG "All Checks Done. Runtime: $runtime seconds.";
 
-   my $output = $self->output_as_string(
+   my $output = $self->generate_output(
       {
         message        => $message,
         posemo_version => $posemo_version . "",   # convert to string!
