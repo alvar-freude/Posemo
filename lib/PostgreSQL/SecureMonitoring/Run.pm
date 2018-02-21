@@ -85,20 +85,11 @@ The following options of Gonfig::General are enabled:
   -IncludeDirectories => 1,
   -IncludeGlob        => 1,
 
-So all options may be written in lowe/upper case mixed. If you use another config file format
+So all options may be written in lower/upper case mixed. If you use another config file format
 (YAML, JSON, ...), then you should write all attribute names in lowercase.
 
 
 
-Extra Checks für HostGroups:
-
-  * Kriegen eine Liste an Hosts, das sind check-Objete für jeden Host!
-  * ermitteln dann da Zeug
-
-
-# check: http://search.cpan.org/~mbp/Data-Processor-0.4.3/lib/Data/Processor.pm
-# Check: http://search.cpan.org/~sonnen/Data-Validate-0.09/Validate.pm
-# check: http://search.cpan.org/~cmo/Config-Validate-0.2.6/lib/Config/Validate.pm
 
 
 
@@ -594,10 +585,6 @@ sub _split_hosts
 
    return @hosts;
 
-   #   return map {                                    ## no critic (BuiltinFunctions::ProhibitComplexMappings)
-   #      { ( %$defaults, host => $_ ) }
-   #   } split( qr{\s+}, $host_conf_entry );
-
-   } ## end sub _split_hosts
+   }
 
 1;
