@@ -19,7 +19,7 @@ max_statements = 2
 
 # 100 (for 100 percent etc) and 1000 is allowed too; 0, 1, 2 are the defaults
 [ValuesAndExpressions::ProhibitMagicNumbers]
-allowed_values = 0 1 2 100 1000
+allowed_values = -1 0 1 2 100 1000
 
 
 # use strict/warnings is enabled by PostgreSQL::SecureMonitoring::ChecksHelper
