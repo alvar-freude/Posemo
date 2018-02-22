@@ -121,35 +121,43 @@ use IO::All -utf8;
 
 has configfile => ( is => "ro", isa => "Str",          default => search_conf("posemo.conf"),            documentation => "Configuration file", );
 has log_config => ( is => "rw", isa => "Str",                                                            documentation => "Alternative logging config", );
-has conf       => ( is => "ro", isa => "HashRef[Any]", builder => "_build_conf",              lazy => 1, documentation => "Complete configuration (usually don't use at CLI)", );
 has outfile    => ( is => "ro", isa => "Str",          default => q{-},                                  documentation => "Output file name; - for STDOUT (default)" );
 
-has results => 
-      (
-      traits   => ['Array'],
-      is       => 'ro',
-      isa      => 'ArrayRef[Any]',
-      default  => sub { [] },
-      handles  => 
-         {
-         all_results    => 'elements',
-         add_result     => 'push',
-         },
-      );
-
-has errcount => 
-      (
-      traits  => ['Counter'],
-      is      => 'ro',
-      isa     => 'Num',
-      default => 0,
-      handles => 
-         {
-         inc_error   => 'inc',
-         },
-      );
-
 #>>>
+
+has _conf => (
+              reader        => "conf",
+              is            => "ro",
+              isa           => "HashRef[Any]",
+              builder       => "_build_conf",
+              lazy          => 1,
+              documentation => "Complete configuration (usually don't use at CLI)",
+            );
+
+has _results => (
+                  reader  => "results",
+                  traits  => ['Array'],
+                  is      => 'ro',
+                  isa     => 'ArrayRef[Any]',
+                  default => sub { [] },
+                  handles => {
+                               all_results => 'elements',
+                               add_result  => 'push',
+                             },
+                );
+
+has _errcount => (
+                   reader  => "errcount",
+                   traits  => ['Counter'],
+                   is      => 'ro',
+                   isa     => 'Num',
+                   default => 0,
+                   handles => {
+                                inc_error => 'inc',
+                              },
+                 );
+
+
 
 with "MooseX::Getopt";
 with 'MooseX::ListAttributes';
