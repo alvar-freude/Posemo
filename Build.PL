@@ -53,7 +53,7 @@ my $builder = Module::Build->new(
    # usually it should work with older versions of this modules, but this
    # is not tested.
    requires => {
-      'DBI'                       => 1.633,
+      'DBI'                       => 1.631,
       'DBD::Pg'                   => '3.5.1',
       'Moose'                     => 2.0401,
       'MooseX::Getopt'            => 0.37,
