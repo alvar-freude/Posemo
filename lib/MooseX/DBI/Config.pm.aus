@@ -1,0 +1,12 @@
+package MooseX::DBI::Config;
+
+use Moose::Role;
+
+has dbi_dsn    => ( is => "ro", isa => "Str", lazy => 1, default => sub { shift->config('dbi.dsn') } );
+has dbi_user   => ( is => "ro", isa => "Str", lazy => 1, default => sub { shift->config('dbi.user') } );
+has dbi_passwd => ( is => "ro", isa => "Str", lazy => 1, default => sub { shift->config('dbi.passwd') } );
+has dbi_options =>
+   ( is => "ro", isa => "HashRef", lazy => 1, default => sub { shift->config('dbi.options') } );
+
+1;
+

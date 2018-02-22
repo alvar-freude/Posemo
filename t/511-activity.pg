@@ -1,0 +1,25 @@
+-- Start transaction and plan the tests.
+BEGIN;
+SELECT plan(3);
+
+
+-- Run the tests.
+
+-- only some SIMPLE tests, because we don't have concurrent connections
+-- maybe add some Tests with concurrent connections in the future (besser as perl test?)
+--
+-- when changed database or something similar, then this tests may fail.
+
+
+SELECT has_function( 'activity'::name, ARRAY[]::name[], 'function activity exists' );
+
+SELECT ok( (SELECT count(*) FROM activity()) = 5, 'Activity gives five rows');
+
+SELECT is( (SELECT total FROM activity() WHERE database = '$TOTAL'), 1, 'only     one connection to the databases ...' );
+
+
+-- Finish the tests and clean up.
+SELECT * FROM finish();
+ROLLBACK;
+
+

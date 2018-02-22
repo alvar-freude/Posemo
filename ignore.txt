@@ -1,5 +1,3 @@
-*~
-.DS_Store
 Makefile
 Makefile.old
 Build
@@ -7,11 +5,11 @@ Build.bat
 MANIFEST.bak
 META.*
 MYMETA.*
-.build
-_build
-cover_db
-blib
-inc
+.build/
+_build/
+cover_db/
+blib/
+inc/
 .lwpcookies
 .last_cover_stats
 nytprof.out
@@ -19,9 +17,6 @@ pod2htm*.tmp
 pm_to_blib
 Posemo-*
 Posemo-*.tar.gz
-tmp
-work
-logs
-
-
-
+tmp/
+work/
+logs/

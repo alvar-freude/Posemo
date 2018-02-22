@@ -1,0 +1,16 @@
+-- Start transaction and plan the tests.
+BEGIN;
+SELECT plan(2);
+
+
+-- Run the tests.
+
+SELECT has_function( 'alive'::name, ARRAY[]::name[], 'function alive exists' );
+SELECT is( (SELECT alive()), true, 'alive check says database is alive');
+
+-- not alive check is not possible, because when not alive we can not connect ...
+
+-- Finish the tests and clean up.
+SELECT * FROM finish();
+ROLLBACK;
+

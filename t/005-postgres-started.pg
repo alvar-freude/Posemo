@@ -1,0 +1,14 @@
+-- Start transaction and plan the tests.
+BEGIN;
+SELECT plan(2);
+
+
+-- Run the tests.
+SELECT pass( 'PostgreSQL running.' );
+SELECT ok(true, 'true is OK, PostgreSQL is running!');
+
+
+-- Finish the tests and clean up.
+SELECT * FROM finish();
+ROLLBACK;
+
