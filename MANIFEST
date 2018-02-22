@@ -3,10 +3,10 @@ bin/posemo_install.pl
 bin/posemo_json.pl
 Build.PL
 Changes
-conf/example.conf
 conf/posemo-logging.properties
 conf/posemo.conf
 conf/simple-local.conf
+conf/test-example.conf
 extra-dummy-tests/insert-and-delete.pl
 extra-dummy-tests/performance_hash_slices_loops.pl
 ignore.txt
