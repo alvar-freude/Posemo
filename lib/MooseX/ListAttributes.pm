@@ -51,8 +51,8 @@ sub list_attributes
    my $self = shift;
 
    print "\n $PROGRAM_NAME was called with the following options:\n\n";
-   print "   Attribute/Option   | Current value                  | Default \n";
-   print "----------------------+--------------------------------+--------------------------\n";
+   print "   Attribute/Option      | Current value                  | Default \n";
+   print "-------------------------+--------------------------------+--------------------------\n";
 
    # search all attributes ...
    foreach my $attr ( sort { $a->name cmp $b->name } $self->meta->get_all_attributes )
@@ -71,7 +71,7 @@ sub list_attributes
 
       $value = "<like default>" if $value eq $default;
 
-      printf " %-20s | %-30s | %-30s\n", "--$attr_name", $value, $default;
+      printf " %-23s | %-30s | %-30s\n", "--$attr_name", $value, $default;
       }
 
    print "\n";
