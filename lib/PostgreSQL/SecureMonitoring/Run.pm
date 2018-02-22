@@ -126,13 +126,13 @@ has outfile    => ( is => "ro", isa => "Str",          default => q{-},         
 #>>>
 
 has _conf => (
-              reader        => "conf",
-              is            => "ro",
-              isa           => "HashRef[Any]",
-              builder       => "_build_conf",
-              lazy          => 1,
-              documentation => "Complete configuration (usually don't use at CLI)",
-            );
+               reader        => "conf",
+               is            => "ro",
+               isa           => "HashRef[Any]",
+               builder       => "_build_conf",
+               lazy          => 1,
+               documentation => "Complete configuration (usually don't use at CLI)",
+             );
 
 has _results => (
                   reader  => "results",

@@ -30,8 +30,6 @@ use version; our $VERSION = qv("v0.5.0");
  
  # or, when failed:
  $self->rollback;
- 
-
 
 =head1 DESCRIPTION
 
@@ -53,7 +51,7 @@ has _is_my_dbh => (                  is => "rw", isa => "Bool", );
 requires qw(dbi_dsn dbi_user dbi_passwd dbi_options);
 
 
-sub _build_dbh
+sub _build__dbh
    {
    my $self = shift;
 
@@ -79,7 +77,7 @@ sub _build_dbh
    #   warn "Ping-result: $ping\n";
 
    return $dbh;
-   } ## end sub _build_dbh
+   } ## end sub _build__dbh
 
 
 =head2 ->commit

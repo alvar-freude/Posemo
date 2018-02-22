@@ -112,8 +112,8 @@ sub _build_server_version
    {
    my $self = shift;
    my $pg_version;
-   eval { ($pg_version) = $self->dbh->selectrow_array("SHOW server_version_num;") };
-   return $pg_version // -1;
+   eval { ($pg_version) = $self->dbh->selectrow_array("SHOW server_version_num;"); return 1; } or return -1;
+   return $pg_version;
    }
 
 
