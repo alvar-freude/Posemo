@@ -44,12 +44,11 @@ my $json = io("$dir/t-211-simple.json")->all;
 
 my $result = decode_json($json);
 
-use Data::Dumper;
-diag Dumper($result);
+#use Data::Dumper;
+#diag Dumper($result);
+# diag $dir;
 
-
-
-diag $dir;
+diag "TODO: analyse result ...";
 
 # sleep 60;
 
