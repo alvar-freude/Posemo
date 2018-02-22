@@ -1,3 +1,13 @@
+-- 
+-- This check must run as user, who can access the writeable table.
+-- the default user can't, so we need the table owner.
+-- But this can not login; so: superuser and change role.
+--
+
+\c - _pgtap_superuser
+SET ROLE _posemo_superuser;          --  _pgtap_superuser would also be enough.
+
+
 -- Start transaction and plan the tests.
 BEGIN;
 SELECT plan(10);

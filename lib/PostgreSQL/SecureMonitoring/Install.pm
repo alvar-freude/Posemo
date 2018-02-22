@@ -106,7 +106,7 @@ Only used when necessary.
 #<<< no perltidy
 
 has superuser             => ( is => "ro", isa => "Str",  default => "monitoring_admin", documentation => "Owner of check functions (ususally a superuser)" );
-has superpasswd           => ( is => "ro", isa => "Str",                                 documentation => "Password for superuser" );
+# has superpasswd           => ( is => "ro", isa => "Str",                                 documentation => "Password for superuser" );
 has create_database       => ( is => "ro", isa => "Bool", default => 0,                  documentation => "Flag: create new DB", );
 has drop_database         => ( is => "ro", isa => "Bool", default => 0,                  documentation => "Flag: drop old DB if exist", );
 has create_user           => ( is => "ro", isa => "Bool", default => 0,                  documentation => "Flag: create monitoring user", );
@@ -123,6 +123,11 @@ with "MooseX::Getopt";
 with 'MooseX::ListAttributes';
 
 
+use Readonly;
+
+Readonly my $VERSION_HAS_MONITORING_ROLE => 10_00_00;    # 10.0
+
+
 =head2 install
 
 installs database and all checks
@@ -137,10 +142,10 @@ sub install
 
    my $installed_non_rollbackable = 0;
    INFO "Install Posemo and Checks";
-   if ( $self->create_superuser or $self->create_database )
+   if ( $self->create_database )
       {
       eval { return $self->install_basics; }
-         or die "ERROR creating Database or Superuser: $EVAL_ERROR.\nAttention: Can not rollback already created objects!\n";
+         or die "ERROR creating Database: $EVAL_ERROR.\nAttention: Can not rollback already created objects!\n";
       $installed_non_rollbackable = 1;
       }
 
@@ -149,9 +154,15 @@ sub install
 
       # $self->dbh->do("SET search_path TO ${ \$self->schema }");
 
+      $self->_do_create_superuser() if $self->create_superuser;
       $self->_do_create_user if $self->create_user;
 
-      $self->dbh->do("REVOKE ALL     ON DATABASE ${ \$self->database } FROM PUBLIC;") if $self->create_database;
+      if ( $self->create_database )
+         {
+         TRACE "Clean up owner and permissions of created database";
+         $self->dbh->do("ALTER          DATABASE ${ \$self->database } OWNER TO ${ \$self->superuser };");
+         $self->dbh->do("REVOKE ALL  ON DATABASE ${ \$self->database } FROM PUBLIC;");
+         }
       $self->dbh->do("GRANT  CONNECT ON DATABASE ${ \$self->database } TO ${ \$self->user }");
 
       $self->_do_install_schema if $self->create_schema;
@@ -175,9 +186,9 @@ sub install
 
 =head2 install_basics
 
-Creates user and database ...
-Depending on the create/drop flags, all users and databases
+Installs basic objects, that must be created with other connection.
 
+Currently this is only the database.
 
 =cut
 
@@ -191,8 +202,7 @@ sub install_basics
 
    $dsn =~ s{dbname=\w+}{dbname=${ \$self->installation_database }}msx;
 
-   $self->_do_create_superuser($dsn) if $self->create_superuser;
-   $self->_do_create_database($dsn)  if $self->create_database;
+   $self->_do_create_database($dsn) if $self->create_database;
 
    return 1;
    }
@@ -228,6 +238,7 @@ sub _do_drop_user
 
    INFO "INSTALL: drop monitoring user '${ \$self->user }', but only if exists";
    $self->dbh->do("DROP USER IF EXISTS ${ \$self->user };");
+   $self->dbh->do("DROP USER IF EXISTS ${ \$self->superuser };") if $self->create_superuser;
    DEBUG "drop user done";
 
    return $self;
@@ -250,16 +261,14 @@ sub _do_create_user
 sub _do_create_superuser
    {
    my $self = shift;
-   my $dsn  = shift;
 
-   INFO "Connect to installation DB as installation user " . ( $self->installation_user // "<undef>" );
-
-   # Autocommit, because we only create the superuser!
-   my $dbh = DBI->connect( $dsn, $self->installation_user, $self->installation_passwd, { RaiseError => 1, AutoCommit => 1 }, );
+   my $role_string;
+   if   ( $self->server_version >= $VERSION_HAS_MONITORING_ROLE ) { $role_string = "IN ROLE pg_monitor"; }
+   else                                                           { $role_string = "SUPERUSER"; }
 
    INFO "INSTALL: create monitoring superuser '${ \$self->superuser }'";
-   $dbh->do("CREATE USER ${ \$self->superuser } SUPERUSER;");
-   $dbh->do("ALTER USER ${ \$self->superuser } SET search_path TO ${ \$self->schema };");
+   $self->dbh->do("CREATE ROLE ${ \$self->superuser } NOLOGIN $role_string;");
+   $self->dbh->do("ALTER USER ${ \$self->superuser } SET search_path TO ${ \$self->schema };");
    DEBUG "create user done";
 
    return $self;
@@ -288,7 +297,7 @@ sub _do_create_database
    $self->_do_drop_database($dbh) if $self->drop_database;
 
    INFO "INSTALL: create monitoring database '${ \$self->database }'";
-   $dbh->do("CREATE DATABASE ${ \$self->database } OWNER ${ \$self->superuser };");
+   $dbh->do("CREATE DATABASE ${ \$self->database };");
 
    # grants will be set later!
 
@@ -335,13 +344,13 @@ installation we need the superuser!
 sub dbi_user
    {
    my $self = shift;
-   return $self->superuser;
+   return $self->installation_user;
    }
 
 sub dbi_passwd
    {
    my $self = shift;
-   return $self->superpasswd;
+   return $self->installation_passwd;
    }
 
 =head1 AUTHOR

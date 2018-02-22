@@ -1,3 +1,8 @@
+-- run as superuser, because start_backup:
+
+\c - _pgtap_superuser
+
+
 -- Start transaction and plan the tests.
 BEGIN;
 SELECT plan(8);

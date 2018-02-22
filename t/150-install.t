@@ -21,12 +21,13 @@ my $install;
 
 lives_ok sub {
    $install = PostgreSQL::SecureMonitoring::Install->new(
-                                                          database  => "_posemo_tests",
-                                                          user      => "_posemo_tests",
-                                                          superuser => "_posemo_superuser",
-                                                          port      => 15432,
+                                                          database         => "_posemo_tests",
+                                                          user             => "_posemo_tests",
+                                                          superuser        => "_posemo_superuser",
+                                                          port             => 15432,
+                                                          create_superuser => 1,
                                                         );
-      },
+   },
    "survive installer object creation";
 
 

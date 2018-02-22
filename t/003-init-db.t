@@ -21,15 +21,15 @@ my $install;
 
 lives_ok sub {
    $install = PostgreSQL::SecureMonitoring::Install->new(
-                                                          database         => "_posemo_tests",
-                                                          user             => "_posemo_tests",
-                                                          superuser        => "_posemo_superuser",
-                                                          drop_database    => 0,
-                                                          create_database  => 1,
-                                                          create_superuser => 1,
-                                                          port             => 15432,
+                                                          database        => "_posemo_tests",
+                                                          user            => "_posemo_tests",
+                                                          superuser       => "_posemo_superuser",
+                                                          drop_database   => 0,
+                                                          create_database => 1,
+                                                          create_user     => 1,
+                                                          port            => 15432,
                                                         );
-      },
+   },
    "Got DB installer object";
 
 
@@ -37,7 +37,7 @@ BAIL_OUT("FATAL: Got no installation object, leaving.") unless $install;
 
 ok( $install, "have monitoring installer object" );
 
-lives_ok sub { $install->install_basics; }, "Installed basics";
+lives_ok sub { $install->install_basics; }, "Installed basics (database)";
 
 
 # Now DB and user accessible
@@ -63,6 +63,15 @@ lives_ok sub {
    $dbh->do("CREATE EXTENSION pgtap;");
    $dbh->commit;
 }, "pgTAP extention installed";
+
+
+# Create another superuser, because the above created can NOT not login
+# used for pgTAP checking when access to tables are needed
+lives_ok sub {
+   $dbh->do("CREATE USER _pgtap_superuser SUPERUSER;");
+   $dbh->commit;
+}, "my pgTAP superuser created";
+
 
 
 
