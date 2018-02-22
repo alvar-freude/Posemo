@@ -42,9 +42,13 @@ This role provides cached DBI handles.
 
 =cut
 
-has dbh => ( is => "ro", isa => "DBI::db", lazy_build => 1, handles => [qw(rollback)], predicate => "has_dbh", );
-has _committed => ( is => "rw", isa => "Bool", );
-has _is_my_dbh => ( is => "rw", isa => "Bool", );
+#<<< no perltidy
+
+has _dbh       => ( reader => "dbh", is => "ro", isa => "DBI::db", lazy_build => 1, handles => [qw(rollback)], predicate => "has_dbh", );
+has _committed => (                  is => "rw", isa => "Bool", );
+has _is_my_dbh => (                  is => "rw", isa => "Bool", );
+
+#>>> no perltidy
 
 requires qw(dbi_dsn dbi_user dbi_passwd dbi_options);
 
