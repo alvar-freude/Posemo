@@ -10,7 +10,7 @@ use Data::Dumper;
 
 has show_options => ( is => "ro", isa => "Bool", default => 0, documentation => "List all Options" );
 has undef_string =>
-   ( is => "ro", isa => "Str", default => "<undef>", documentation => "String for show undef values with show_options" );
+   ( is => "ro", isa => "Str", default => "<undef>", documentation => "String to display undef values with show_options" );
 
 =head1 NAME
 
@@ -78,8 +78,7 @@ sub list_attributes
    print "CLI parameter at calling: ", join( " ", @{ $self->ARGV } ) . "\n\n";
 
    return;
-   };                                              ## end after usage
-
+   } ## end sub list_attributes
 
 
 1;
