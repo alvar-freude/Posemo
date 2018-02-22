@@ -8,8 +8,9 @@ use Data::Dumper;
 
 # use Readonly;
 
-has show_options => ( is => "ro", isa => "Bool", default => 0,         documentation => "List all Options" );
-has undef_string => ( is => "ro", isa => "Str",  default => "<undef>", documentation => "String for undef with show_options" );
+has show_options => ( is => "ro", isa => "Bool", default => 0, documentation => "List all Options" );
+has undef_string =>
+   ( is => "ro", isa => "Str", default => "<undef>", documentation => "String for show undef values with show_options" );
 
 =head1 NAME
 
@@ -49,11 +50,11 @@ sub list_attributes
    {
    my $self = shift;
 
-   print "\n $PROGRAM_NAME wurde mit den folgenden Werten gestartet:\n\n";
-   print "   Attribut/Option    | Aktueller Wert                 | Default \n";
+   print "\n $PROGRAM_NAME was called with the following options:\n\n";
+   print "   Attribute/Option   | Current value                  | Default \n";
    print "----------------------+--------------------------------+--------------------------\n";
 
-   # alle Attribute durchsuchen ...
+   # search all attributes ...
    foreach my $attr ( sort { $a->name cmp $b->name } $self->meta->get_all_attributes )
       {
       next unless $attr->documentation;
@@ -74,7 +75,7 @@ sub list_attributes
       }
 
    print "\n";
-   print "Uebergebene CLI-Parameter beim Aufruf: ", join( " ", @{ $self->ARGV } ) . "\n\n";
+   print "CLI parameter at calling: ", join( " ", @{ $self->ARGV } ) . "\n\n";
 
    return;
    };                                              ## end after usage
