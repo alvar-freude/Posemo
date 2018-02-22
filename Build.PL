@@ -92,7 +92,18 @@ $builder->create_build_script();
 =begin install Ubuntu dependencies
 
   # UNTESTED!
-  apt-get install libdbd-pg-perl libmoosex-simpleconfig-perl libmoosex-configfromfile-perl liblog-log4perl-perl libconfig-general-perl libreadonly-perl libio-all-perl libfile-homedir-perl libfile-sharedir-perl libconfig-tiny-perl
+  apt-get install libdbd-pg-perl \
+      libmoosex-simpleconfig-perl \
+      libmoosex-configfromfile-perl \
+      liblog-log4perl-perl \
+      libconfig-general-perl \
+      libreadonly-perl \
+      libio-all-perl \
+      libfile-homedir-perl \
+      libfile-sharedir-perl \
+      libconfig-tiny-perl \
+      libjson-perl \
+      libjson-xs-perl
 
 
 =end
