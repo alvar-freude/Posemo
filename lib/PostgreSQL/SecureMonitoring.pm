@@ -10,11 +10,11 @@ use 5.010;
 
 =head1 VERSION
 
-Version 0.2.1
+Version 0.4.0
 
 =cut
 
-use version; our $VERSION = qv("v0.2.1");
+use version; our $VERSION = qv("v0.4.0");
 
 
 =head1 SYNOPSIS
