@@ -146,9 +146,11 @@ For more complex configuration look into the examples in `conf/` or the tests in
 
 ## Test Driven Development
 
-For development, you usually don't run the real tests, but the test environment.
+For development, you usually don't run the real checks, but the test environment. It installs everything in a clean temporary PostgreSQL database (test files `t/[01]*`) and cleans it up after testing (test files `t/99*`).
 
 For testing you need a local PostgreSQL installation. We use a new testing module for starting/stopping/... PostgreSQL instances called `Test::PostgreSQL::Starter`, which is included (but will be an extra CPAN module later).
+
+The [pgTAP PostgreSQL extension](http://pgtap.org) ([pgTAP code on GitHub](https://github.com/theory/pgtap/)) is necessary too (installed in the local Postgres-Installation).
 
 To start all the tests run:
 
