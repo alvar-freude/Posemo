@@ -40,6 +40,7 @@ extends "PostgreSQL::SecureMonitoring::Checks";
 check_has
    description          => 'Counts running and idling connections.',
    has_multiline_result => 1,
+   parameters           => [ [ skip_db_re => 'TEXT', '^template[01]$' ], ],
 
    # complex return type
    return_type => q{
@@ -65,6 +66,7 @@ check_has
                    COUNT(CASE WHEN state = 'disabled'                      THEN true END)::INTEGER AS disabled
               FROM pg_stat_activity AS stat
         RIGHT JOIN pg_database AS db ON stat.datname = db.datname 
+          WHERE ( CASE WHEN length(skip_db_re) > 0 THEN db.datname !~ skip_db_re ELSE true END )
           GROUP BY database
           ORDER BY database
          )
