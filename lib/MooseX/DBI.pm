@@ -82,9 +82,14 @@ sub _build__dbh
 
 =head2 ->commit
 
-macht ein Commit und setzt das Flag, dass committet ist!
-Wenn mehrere transaktionen pro Query stattfinden, muss das wieder zurückgesetzt werden,
-sonst kommt kein Rollback am Ende, was dazu führt dass es auf den nächsten Query wartet!
+COMMITs all changes (by calling dbh->commit) and sets internal "committed" flag.
+
+When commit was not called at object destruction (see DEMOLISH below), then 
+rollback will be called there.
+
+If you need more then one transaction inside the object lifetime, (e.q. request), then 
+you need to clean _committed attribute by calling ->begin manually!
+
 
 =cut
 
@@ -124,7 +129,7 @@ sub DEMOLISH
    {
    my $self = shift;
 
-   # Kein ROllback wenn schon Commit oder es ein übergebenes Handle ist
+   # Don't rollback, if committet or external transaction management (exernal dbh)
    return if $self->_committed or not $self->_is_my_dbh;
    $self->rollback if $self->has_dbh;
 
