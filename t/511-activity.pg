@@ -1,6 +1,6 @@
 -- Start transaction and plan the tests.
 BEGIN;
-SELECT plan(3);
+SELECT plan(8);
 
 
 -- Run the tests.
@@ -11,11 +11,72 @@ SELECT plan(3);
 -- when changed database or something similar, then this tests may fail.
 
 
-SELECT has_function( 'activity'::name, ARRAY[]::name[], 'function activity exists' );
+SELECT has_function( 'activity'::name, ARRAY['text']::name[], 'function activity exists' );
 
-SELECT ok( (SELECT count(*) FROM activity()) = 5, 'Activity gives five rows');
+SELECT ok( (SELECT count(*) FROM activity()) = 3, 'Activity gives three rows');
 
-SELECT is( (SELECT total FROM activity() WHERE database = '$TOTAL'), 1, 'only     one connection to the databases ...' );
+SELECT is( (SELECT total FROM activity() WHERE database = '$TOTAL'), 1, 'only one connection to the databases ...' );
+
+SELECT results_eq
+   (
+   'SELECT * FROM activity();', 
+   $$ VALUES ('_posemo_tests'::VARCHAR(64), 1, 1, 0, 0, 0, 0, 0),
+             ('postgres'::VARCHAR(64),      0, 0, 0, 0, 0, 0, 0),
+             ('$TOTAL'::VARCHAR(64),        1, 1, 0, 0, 0, 0, 0) 
+   $$,
+   'One active connection in activity (my connection)'
+);
+
+
+SELECT results_eq
+   (
+   $$ SELECT * FROM activity(skip_db_re => ''); $$, 
+   $$ VALUES ('_posemo_tests'::VARCHAR(64), 1, 1, 0, 0, 0, 0, 0),
+             ('postgres'::VARCHAR(64),      0, 0, 0, 0, 0, 0, 0),
+             ('template0'::VARCHAR(64),     0, 0, 0, 0, 0, 0, 0),
+             ('template1'::VARCHAR(64),     0, 0, 0, 0, 0, 0, 0),
+             ('$TOTAL'::VARCHAR(64),        1, 1, 0, 0, 0, 0, 0) 
+   $$,
+   'empty skip regexp'
+);
+
+
+SELECT results_eq
+   (
+   $$ SELECT * FROM activity(skip_db_re => NULL); $$, 
+   $$ VALUES ('_posemo_tests'::VARCHAR(64), 1, 1, 0, 0, 0, 0, 0),
+             ('postgres'::VARCHAR(64),      0, 0, 0, 0, 0, 0, 0),
+             ('template0'::VARCHAR(64),     0, 0, 0, 0, 0, 0, 0),
+             ('template1'::VARCHAR(64),     0, 0, 0, 0, 0, 0, 0),
+             ('$TOTAL'::VARCHAR(64),        1, 1, 0, 0, 0, 0, 0) 
+   $$,
+   'NULL skip regexp'
+);
+
+
+SELECT results_eq
+   (
+   $$ SELECT * FROM activity(skip_db_re => 'ostg[a-z]e'); $$, 
+   $$ VALUES ('_posemo_tests'::VARCHAR(64), 1, 1, 0, 0, 0, 0, 0),
+             ('template0'::VARCHAR(64),     0, 0, 0, 0, 0, 0, 0),
+             ('template1'::VARCHAR(64),     0, 0, 0, 0, 0, 0, 0),
+             ('$TOTAL'::VARCHAR(64),        1, 1, 0, 0, 0, 0, 0) 
+   $$,
+   'empty skip pOSTGRes regexp'
+);
+
+
+SELECT results_eq
+   (
+   $$ SELECT * FROM activity(skip_db_re => '^template[01]$'); $$, 
+   $$ VALUES ('_posemo_tests'::VARCHAR(64), 1, 1, 0, 0, 0, 0, 0),
+             ('postgres'::VARCHAR(64),      0, 0, 0, 0, 0, 0, 0),
+             ('$TOTAL'::VARCHAR(64),        1, 1, 0, 0, 0, 0, 0) 
+   $$,
+   'skip template DBSs, like default'
+);
+
+
 
 
 -- Finish the tests and clean up.

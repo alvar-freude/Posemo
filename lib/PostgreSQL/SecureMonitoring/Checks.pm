@@ -611,7 +611,7 @@ When a check module sets C<enabled_on_this_platform> to false, then
 the check will not run, because C<get_all_checks_ordered> removes it.
 
 This should only be dependent on the platform, the application is 
-running, not the PostgreSQL server. 
+running (local), not the PostgreSQL server (remote). 
 
 
 =cut
