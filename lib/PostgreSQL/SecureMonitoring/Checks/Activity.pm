@@ -42,6 +42,7 @@ has skip_db_re => ( is => "ro", isa => "Str", );
 check_has
    description          => 'Counts running and idling connections.',
    has_multiline_result => 1,
+   result_type          => "integer",
    parameters           => [ [ skip_db_re => 'TEXT', '^template[01]$' ], ],
 
    # complex return type
