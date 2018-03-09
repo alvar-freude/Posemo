@@ -272,7 +272,7 @@ sub result_is($$;$)
 
 =head2 result_cmp($result, $operator, $expected [, $message])
 
-Compares the result with the operator and the expercted value, like cmp_ok.
+Compares the result with the operator and the expected value, like cmp_ok.
 
 =cut
 
