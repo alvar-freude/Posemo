@@ -72,6 +72,8 @@ use Data::Dumper;
 use Test::PostgreSQL::Starter;
 
 use PostgreSQL::SecureMonitoring;
+use Test::Deep;
+
 
 
 =head2 result_ok( $check [, $clustername, $message] )
@@ -258,6 +260,10 @@ sub result_unit_is($$;$)
 
 Compares the result with expected value.
 
+When expected is a reference, cmp_deeply for comparing data structures is called.
+Othervise it's compared via "is"
+
+
 =cut
 
 sub result_is($$;$)
@@ -266,7 +272,15 @@ sub result_is($$;$)
    my $expected = shift;
    my $message  = shift // "Result is '$expected'";
 
-   return is( $result->{result}, $expected, $message );
+
+   if ( ref $expected )
+      {
+      return cmp_deeply( $result->{result}, $expected, $message );
+      }
+   else
+      {
+      return is( $result->{result}, $expected, $message );
+      }
    }
 
 
