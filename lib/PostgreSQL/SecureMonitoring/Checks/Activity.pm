@@ -19,14 +19,13 @@ The SQL generates a result like this:
  ---------------+-------+--------+------+---------------------+-------------------------------+------------------------+----------
   _posemo_tests |     1 |      1 |    0 |                   0 |                             0 |                      0 |        0
   postgres      |     0 |      0 |    0 |                   0 |                             0 |                      0 |        0
-  template0     |     0 |      0 |    0 |                   0 |                             0 |                      0 |        0
-  template1     |     0 |      0 |    0 |                   0 |                             0 |                      0 |        0
   $TOTAL        |     1 |      1 |    0 |                   0 |                             0 |                      0 |        0
- (5 rows)
+ (3 rows)
 
 
 For each existing database all connections are counted grouped by type, and a summary of all databases is given too.
 
+=head3 Filter by database name
 
 Results may be filtered with parameter C<skip_db_re>, which is a regular expression filtering the databases. 
 Default Filter is C<^template[01]$>, which excludes <template0> and <template1> databases.
@@ -34,9 +33,11 @@ Default Filter is C<^template[01]$>, which excludes <template0> and <template1> 
 
 =cut
 
-
 use PostgreSQL::SecureMonitoring::ChecksHelper;
 extends "PostgreSQL::SecureMonitoring::Checks";
+
+has skip_db_re => ( is => "ro", isa => "Str", );
+
 
 check_has
    description          => 'Counts running and idling connections.',
