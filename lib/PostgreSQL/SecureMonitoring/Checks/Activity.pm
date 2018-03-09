@@ -27,8 +27,9 @@ The SQL generates a result like this:
 
 For each existing database all connections are counted grouped by type, and a summary of all databases is given too.
 
-For future addition:
-Filter databases to exclude template DBs etc. via parameter
+
+Results may be filtered with parameter C<skip_db_re>, which is a regular expression filtering the databases. 
+Default Filter is C<^template[01]$>, which excludes <template0> and <template1> databases.
 
 
 =cut
