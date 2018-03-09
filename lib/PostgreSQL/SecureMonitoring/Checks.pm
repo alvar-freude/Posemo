@@ -218,6 +218,7 @@ has app                  => ( is => "ro", isa => "Object",        required  => 1
 # attributes for attrs with builder method
 # the builder looks first here and when nothing found then uses his default
 has _code_attr           => ( is => "ro", isa => "Str",           predicate => "has_code_attr", );
+has _name_attr           => ( is => "ro", isa => "Str",           predicate => "has_name_attr", );
 has _description_attr    => ( is => "ro", isa => "Str",           predicate => "has_description_attr", );
 has _result_type_attr    => ( is => "ro", isa => "Str",           predicate => "has_result_type_attr", );
 
@@ -246,6 +247,8 @@ sub _build_class
 sub _build_name
    {
    my $self = shift;
+
+   return $self->_name_attr if $self->has_name_attr;
 
    my $package = __PACKAGE__;
    ( my $name = $self->class ) =~ s{ $package :: }{}ox;
