@@ -16,7 +16,7 @@ result_type_is $result, "integer";
 row_type_is $result,    "single";
 result_unit_is $result, "seconds";
 
-result_is $result, undef, "No backup runnin";
+result_is $result, undef, "No backup running";
 
 
 

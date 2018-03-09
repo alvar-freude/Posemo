@@ -61,7 +61,8 @@ give more then one test result.
 =cut
 
 use base qw(Exporter);
-our @EXPORT = qw( result_ok no_warning_ok no_critical_ok name_is result_type_is row_type_is result_unit_is result_is result_cmp);
+our @EXPORT
+   = qw( result_ok no_warning_ok no_critical_ok no_error_ok error_ok name_is result_type_is row_type_is result_unit_is result_is result_cmp);
 
 
 # use parent 'Test::Builder::Module';
@@ -72,6 +73,8 @@ use Data::Dumper;
 use Test::PostgreSQL::Starter;
 
 use PostgreSQL::SecureMonitoring;
+use Test::Deep;
+
 
 
 =head2 result_ok( $check [, $clustername, $message] )
@@ -175,7 +178,7 @@ sub critical_ok($;$)
 
 =head2 no_critical_ok( $result [, $message] )
 
-Test passes, if result is critical.
+Test passes, if result is not critical.
 
 =cut
 
@@ -186,6 +189,41 @@ sub no_critical_ok($;$)
    my $message = shift // "Result is not crtitical";
    return ok( !$result->{critical}, $message );
    }
+
+
+=head2 no_error_ok( $result [, $message] )
+
+Test passes, if result has no error.
+
+=cut
+
+
+sub no_error_ok($;$)
+   {
+   my $result  = shift;
+   my $message = shift // "Result has no error";
+   my $ret     = ok( !$result->{error}, $message );
+   $ret or diag "Has unexpected error: $result->{error}";
+   return $ret;
+   }
+
+
+=head2 error_ok( $result [, $message] )
+
+Test passes, if result has an error.
+
+=cut
+
+
+sub error_ok($;$)
+   {
+   my $result  = shift;
+   my $message = shift // "Result has an error";
+   my $ret     = ok( $result->{error}, $message );
+   $ret or diag "Expected error, but there is no error";
+   return $ret;
+   }
+
 
 
 =head2 name_is($result, $name [, $message])
@@ -258,6 +296,10 @@ sub result_unit_is($$;$)
 
 Compares the result with expected value.
 
+When expected is a reference, cmp_deeply for comparing data structures is called.
+Othervise it's compared via "is"
+
+
 =cut
 
 sub result_is($$;$)
@@ -266,13 +308,21 @@ sub result_is($$;$)
    my $expected = shift;
    my $message  = shift // "Result is '$expected'";
 
-   return is( $result->{result}, $expected, $message );
+
+   if ( ref $expected )
+      {
+      return cmp_deeply( $result->{result}, $expected, $message );
+      }
+   else
+      {
+      return is( $result->{result}, $expected, $message );
+      }
    }
 
 
 =head2 result_cmp($result, $operator, $expected [, $message])
 
-Compares the result with the operator and the expercted value, like cmp_ok.
+Compares the result with the operator and the expected value, like cmp_ok.
 
 =cut
 
@@ -289,5 +339,3 @@ sub result_cmp($$$;$)
 
 
 1;
-
-
