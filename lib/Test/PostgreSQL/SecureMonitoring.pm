@@ -61,8 +61,12 @@ give more then one test result.
 =cut
 
 use base qw(Exporter);
-our @EXPORT
-   = qw( result_ok no_warning_ok no_critical_ok no_error_ok error_ok name_is result_type_is row_type_is result_unit_is result_is result_cmp);
+our @EXPORT = qw( result_ok
+   no_warning_ok no_critical_ok warning_ok critical_ok
+   no_error_ok error_ok
+   message_like
+   name_is result_type_is row_type_is result_unit_is
+   result_is result_cmp);
 
 
 # use parent 'Test::Builder::Module';
@@ -84,10 +88,11 @@ Returns the result object for check $check in the $clustername cluster.
 =cut
 
 
-sub result_ok($;$$)
+sub result_ok($;$$$)
    {
    my $checkname   = shift;
    my $clustername = shift;
+   my $params      = shift;
    my $message     = shift // ( "Result for $checkname on cluster " . ( $clustername // "unnamed" ) );
 
    my $tps_conf = pg_read_conf_ok( $clustername, "Read conf (for $message)" );
@@ -115,7 +120,7 @@ sub result_ok($;$$)
       skip "Got no Object for $message", 2 unless $app;
 
       # Get Check Object
-      lives_ok( sub { $check = $app->new_check($checkname) }, "Check Object (for $message)" );
+      lives_ok( sub { $check = $app->new_check( $checkname, $params ) }, "Check Object (for $message)" );
 
       skip "Got no check object for $message", 1 unless $check;
 
@@ -128,7 +133,7 @@ sub result_ok($;$$)
    ok( ref $result eq "HASH", "got Result for $message" ) or diag "Result is no hashref: " . Dumper($result);
 
    return $result;
-   } ## end sub result_ok($;$$)
+   } ## end sub result_ok($;$$$)
 
 
 
@@ -221,6 +226,25 @@ sub error_ok($;$)
    my $message = shift // "Result has an error";
    my $ret     = ok( $result->{error}, $message );
    $ret or diag "Expected error, but there is no error";
+   return $ret;
+   }
+
+
+
+=head2 message_like( $result, $regexp [, $message] )
+
+Compares an internal message (used when check failed) via regexp.
+
+=cut
+
+
+sub message_like($$;$)
+   {
+   my $result  = shift;
+   my $re      = shift;
+   my $message = shift // "Result has an error";
+   my $ret     = like( $result->{message}, $re, $message );
+   $ret or diag "Message does not match $re!";
    return $ret;
    }
 
