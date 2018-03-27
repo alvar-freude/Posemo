@@ -40,7 +40,7 @@ has skip_db_re => ( is => "ro", isa => "Str", );
 
 
 check_has
-   description          => 'Get number of transactions.',
+   description          => 'Get transaction counter.',
    has_multiline_result => 1,
    result_type          => "bigint",
    parameters           => [ [ skip_db_re => 'TEXT', '^template[01]$' ], ],
