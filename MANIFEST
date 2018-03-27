@@ -20,6 +20,7 @@ lib/PostgreSQL/SecureMonitoring/Checks/Activity.pm
 lib/PostgreSQL/SecureMonitoring/Checks/Alive.pm
 lib/PostgreSQL/SecureMonitoring/Checks/BackupAge.pm
 lib/PostgreSQL/SecureMonitoring/Checks/DBSize.pm
+lib/PostgreSQL/SecureMonitoring/Checks/IsMaster.pm
 lib/PostgreSQL/SecureMonitoring/Checks/Transactions.pm
 lib/PostgreSQL/SecureMonitoring/Checks/Writeable.pm
 lib/PostgreSQL/SecureMonitoring/ChecksHelper.pm
@@ -44,6 +45,7 @@ t/501-alive.pg
 t/501-alive.t
 t/502-writeable.pg
 t/502-writeable.t
+t/503-is_master.t
 t/510-backup-age.pg
 t/510-backup-age.t
 t/511-activity.pg
