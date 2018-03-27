@@ -61,8 +61,12 @@ give more then one test result.
 =cut
 
 use base qw(Exporter);
-our @EXPORT
-   = qw( result_ok no_warning_ok no_critical_ok warning_ok critical_ok no_error_ok error_ok name_is result_type_is row_type_is result_unit_is result_is result_cmp);
+our @EXPORT = qw( result_ok
+   no_warning_ok no_critical_ok warning_ok critical_ok
+   no_error_ok error_ok
+   message_like
+   name_is result_type_is row_type_is result_unit_is
+   result_is result_cmp);
 
 
 # use parent 'Test::Builder::Module';
@@ -222,6 +226,25 @@ sub error_ok($;$)
    my $message = shift // "Result has an error";
    my $ret     = ok( $result->{error}, $message );
    $ret or diag "Expected error, but there is no error";
+   return $ret;
+   }
+
+
+
+=head2 message_like( $result, $regexp [, $message] )
+
+Compares an internal message (used when check failed) via regexp.
+
+=cut
+
+
+sub message_like($$;$)
+   {
+   my $result  = shift;
+   my $re      = shift;
+   my $message = shift // "Result has an error";
+   my $ret     = like( $result->{message}, $re, $message );
+   $ret or diag "Message does not match $re!";
    return $ret;
    }
 
