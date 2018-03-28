@@ -17,9 +17,9 @@ The SQL generates a result like this:
 
     database    | total | active | idle | idle in transaction | idle in transaction (aborted) | fastpath function call | disabled 
  ---------------+-------+--------+------+---------------------+-------------------------------+------------------------+----------
+  $TOTAL        |     1 |      1 |    0 |                   0 |                             0 |                      0 |        0
   _posemo_tests |     1 |      1 |    0 |                   0 |                             0 |                      0 |        0
   postgres      |     0 |      0 |    0 |                   0 |                             0 |                      0 |        0
-  $TOTAL        |     1 |      1 |    0 |                   0 |                             0 |                      0 |        0
  (3 rows)
 
 
@@ -73,15 +73,6 @@ check_has
           GROUP BY database
           ORDER BY database
          )
-       SELECT database, total, 
-                        active, 
-                        idle, 
-                        "idle in transaction", 
-                        "idle in transaction (aborted)", 
-                        "fastpath function call", 
-                        disabled 
-         FROM states
-       UNION ALL
        SELECT '$TOTAL', sum(total)::INTEGER, 
                         sum(active)::INTEGER, 
                         sum(idle)::INTEGER, 
@@ -89,6 +80,15 @@ check_has
                         sum("idle in transaction (aborted)")::INTEGER, 
                         sum("fastpath function call")::INTEGER, 
                         sum(disabled)::INTEGER 
+         FROM states
+       UNION ALL
+       SELECT database, total, 
+                        active, 
+                        idle, 
+                        "idle in transaction", 
+                        "idle in transaction (aborted)", 
+                        "fastpath function call", 
+                        disabled 
          FROM states;
       };
 

@@ -19,8 +19,10 @@ lib/PostgreSQL/SecureMonitoring/Checks.pm
 lib/PostgreSQL/SecureMonitoring/Checks/Activity.pm
 lib/PostgreSQL/SecureMonitoring/Checks/Alive.pm
 lib/PostgreSQL/SecureMonitoring/Checks/BackupAge.pm
+lib/PostgreSQL/SecureMonitoring/Checks/CacheHitRatio.pm
 lib/PostgreSQL/SecureMonitoring/Checks/DBSize.pm
 lib/PostgreSQL/SecureMonitoring/Checks/IsMaster.pm
+lib/PostgreSQL/SecureMonitoring/Checks/SlaveLag.pm
 lib/PostgreSQL/SecureMonitoring/Checks/Transactions.pm
 lib/PostgreSQL/SecureMonitoring/Checks/Writeable.pm
 lib/PostgreSQL/SecureMonitoring/ChecksHelper.pm
@@ -50,8 +52,10 @@ t/510-backup-age.pg
 t/510-backup-age.t
 t/511-activity.pg
 t/511-activity.t
+t/511-slave-lag.t
 t/515-dbsize.t
 t/520-transactions.t
+t/530-cache-hit-ratio.t
 t/701-run-json.t
 t/801-security-definer.pg
 t/900-perlcritic.t

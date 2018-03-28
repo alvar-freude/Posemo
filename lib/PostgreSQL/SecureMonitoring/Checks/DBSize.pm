@@ -17,9 +17,9 @@ The SQL generates a result like this:
 
     database    | size  
  ---------------+-------
+  $TOTAL        |    14 
   _posemo_tests |     7 
   postgres      |     7 
-  $TOTAL        |    14 
  (3 rows)
 
 
@@ -62,9 +62,9 @@ check_has
           WHERE ( CASE WHEN length(skip_db_re) > 0 THEN datname !~ skip_db_re ELSE true END )
        ORDER BY database
          )
-       SELECT database, size               FROM sizes
+       SELECT '$TOTAL', sum(size)::INTEGER FROM sizes
        UNION ALL
-       SELECT '$TOTAL', sum(size)::INTEGER FROM sizes;
+       SELECT database, size               FROM sizes;
       };
 
 

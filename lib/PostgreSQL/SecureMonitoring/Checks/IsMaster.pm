@@ -11,7 +11,7 @@ In config:
   # fail, when host is no master
   master_required = 1
   
-  # or fail, when host is no slace 
+  # or fail, when host is no slave 
   slave_required  = 1
 
 =head1 DESCRIPTION

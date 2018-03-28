@@ -196,6 +196,7 @@ has result_unit          => ( is => "ro", isa => "Str",           default   => "
 has language             => ( is => "ro", isa => "Str",           default   => "sql", );
 has volatility           => ( is => "ro", isa => "Str",           default   => "STABLE", );
 has has_multiline_result => ( is => "ro", isa => "Bool",          default   => 0, );
+has result_is_counter    => ( is => "ro", isa => "Bool",          default   => 0, );
 has has_writes           => ( is => "ro", isa => "Bool",          default   => 0, );
 has parameters           => ( is => "ro", isa => "ArrayRef[Any]", default   => sub { [] }, traits  => ['Array'], 
                                                                                            handles => 
@@ -210,6 +211,10 @@ has warning_level        => ( is => "ro", isa => "Num",           predicate => "
 has critical_level       => ( is => "ro", isa => "Num",           predicate => "has_critical_level", );
 has min_value            => ( is => "ro", isa => "Num",           predicate => "has_min_value", );
 has max_value            => ( is => "ro", isa => "Num",           predicate => "has_max_value", );
+
+# Flag for critical/warning check: 
+# when true, then check if result is lower else higher then critical/warning_level
+has lower_is_worse       => ( is => "ro", isa => "Bool",          default   => 0,);
 
 # Internal states
 has app                  => ( is => "ro", isa => "Object",        required  => 1,          handles => [qw(dbh has_dbh schema user superuser host port host_desc has_host has_port commit rollback)], );
@@ -324,12 +329,12 @@ sub _build_sql_function
    my $setof = "";
    $setof = "SETOF" if $self->has_multiline_result;
 
-   # When return type contains a space, then we need a new type!
+   # When return type contains a comma, then we need a new type!
    # because then the return type contains a list of elements
    my $return_type = $self->return_type;
    my $new_type    = "";
 
-   if ( $return_type =~ m{\s} )
+   if ( $return_type =~ m{,} )
       {
       $new_type    = "CREATE TYPE ${ \$self->sql_function_name }_type AS ($return_type);";
       $return_type = "${ \$self->sql_function_name }_type";
@@ -426,10 +431,11 @@ sub run_check
       eval { $self->rollback if $self->has_dbh; return 1; } or ERROR "Error in rollback: $EVAL_ERROR";
       }
 
-   $result->{check_name}  = $self->name;
-   $result->{description} = $self->description;
-   $result->{result_unit} = $self->result_unit;
-   $result->{result_type} = $self->result_type;
+   $result->{check_name}        = $self->name;
+   $result->{description}       = $self->description;
+   $result->{result_unit}       = $self->result_unit;
+   $result->{result_type}       = $self->result_type;
+   $result->{result_is_counter} = $self->result_is_counter;
 
    foreach my $attr (qw(warning_level critical_level min_value max_value))
       {
@@ -567,15 +573,25 @@ sub test_critical_warning
       }
    elsif ( $result->{row_type} eq "multiline" )
       {
-      @values = map { splice( @$_, 1 ) } @{ $result->{result} };
+      @values = map { @$_[ 1 .. $#$_ ] } @{ $result->{result} };
       }
    else { $result->{error} = "FATAL: Wrong row_type '${ \$self->result_type }' in critical/warning-check\n"; }
+
+   TRACE "All Values to test for crit/warn: @values";
 
    my $message = "";
 
    my ( @crit, @warn );
-   @crit = grep { $_ >= $self->critical_level } @values if $self->has_critical_level;
-   @warn = grep { $_ >= $self->warning_level } @values  if $self->has_warning_level;
+   if ( $self->lower_is_worse )
+      {
+      @crit = grep { $_ <= $self->critical_level } @values if $self->has_critical_level;
+      @warn = grep { $_ <= $self->warning_level } @values  if $self->has_warning_level;
+      }
+   else
+      {
+      @crit = grep { $_ >= $self->critical_level } @values if $self->has_critical_level;
+      @warn = grep { $_ >= $self->warning_level } @values  if $self->has_warning_level;
+      }
 
    if (@crit)
       {
