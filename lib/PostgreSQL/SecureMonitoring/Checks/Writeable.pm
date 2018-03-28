@@ -6,7 +6,13 @@ package PostgreSQL::SecureMonitoring::Checks::Writeable;
 
 =head1 SYNOPSIS
 
-...
+  # Example config, only necessary for overwriting the defaults 
+  <Check Writeable>
+    timeout        = 6000         # timeout 6000 ms (extra parameter for this check); default: critical_level in ms (*1000)
+    warning_level  = 2            # warning after 2 seconds (default: 3)
+    critical_level = 4            # critical after 4 seconds (default: 5)
+  </Check>
+ 
 
 =head1 DESCRIPTION
 
@@ -16,6 +22,15 @@ The purpose is to check if a group of master and syncronous slaves are
 ready to accept write queries in time. When at least one streaming replication 
 slave is configured as syncronous slave, COMMIT returns after at least one slave 
 got the data. When all slaves are gone (or too much behind), then this check fails.
+
+=head2 Parameters
+
+This check has one non-default parameter: C<timeout>. This is the amount of 
+milliseconds, after which the check will be canceled. Default is C<critical_level> 
+in milliseconds (critical_level*1000).
+
+Timeout should not be shorter then critical_level, because with shorter timeout, 
+critical_level can't be reached.
 
 =cut
 
