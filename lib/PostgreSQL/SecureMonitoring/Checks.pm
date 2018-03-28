@@ -196,6 +196,7 @@ has result_unit          => ( is => "ro", isa => "Str",           default   => "
 has language             => ( is => "ro", isa => "Str",           default   => "sql", );
 has volatility           => ( is => "ro", isa => "Str",           default   => "STABLE", );
 has has_multiline_result => ( is => "ro", isa => "Bool",          default   => 0, );
+has result_is_counter    => ( is => "ro", isa => "Bool",          default   => 0, );
 has has_writes           => ( is => "ro", isa => "Bool",          default   => 0, );
 has parameters           => ( is => "ro", isa => "ArrayRef[Any]", default   => sub { [] }, traits  => ['Array'], 
                                                                                            handles => 
@@ -426,10 +427,11 @@ sub run_check
       eval { $self->rollback if $self->has_dbh; return 1; } or ERROR "Error in rollback: $EVAL_ERROR";
       }
 
-   $result->{check_name}  = $self->name;
-   $result->{description} = $self->description;
-   $result->{result_unit} = $self->result_unit;
-   $result->{result_type} = $self->result_type;
+   $result->{check_name}        = $self->name;
+   $result->{description}       = $self->description;
+   $result->{result_unit}       = $self->result_unit;
+   $result->{result_type}       = $self->result_type;
+   $result->{result_is_counter} = $self->result_is_counter;
 
    foreach my $attr (qw(warning_level critical_level min_value max_value))
       {
