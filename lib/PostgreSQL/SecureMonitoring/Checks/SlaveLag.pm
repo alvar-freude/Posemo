@@ -1,8 +1,8 @@
-package PostgreSQL::SecureMonitoring::Checks::ReplicationLag;
+package PostgreSQL::SecureMonitoring::Checks::SlaveLag;
 
 =head1 NAME
 
- PostgreSQL::SecureMonitoring::Checks::ReplicationLag -- checks if the machine is a slave and returns the replication lag
+ PostgreSQL::SecureMonitoring::Checks::SlaveLag -- checks if the machine is a slave and returns the replication lag
 
 =head1 SYNOPSIS
 
