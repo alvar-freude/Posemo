@@ -325,12 +325,12 @@ sub _build_sql_function
    my $setof = "";
    $setof = "SETOF" if $self->has_multiline_result;
 
-   # When return type contains a space, then we need a new type!
+   # When return type contains a comma, then we need a new type!
    # because then the return type contains a list of elements
    my $return_type = $self->return_type;
    my $new_type    = "";
 
-   if ( $return_type =~ m{\s} )
+   if ( $return_type =~ m{,} )
       {
       $new_type    = "CREATE TYPE ${ \$self->sql_function_name }_type AS ($return_type);";
       $return_type = "${ \$self->sql_function_name }_type";
