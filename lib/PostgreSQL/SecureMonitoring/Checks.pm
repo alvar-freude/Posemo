@@ -263,7 +263,7 @@ sub _camel_case_to_words
 sub _build_sql_function_name
    {
    my $self = shift;
-   ( my $function_name = $self->name ) =~ s{\s}{_}gx;
+   ( my $function_name = $self->name ) =~ s{\W}{_}gx;
    return lc("${ \$self->schema }.$function_name");
    }
 
