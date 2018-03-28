@@ -21,11 +21,11 @@ row_type_is $result,    "multiline";
 result_unit_is $result, "MB";
 
 
-cmp_deeply [ map { $_->[0] } @{ $result->{result} } ], [qw(_posemo_tests postgres $TOTAL)], "Database names";
-cmp_ok $result->{result}[0][1], '>', 5,  "Database _posemo tests is bigger then 5 MB";
-cmp_ok $result->{result}[0][1], '<', 10, "Database _posemo tests is smaller then 10 MB";
+cmp_deeply [ map { $_->[0] } @{ $result->{result} } ], [qw($TOTAL _posemo_tests postgres)], "Database names";
+cmp_ok $result->{result}[1][1], '>', 5,  "Database _posemo tests is bigger then 5 MB";
+cmp_ok $result->{result}[1][1], '<', 10, "Database _posemo tests is smaller then 10 MB";
 
-is $result->{result}[0][1] + $result->{result}[1][1], $result->{result}[2][1], "Total size is the sum of the other both";
+is $result->{result}[1][1] + $result->{result}[2][1], $result->{result}[0][1], "Total size is the sum of the other both";
 
 
 
