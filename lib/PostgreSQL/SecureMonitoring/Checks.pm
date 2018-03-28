@@ -212,6 +212,10 @@ has critical_level       => ( is => "ro", isa => "Num",           predicate => "
 has min_value            => ( is => "ro", isa => "Num",           predicate => "has_min_value", );
 has max_value            => ( is => "ro", isa => "Num",           predicate => "has_max_value", );
 
+# Flag for critical/warning check: 
+# when true, then check if result is lower else higher then critical/warning_level
+has lower_is_worse       => ( is => "ro", isa => "Bool",          default   => 0,);
+
 # Internal states
 has app                  => ( is => "ro", isa => "Object",        required  => 1,          handles => [qw(dbh has_dbh schema user superuser host port host_desc has_host has_port commit rollback)], );
 # has result               => ( is => "ro", isa => "ArrayRef[Any]", default   => sub { [] }, ); 
@@ -578,8 +582,16 @@ sub test_critical_warning
    my $message = "";
 
    my ( @crit, @warn );
-   @crit = grep { $_ >= $self->critical_level } @values if $self->has_critical_level;
-   @warn = grep { $_ >= $self->warning_level } @values  if $self->has_warning_level;
+   if ( $self->lower_is_worse )
+      {
+      @crit = grep { $_ <= $self->critical_level } @values if $self->has_critical_level;
+      @warn = grep { $_ <= $self->warning_level } @values  if $self->has_warning_level;
+      }
+   else
+      {
+      @crit = grep { $_ >= $self->critical_level } @values if $self->has_critical_level;
+      @warn = grep { $_ >= $self->warning_level } @values  if $self->has_warning_level;
+      }
 
    if (@crit)
       {
