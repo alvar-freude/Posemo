@@ -569,9 +569,11 @@ sub test_critical_warning
       }
    elsif ( $result->{row_type} eq "multiline" )
       {
-      @values = map { splice( @$_, 1 ) } @{ $result->{result} };
+      @values = map { @$_[ 1 .. $#$_ ] } @{ $result->{result} };
       }
    else { $result->{error} = "FATAL: Wrong row_type '${ \$self->result_type }' in critical/warning-check\n"; }
+
+   TRACE "All Values to test for crit/warn: @values";
 
    my $message = "";
 
