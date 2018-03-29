@@ -66,7 +66,8 @@ our @EXPORT = qw( result_ok
    no_error_ok error_ok
    message_like
    name_is result_type_is row_type_is result_unit_is
-   result_is result_cmp);
+   result_is result_cmp
+   result_is_counter result_isnt_counter);
 
 
 # use parent 'Test::Builder::Module';
@@ -312,6 +313,29 @@ sub result_unit_is($$;$)
    my $message = shift // "Result Unit is '$unit'";
 
    return is( $result->{result_unit}, $unit, $message );
+   }
+
+
+=head2 result_is_counter($result [, $message]), result_isnt_counter($result [, $message])
+
+Checks if the result_is_counter flag is set
+
+=cut
+
+sub result_is_counter($;$)
+   {
+   my $result = shift;
+   my $message = shift // "Result is counter";
+
+   return ok( $result->{result_is_counter}, $message );
+   }
+
+sub result_isnt_counter($;$)
+   {
+   my $result = shift;
+   my $message = shift // "Result is counter";
+
+   return ok( !$result->{result_is_counter}, $message );
    }
 
 
