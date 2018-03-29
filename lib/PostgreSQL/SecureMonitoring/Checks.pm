@@ -19,6 +19,12 @@ package PostgreSQL::SecureMonitoring::Checks;
 
 =head1 DESCRIPTION
 
+  TODO: Documentation!
+  TODO: Separate install methods?
+
+
+
+
 This is the base class for all Posemo checks. It declares all base methods for 
 creating SQL in initialisation, calling the check at runtime etc.
 
@@ -196,7 +202,6 @@ has result_unit          => ( is => "ro", isa => "Str",           default   => "
 has language             => ( is => "ro", isa => "Str",           default   => "sql", );
 has volatility           => ( is => "ro", isa => "Str",           default   => "STABLE", );
 has has_multiline_result => ( is => "ro", isa => "Bool",          default   => 0, );
-has result_is_counter    => ( is => "ro", isa => "Bool",          default   => 0, );
 has has_writes           => ( is => "ro", isa => "Bool",          default   => 0, );
 has parameters           => ( is => "ro", isa => "ArrayRef[Any]", default   => sub { [] }, traits  => ['Array'], 
                                                                                            handles => 
@@ -204,6 +209,13 @@ has parameters           => ( is => "ro", isa => "ArrayRef[Any]", default   => s
                                                                                              has_parameters => 'count', 
                                                                                              all_parameters => 'elements', 
                                                                                              }, );
+# options for graphs, display, ...
+# Graph type: line, area, stacked_area, ...
+# TODO: POD Documentation!
+has result_is_counter    => ( is => "ro", isa => "Bool",          predicate => "has_result_is_counter", );
+has graph_type           => ( is => "ro", isa => "Str",           predicate => "has_graph_type",        );
+has graph_mirrored       => ( is => "ro", isa => "Bool",          predicate => "has_graph_mirrored",    );
+
 
 # The following values can be set via config file etc as parameter
 has enabled              => ( is => "ro", isa => "Bool",          default   => 1,); 
@@ -215,6 +227,7 @@ has max_value            => ( is => "ro", isa => "Num",           predicate => "
 # Flag for critical/warning check: 
 # when true, then check if result is lower else higher then critical/warning_level
 has lower_is_worse       => ( is => "ro", isa => "Bool",          default   => 0,);
+
 
 # Internal states
 has app                  => ( is => "ro", isa => "Object",        required  => 1,          handles => [qw(dbh has_dbh schema user superuser host port host_desc has_host has_port commit rollback)], );
@@ -431,13 +444,12 @@ sub run_check
       eval { $self->rollback if $self->has_dbh; return 1; } or ERROR "Error in rollback: $EVAL_ERROR";
       }
 
-   $result->{check_name}        = $self->name;
-   $result->{description}       = $self->description;
-   $result->{result_unit}       = $self->result_unit;
-   $result->{result_type}       = $self->result_type;
-   $result->{result_is_counter} = $self->result_is_counter;
+   $result->{check_name}  = $self->name;
+   $result->{description} = $self->description;
+   $result->{result_unit} = $self->result_unit;
+   $result->{result_type} = $self->result_type;
 
-   foreach my $attr (qw(warning_level critical_level min_value max_value))
+   foreach my $attr (qw(warning_level critical_level min_value max_value result_is_counter graph_type graph_mirrored))
       {
       my $method = "has_$attr";
       next unless $self->$method;
@@ -445,7 +457,7 @@ sub run_check
       }
 
    # skip critical/warning test, when no real result!
-   $self->test_critical_warning($result) if $self->enabled and not $result->{error};
+   $self->test_critical_warning($result) if not $result->{error};
 
    TRACE "Finished check ${ \$self->name } for host ${ \$self->host_desc }";
    TRACE "Result: " . Dumper($result);
