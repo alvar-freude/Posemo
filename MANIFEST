@@ -18,6 +18,7 @@ lib/PostgreSQL/SecureMonitoring.pm
 lib/PostgreSQL/SecureMonitoring/Checks.pm
 lib/PostgreSQL/SecureMonitoring/Checks/Activity.pm
 lib/PostgreSQL/SecureMonitoring/Checks/Alive.pm
+lib/PostgreSQL/SecureMonitoring/Checks/AllocatedBuffers.pm
 lib/PostgreSQL/SecureMonitoring/Checks/BackupAge.pm
 lib/PostgreSQL/SecureMonitoring/Checks/CacheHitRatio.pm
 lib/PostgreSQL/SecureMonitoring/Checks/CheckpointTime.pm
@@ -56,10 +57,11 @@ t/511-activity.t
 t/511-slave-lag.t
 t/515-dbsize.t
 t/520-transactions.t
+t/523-checkpoint-time.t
+t/524-allocated-buffers.t
 t/530-cache-hit-ratio.t
 t/701-run-json.t
 t/801-security-definer.pg
-t/823-checkpoin-time.t
 t/900-perlcritic.t
 t/910-boilerplate.t
 t/920-manifest.t
