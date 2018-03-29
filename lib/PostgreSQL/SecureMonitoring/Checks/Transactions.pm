@@ -41,8 +41,9 @@ has skip_db_re => ( is => "ro", isa => "Str", );
 
 check_has
    description          => 'Get transaction counter.',
-   has_multiline_result => 1,
    result_type          => "bigint",
+   result_is_counter    => 1,
+   has_multiline_result => 1,
    parameters           => [ [ skip_db_re => 'TEXT', '^template[01]$' ], ],
 
    # complex return type
