@@ -19,7 +19,7 @@ result_type_is $result, "boolean";
 
 
 # Next check, need master
-$result = result_ok "IsMaster", "test", { master_reuired => 1 };
+$result = result_ok "IsMaster", "test", { master_required => 1, };
 
 no_warning_ok $result;
 no_critical_ok $result;
@@ -31,7 +31,7 @@ result_type_is $result, "boolean";
 
 
 # Next check, need slave
-$result = result_ok "IsMaster", "test", { slave_required => 1 };
+$result = result_ok "IsMaster", "test", { slave_required => 1, };
 
 no_warning_ok $result;
 critical_ok $result;
