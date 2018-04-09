@@ -6,12 +6,21 @@ use warnings;
 use FindBin qw($Bin);
 use lib "$Bin/../lib";
 
-my $output_module = "JSON";
+my $output_module;
 
-if ( @ARGV && $ARGV[0] !~ m{^-} )
-   {
-   $output_module = shift;
-   }
+# set output module at beginning!
+BEGIN
+{
+
+   if ( @ARGV && $ARGV[0] !~ m{^-} )
+      {
+      $output_module = shift;
+      }
+   else
+      {
+      $output_module = "JSON";
+      }
+}
 
 use PostgreSQL::SecureMonitoring::Run output => $output_module;
 
