@@ -115,7 +115,7 @@ sub generate_output
       #>>>
       }
 
-   $output .= "<<<<>>>\n";
+   $output .= "<<<<>>>>\n";
 
    return $output;
    } ## end sub generate_output
