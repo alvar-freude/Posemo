@@ -30,3 +30,16 @@ until this, use a dump:
   * install it
 
 
+
+
+TODO: Check this:
+ERROR: Perl warning: Use of uninitialized value $in_host in concatenation (.) or string at bin/../lib/PostgreSQL/SecureMonitoring/Run.pm line 520. 
+ERROR: Perl warning: Use of uninitialized value $in_host in split at bin/../lib/PostgreSQL/SecureMonitoring/Run.pm line 521. 
+ERROR: Perl warning: Use of uninitialized value $in_host in concatenation (.) or string at bin/../lib/PostgreSQL/SecureMonitoring/Run.pm line 530. 
+
+
+Slave(?):
+
+INFO : Critical values: 0 0 0 0 25.5998 55.8631!  in check Cache Hit Ratio for host XXX
+INFO : Warning values: 0 0 0 0 25.5998 55.8631 in check Cache Hit Ratio for host XXX
+ 
