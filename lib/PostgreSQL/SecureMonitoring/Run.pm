@@ -195,6 +195,8 @@ sub import
    my %params = @ARG;
 
    my $output = $params{output} // "JSON";
+   
+   TRACE "Using $output as output class.";
 
    with "PostgreSQL::SecureMonitoring::Output::$output";
 
