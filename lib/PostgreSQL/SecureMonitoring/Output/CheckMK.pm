@@ -98,7 +98,7 @@ sub generate_output
       $metadata{$key} = $complete_result->{$key};
       }
 
-   my $output = "<<<posemo>>>\n" . $json->encode( \%metadata ) . "\n";
+   my $output = "<<<posemo_base>>>\n" . $json->encode( \%metadata ) . "\n";
 
 
    #
