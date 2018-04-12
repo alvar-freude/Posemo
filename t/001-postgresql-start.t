@@ -15,6 +15,9 @@ use Test::More;
 # * pg_start_ok($name, $message) (undef: all)
 # * pg_stop_ok($name, $message) (undef: all)
 
+use Data::Dumper;
+
+diag Dumper \@INC;
 
 pg_binary_ok();
 
