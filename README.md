@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/alvar-freude/Posemo?branch=master)](https://travis-ci.org/alvar-freude/Posemo)
+[![Build Status](https://travis-ci.org/alvar-freude/Posemo.svg?branch=master)](https://travis-ci.org/alvar-freude/Posemo)
 
 # Posemo – PostgreSQL Secure Monitoring
 
