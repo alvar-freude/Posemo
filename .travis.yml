@@ -11,11 +11,18 @@ perl:
 #  - "5.18"
 #  - "5.16"
 
-addons:
-  postgresql: "10"
-  apt:
-    packages:
-      - postgresql-server-dev-10
+matrix:
+  include:
+    - addons:
+        postgresql: 10
+    - addons:
+        postgresql: 9.6
+    - addons:
+        postgresql: 9.5
+    - addons:
+        postgresql: 9.4
+    - addons:
+        postgresql: 9.3
 
 
 before_install:
