@@ -18,6 +18,7 @@ use Test::More;
 use Data::Dumper;
 
 diag Dumper \@INC;
+diag Dumper \%ENV;
 
 pg_binary_ok();
 
