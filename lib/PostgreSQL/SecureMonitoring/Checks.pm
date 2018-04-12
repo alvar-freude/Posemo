@@ -227,7 +227,7 @@ has max_value            => ( is => "ro", isa => "Num",           predicate => "
 
 # Flag for critical/warning check: 
 # when true, then check if result is lower else higher then critical/warning_level
-has lower_is_worse       => ( is => "ro", isa => "Bool",          default   => 0,);
+has lower_is_worse       => ( is => "ro", isa => "Bool",          predicate => "has_lower_is_worse",);
 
 
 # Internal states
