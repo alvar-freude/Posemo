@@ -89,6 +89,11 @@ use DBI;
 
 =head2 get_connection_ok($config [, $database, $superuser_flag, $message])
 
+Connects to the DB server (according to config, host (socket path) and port); 
+returns the DB handle.
+
+On failure retuns undef.
+
 =cut
 
 sub get_connection_ok($;$$$)
@@ -99,11 +104,10 @@ sub get_connection_ok($;$$$)
    my $message        = shift // "Get DBB Connection to $database";
 
    my $dbh = eval {
-      return DBI->connect(
-         "dbi:Pg:dbname=$database;host=$conf->{host};port=$conf->{port}",
-         $superuser_flag ? undef : "_posemo_tests",
-         undef, { RaiseError => 1, AutoCommit => 0 }
-                         );
+      return
+         DBI->connect( "dbi:Pg:dbname=$database;host=$conf->{host};port=$conf->{port}",
+                       $superuser_flag ? undef : "_posemo_tests",
+                       undef, { RaiseError => 1, AutoCommit => 0 } );
    };
 
    ok( $dbh, $message ) or diag "Error while connecting DB $database: $DBI::errstr";
