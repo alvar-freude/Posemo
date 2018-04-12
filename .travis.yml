@@ -17,12 +17,13 @@ matrix:
         postgresql: 10
     - addons:
         postgresql: 9.6
-    - addons:
-        postgresql: 9.5
-    - addons:
-        postgresql: 9.4
-    - addons:
-        postgresql: 9.3
+# Later; pgTAP CREATE EXTENSION fails ...
+#    - addons:
+#        postgresql: 9.5
+#    - addons:
+#        postgresql: 9.4
+#    - addons:
+#        postgresql: 9.3
 
 
 before_install:
