@@ -641,7 +641,7 @@ is about the configuration or something similar, the attribute
 When a check module sets C<enabled_on_this_platform> to false, then 
 the check will not run, because C<get_all_checks_ordered> removes it.
 
-This should only be dependent on the platform, the application is 
+This should only be dependent on the platform the application is 
 running (local), not the PostgreSQL server (remote). 
 
 
