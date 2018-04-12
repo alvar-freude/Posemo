@@ -1,4 +1,5 @@
 .project
+.travis.yml
 bin/posemo_install.pl
 bin/posemo_json.pl
 Build.PL

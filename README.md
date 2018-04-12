@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/alvar-freude/Posemo?branch=master)](https://travis-ci.org/alvar-freude/Posemo)
+
 # Posemo – PostgreSQL Secure Monitoring
 
 Posemo is a PostgreSQL monitoring framework, that can monitor everything in Postgres with an unprivileged user, which has no access to any data. Posemo conforms to the rules of the *German Federal Office for Information Security* ([Bundesamt für Sicherheit in der Informationstechnik](https://www.bsi.bund.de/), BSI).
