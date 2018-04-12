@@ -144,6 +144,7 @@ use Scalar::Util qw(looks_like_number);
 use List::Util qw(any);
 use English qw( -no_match_vars );
 use Data::Dumper;
+use Carp;
 
 use Config::FindFile qw(search_conf);
 use Log::Log4perl::EasyCatch ( log_config => search_conf("posemo-logging.properties") );
@@ -457,7 +458,11 @@ sub run_check
       }
 
    # skip critical/warning test, when no real result!
-   $self->test_critical_warning($result) if not $result->{error};
+   if ( not $result->{error} )
+      {
+      $self->test_critical_warning($result);
+      $result->{status} = $self->status($result);
+      }
 
    TRACE "Finished check ${ \$self->name } for host ${ \$self->host_desc }";
    TRACE "Result: " . Dumper($result);
@@ -625,6 +630,29 @@ sub test_critical_warning
    return;
    } ## end sub test_critical_warning
 
+
+=head2 status
+
+This method returns a C<status> according to the warning/critical flags in the given result.
+
+  0: OK
+  1: warning
+  2: critical
+
+It may be overriden in the check to do something else then looking in warning/critical, 
+but usually this here should be fine.
+
+=cut
+
+sub status
+   {
+   my $self = shift;
+   my $result = shift // croak "status needs a result hash for checking!";
+
+   return 2 if $result->{critical};
+   return 1 if $result->{warning};
+   return 0;
+   }
 
 
 =head2 enabled_on_this_platform
