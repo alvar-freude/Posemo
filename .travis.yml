@@ -13,12 +13,15 @@ perl:
 
 addons:
   postgresql: "10"
-
+  apt:
+    packages:
+      - postgresql-server-dev-10
 
 
 before_install:
+  # install pgTAP 
+  - sudo apt-get -qq update
+  - sudo apt-get install -y pgtap
   # We dont't need the system PostgreSQL server, start our own
   - sudo service postgresql stop
-  # install pgTAP
-  - wget http://api.pgxn.org/dist/pgtap/0.98.0/pgtap-0.98.0.zip && unzip pgtap-0.98.0.zip && cd pgtap-0.98.0 && make && sudo make install
 
