@@ -449,7 +449,14 @@ sub run_check
    $result->{result_unit} = $self->result_unit;
    $result->{result_type} = $self->result_type;
 
-   foreach my $attr (qw(warning_level critical_level min_value max_value result_is_counter graph_type graph_mirrored))
+   foreach my $attr (
+                      qw(warning_level critical_level
+                      min_value max_value
+                      lower_is_worse
+                      result_is_counter
+                      graph_type graph_mirrored
+                      )
+      )
       {
       my $method = "has_$attr";
       next unless $self->$method;

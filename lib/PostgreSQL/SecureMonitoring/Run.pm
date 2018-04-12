@@ -383,7 +383,7 @@ sub run_checks
       $this_host_params{results}   = \@host_results;
       $this_host_params{hostgroup} = $host->{_hostgroup};
       $this_host_params{host}      = $host->{host};
-      $this_host_params{name}      = $host->{_name} if defined $host->{_name};
+      $this_host_params{name}      = $host->{_name} // $host->{host};
       $self->add_result( \%this_host_params );
 
       } ## end foreach my $host ( @{ $self...})
