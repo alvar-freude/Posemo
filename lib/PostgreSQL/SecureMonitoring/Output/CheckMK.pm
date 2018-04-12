@@ -88,7 +88,7 @@ sub generate_output
 
    my %metadata;
 
-   foreach my $key (keys %$complete_result)
+   foreach my $key ( keys %$complete_result )
       {
       # ignore results
       next if $key eq "result";
@@ -98,7 +98,7 @@ sub generate_output
       $metadata{$key} = $complete_result->{$key};
       }
 
-   my $output = "<<<posemo>>>\n" . $json->encode( \%metadata ) . "\n";
+   my $output = "<<<posemo_base>>>\n" . $json->encode( \%metadata ) . "\n";
 
 
    #

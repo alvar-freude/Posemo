@@ -9,6 +9,7 @@ use lib "$Bin/../lib";
 my $output_module;
 
 # set output module at beginning!
+# rewrite "help" command to "--help" option
 BEGIN
 {
 
@@ -19,6 +20,10 @@ BEGIN
    else
       {
       $output_module = "JSON";
+      if ( lc( $ARGV[0] // "" ) eq "help" )
+         {
+         $ARGV[0] = "--help";                      ## no critic (Variables::RequireLocalizedPunctuationVars)
+         }
       }
 }
 

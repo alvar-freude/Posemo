@@ -17,6 +17,10 @@ my $TEST_AUTHOR = $ENV{RELEASE_TESTING} || $ENV{TEST_AUTHOR};
 
 # plan tests => 7;
 
+
+use Test::PostgreSQL::Starter;
+my $host = pg_get_hostname("test");
+
 my $install;
 
 lives_ok sub {
@@ -28,6 +32,7 @@ lives_ok sub {
                                                           create_database => 1,
                                                           create_user     => 1,
                                                           port            => 15432,
+                                                          host            => $host,
                                                         );
    },
    "Got DB installer object";
@@ -71,7 +76,6 @@ lives_ok sub {
    $dbh->do("CREATE USER _pgtap_superuser SUPERUSER;");
    $dbh->commit;
 }, "my pgTAP superuser created";
-
 
 
 
