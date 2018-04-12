@@ -88,7 +88,7 @@ sub generate_output
 
    my %metadata;
 
-   foreach my $key (keys %$complete_result)
+   foreach my $key ( keys %$complete_result )
       {
       # ignore results
       next if $key eq "result";
