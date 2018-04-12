@@ -24,6 +24,7 @@ lib/PostgreSQL/SecureMonitoring/Checks/AllocatedBuffers.pm
 lib/PostgreSQL/SecureMonitoring/Checks/BackupAge.pm
 lib/PostgreSQL/SecureMonitoring/Checks/CacheHitRatio.pm
 lib/PostgreSQL/SecureMonitoring/Checks/CheckpointTime.pm
+lib/PostgreSQL/SecureMonitoring/Checks/ConnectionLimit.pm
 lib/PostgreSQL/SecureMonitoring/Checks/CRUDCount.pm
 lib/PostgreSQL/SecureMonitoring/Checks/DBSize.pm
 lib/PostgreSQL/SecureMonitoring/Checks/IsMaster.pm
@@ -60,6 +61,7 @@ t/511-activity.pg
 t/511-activity.t
 t/511-slave-lag.t
 t/515-dbsize.t
+t/517-connection-limit.t
 t/520-transactions.t
 t/523-checkpoint-time.t
 t/524-allocated-buffers.t
