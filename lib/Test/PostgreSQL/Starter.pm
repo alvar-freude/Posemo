@@ -100,7 +100,9 @@ use parent 'Test::Builder::Module';
 
 our @EXPORT = qw( pg_binary_ok
    pg_read_conf_ok
+   pg_get_hostname
    pg_initdb_ok      pg_initdb_unless_exists_ok
+   pg_diag_logs
    pg_dropcluster_ok pg_dropcluster_if_exists_ok
    pg_start_ok       pg_stop_ok
    pg_stop_all_ok    pg_stop_if_running_ok
@@ -364,14 +366,14 @@ sub pg_initdb_ok($;$$$$)
       {
       my $rc = $tb->ok( 0, $message );
       $tb->diag("Error while calling initdb. RC: $rc. OS_ERROR: $OS_ERROR");
-      $tb->diag("Check $conf->{cluster_path}/stdout.log and $conf->{cluster_path}/stderr.log");
+      $tb->diag("Check $conf->{cluster_path}/$conf->{name}/stdout.log and $conf->{cluster_path}/$conf->{name}/stderr.log");
       return 0;
       }
 
    unlink "$conf->{cluster_path}/stdout.log", "$conf->{cluster_path}/stderr.log"
       or warn "UPS? Error when deleting redirection files: $OS_ERROR\n";
 
-   #make_path("/$conf->{cluster_path}/sockets");
+   make_path("$conf->{cluster_path}/sockets");
 
    my $extra_config = <<"CONF_END";
 
@@ -379,12 +381,12 @@ sub pg_initdb_ok($;$$$$)
 # *** Extra Config from Test::PostgreSQL::Starter
 #
 
-lc_messages             = 'C'                       # (error) Messages always in english
+lc_messages             = 'C'                             # (error) Messages always in english
 
 port                    = $conf->{port}
-shared_buffers          = 1MB                       # 1 MB for old shared mem OS X // usually enough for testing; overwrite with more on bigger DBs
-fsync                   = off                       # WOOOH! ONLY FOR TESTING! In testing mode we usually need no fsync.
-
+shared_buffers          = 1MB                             # 1 MB for old shared mem OS X // usually enough for testing; overwrite with more on bigger DBs
+fsync                   = off                             # WOOOH! ONLY FOR TESTING! In testing mode we usually need no fsync.
+unix_socket_directories = '$conf->{cluster_path}/sockets' # our own socket dir, because ubuntu/debian uses one which is not writeable by user
 
 CONF_END
 
@@ -440,6 +442,43 @@ sub pg_initdb_unless_exists_ok($;$$$$)
    return pg_initdb_ok( $conf->{name}, $has_replication, $initdb_params, $config, $message );
 
    }
+
+
+=head2 pg_get_hostname
+
+returns the hostname for connecting; it is no real hostname, but the socket path!
+
+This MUST be used for all connections.
+
+=cut
+
+sub pg_get_hostname(;$)
+   {
+   my $conf = _build_conf(shift);
+   return "$conf->{cluster_path}/sockets";
+   }
+
+
+=head2 pg_diag_logs
+
+Sends the contents of the STDOUT and STDERR captured from tht PostgreSQL server to diag.
+
+=cut
+
+sub pg_diag_logs(;$)
+   {
+   my $conf = _build_conf(shift);
+
+   my $tb = __PACKAGE__->builder;
+   $tb->diag( "\n", "Server has written to STDOUT:" );
+   $tb->diag( io("$conf->{cluster_path}/$conf->{name}/stdout.log")->all );
+   $tb->diag( "\n", "Server has written to STERR:" );
+   $tb->diag( io("$conf->{cluster_path}/$conf->{name}/stderr.log")->all );
+   $tb->diag( "End of logs diag\n", "\n" );
+
+   return 1;
+   }
+
 
 
 # * pg_dropcluster_ok($name, $message)
@@ -535,7 +574,6 @@ sub pg_drop_all_ok(;$)
    }
 
 
-
 # * pg_start_ok($name, $message) (undef: all)
 # * pg_stop_ok($name, $message) (undef: all)
 
@@ -558,7 +596,7 @@ sub pg_start_ok(;$$)
    # $tb->diag("$pg_ctl -D '$conf->{cluster_path}/$conf->{name}' start 1>$conf->{cluster_path}/stdout.log 2>$conf->{cluster_path}/stderr.log");
    my $state
       = system(
-      "$pg_ctl -D '$conf->{cluster_path}/$conf->{name}' start 1>$conf->{cluster_path}/stdout.log 2>$conf->{cluster_path}/stderr.log"
+      "$pg_ctl -D '$conf->{cluster_path}/$conf->{name}' start 1>$conf->{cluster_path}/$conf->{name}/stdout.log 2>$conf->{cluster_path}/$conf->{name}/stderr.log"
       );
 
    if ($state)
@@ -566,12 +604,12 @@ sub pg_start_ok(;$$)
       my $rc = $state >> 8;                        ## no critic (ValuesAndExpressions::ProhibitMagicNumbers)
       $tb->ok( 0, $message );
       $tb->diag("Error while calling pg_ctl -D '$conf->{cluster_path}/$conf->{name}' start. RC: $rc. OS_ERROR: $OS_ERROR");
-      $tb->diag("Check $conf->{cluster_path}/stdout.log and $conf->{cluster_path}/stderr.log");
+      $tb->diag("Check $conf->{cluster_path}/$conf->{name}/stdout.log and $conf->{cluster_path}/$conf->{name}/stderr.log");
       return 0;
       }
 
-   unlink "$conf->{cluster_path}/stdout.log", "$conf->{cluster_path}/stderr.log"
-      or warn "UPS? Error when deleting redirection files: $OS_ERROR\n";
+   #unlink "$conf->{cluster_path}/stdout.log", "$conf->{cluster_path}/stderr.log"
+   #   or warn "UPS? Error when deleting redirection files: $OS_ERROR\n";
 
    $tb->ok( 1, $message );
 
@@ -595,7 +633,7 @@ sub pg_stop_ok(;$$)
    my $pg_ctl = _get_binary( $conf, "pg_ctl" );
    my $state
       = system(
-      "$pg_ctl -D '$conf->{cluster_path}/$conf->{name}' stop -m fast 1>$conf->{cluster_path}/stdout.log 2>$conf->{cluster_path}/stderr.log"
+      "$pg_ctl -D '$conf->{cluster_path}/$conf->{name}' stop -m fast 1>$conf->{cluster_path}/stop-stdout.log 2>$conf->{cluster_path}/stop-stderr.log"
       );
 
    if ($state)
@@ -603,11 +641,11 @@ sub pg_stop_ok(;$$)
       my $rc = $state >> 8;                        ## no critic (ValuesAndExpressions::ProhibitMagicNumbers)
       $tb->ok( 0, $message );
       $tb->diag("Error while calling pg_ctl -D '$conf->{cluster_path}/$conf->{name}' stop -m fast. RC: $rc. OS_ERROR: $OS_ERROR");
-      $tb->diag("Check $conf->{cluster_path}/stdout.log and $conf->{cluster_path}/stderr.log");
+      $tb->diag("Check $conf->{cluster_path}/stop-stdout.log and $conf->{cluster_path}/stop-stderr.log");
       return 0;
       }
 
-   unlink "$conf->{cluster_path}/stdout.log", "$conf->{cluster_path}/stderr.log"
+   unlink "$conf->{cluster_path}/stop-stdout.log", "$conf->{cluster_path}/stop-stderr.log"
       or warn "UPS? Error when deleting redirection files: $OS_ERROR\n";
 
    $tb->ok( 1, $message );

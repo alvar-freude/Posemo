@@ -12,6 +12,9 @@ use strict;
 use warnings FATAL => 'all';
 eval " use Module::Build; return 1; " or die "Please install perl module Module::Build for installation. Stopped.\n";
 
+# The socketdir, which is used by Test::PostgreSQL::Starter
+my $socketdir = ( $ENV{POSTGRES_TEST_DIR} // "/tmp/_test-postgresql-starter" ) . "/sockets";
+
 my $builder = Module::Build->new(
    module_name       => 'Posemo',
    license           => 'artistic_2',
@@ -28,7 +31,7 @@ my $builder = Module::Build->new(
                     dbname   => '_posemo_tests',
                     username => '_posemo_tests',           # no superuser -- switch manuelly, when pgTAP needs it!
                                                            # superuser => '_posemo_superuser',
-                    host     => undef,
+                    host     => $socketdir,
                     suffix   => '.pg',
                     port     => 15432,
                   },

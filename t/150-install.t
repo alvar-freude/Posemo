@@ -14,6 +14,8 @@ plan skip_all => "Skip database initialisation because SKIP_INSTALL is set" if $
 
 my $TEST_AUTHOR = $ENV{RELEASE_TESTING} || $ENV{TEST_AUTHOR};
 
+use Test::PostgreSQL::Starter;
+my $host = pg_get_hostname("test");
 
 # plan tests => 7;
 
@@ -25,6 +27,7 @@ lives_ok sub {
                                                           user             => "_posemo_tests",
                                                           superuser        => "_posemo_superuser",
                                                           port             => 15432,
+                                                          host             => $host,
                                                           create_superuser => 1,
                                                         );
    },

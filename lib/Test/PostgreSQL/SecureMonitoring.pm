@@ -80,6 +80,8 @@ use Test::PostgreSQL::Starter;
 use PostgreSQL::SecureMonitoring;
 use Test::Deep;
 
+use Test::PostgreSQL::Starter;
+my $host = pg_get_hostname("test");
 
 
 =head2 result_ok( $check [, $clustername, $message] )
@@ -112,6 +114,7 @@ sub result_ok($;$$$)
             $app = PostgreSQL::SecureMonitoring->new(
                                                       database => "_posemo_tests",
                                                       user     => "_posemo_tests",
+                                                      host     => $host,
                                                       port     => $tps_conf->{port},
                                                     );
          },

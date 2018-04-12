@@ -34,10 +34,14 @@ sleep 2;
 # and travis sets his own perl libbrary search path.
 delete $ENV{PERL5LIB};
 delete $ENV{PERLLIB};
-my $result = qx( psql -p 15432 postgres -c "SELECT 'Bingo' || 'Yeah';" );
+my $host   = pg_get_hostname("test");
+my $result = qx( psql -h $host -p 15432 postgres -c "SELECT 'Bingo' || 'Yeah';" );
 
-like $result, qr(BingoYeah), "Query OK" or diag "Error with query; wrong result: '$result'";
-
+like $result, qr(BingoYeah), "Query OK" or do
+   {
+   diag "Error with simple test query; wrong result: '$result'";
+   pg_diag_logs("test");
+   };
 
 done_testing();
 
