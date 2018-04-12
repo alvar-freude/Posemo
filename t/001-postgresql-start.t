@@ -15,24 +15,25 @@ use Test::More;
 # * pg_start_ok($name, $message) (undef: all)
 # * pg_stop_ok($name, $message) (undef: all)
 
-use Data::Dumper;
-
-diag Dumper \@INC;
-diag Dumper \%ENV;
 
 pg_binary_ok();
 
 pg_stop_if_running_ok("test");
-pg_dropcluster_if_exists_ok("test", "Dropping an old cluster, if it exists.");
+pg_dropcluster_if_exists_ok( "test", "Dropping an old cluster, if it exists." );
 
 pg_initdb_ok("test");
 pg_dropcluster_ok("test");
 
-pg_initdb_unless_exists_ok("test", 1);
+pg_initdb_unless_exists_ok( "test", 1 );
 
 pg_start_ok("test");
 
 sleep 2;
+
+# Delete other search paths, because Debbian/Ubuntu psql wrapper is junk (using system perl)
+# and travis sets his own perl libbrary search path.
+delete $ENV{PERL5LIB};
+delete $ENV{PERLLIB};
 my $result = qx( psql -p 15432 postgres -c "SELECT 'Bingo' || 'Yeah';" );
 
 like $result, qr(BingoYeah), "Query OK" or diag "Error with query; wrong result: '$result'";
