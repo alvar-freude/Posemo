@@ -22,7 +22,7 @@ BEGIN
       $output_module = "JSON";
       if ( lc( $ARGV[0] // "" ) eq "help" )
          {
-         $ARGV[0] = "--help";
+         $ARGV[0] = "--help";                      ## no critic (Variables::RequireLocalizedPunctuationVars)
          }
       }
 }
