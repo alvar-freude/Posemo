@@ -168,8 +168,9 @@ sub _build_conf
    my $conf = shift // { name => "unnamed" };
 
    $conf = { name => $conf } unless ref $conf;
-   $conf->{port} //= DEFAULT_PORT;
+   $conf->{port}         //= DEFAULT_PORT;
    $conf->{cluster_path} //= $ENV{POSTGRES_TEST_DIR} // "/tmp/_test-postgresql-starter";
+   $conf->{host}         //= "$conf->{cluster_path}/sockets";
 
    return $conf;
    }
@@ -186,22 +187,6 @@ sub _build_conf
 
 
 =head1 TESTS
-
-=head2 summary:
-
-OLD API with name instead of conf
-
-
- * pg_binary_ok($message)
- * pg_initdb_ok($name, $is_master, $initdb_params, $config, $message)
- * pg_initdb_unless_exists_ok($name, $is_master, $initdb_params, $config, $message)
- * pg_dropcluster_ok($name, $message)
- * pg_dropcluster_if_exists_ok($name, $message)
- * pg_start_ok($name, $message) (undef: all)
- * pg_stop_ok($name, $message) (undef: all)
- * pg_temp_config_ok($name, $config)
- * pg_get_dsn_ok($name, $config)
-
 
 =head2 pg_binary_ok( [ $conf, $message ] )
 
@@ -384,6 +369,7 @@ sub pg_initdb_ok($;$$$$)
 lc_messages             = 'C'                             # (error) Messages always in english
 
 port                    = $conf->{port}
+max_connections         = 100
 shared_buffers          = 1MB                             # 1 MB for old shared mem OS X // usually enough for testing; overwrite with more on bigger DBs
 fsync                   = off                             # WOOOH! ONLY FOR TESTING! In testing mode we usually need no fsync.
 unix_socket_directories = '$conf->{cluster_path}/sockets' # our own socket dir, because ubuntu/debian uses one which is not writeable by user
@@ -455,7 +441,7 @@ This MUST be used for all connections.
 sub pg_get_hostname(;$)
    {
    my $conf = _build_conf(shift);
-   return "$conf->{cluster_path}/sockets";
+   return $conf->{host};
    }
 
 

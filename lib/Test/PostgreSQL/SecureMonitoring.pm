@@ -54,14 +54,16 @@ use version; our $VERSION = qv("v0.1.0");
 
 This Module is a helper module for Testing Posemo Checks.
 
-It is NO Test::Builder(::Module)-Subclass and some test subs 
+It is NO Test::Builder(::Module)-Subclass and some test subs
 give more then one test result. 
 
 
 =cut
 
 use base qw(Exporter);
-our @EXPORT = qw( result_ok
+our @EXPORT = qw(
+   get_connection_ok
+   result_ok
    no_warning_ok no_critical_ok warning_ok critical_ok
    no_error_ok error_ok
    message_like
@@ -81,7 +83,34 @@ use PostgreSQL::SecureMonitoring;
 use Test::Deep;
 
 use Test::PostgreSQL::Starter;
-my $host = pg_get_hostname("test");
+
+use DBI;
+
+
+=head2 get_connection_ok($config [, $database, $superuser_flag, $message])
+
+=cut
+
+sub get_connection_ok($;$$$)
+   {
+   my $conf           = shift;
+   my $database       = shift // "_posemo_tests";
+   my $superuser_flag = shift;
+   my $message        = shift // "Get DBB Connection to $database";
+
+   my $dbh = eval {
+      return DBI->connect(
+         "dbi:Pg:dbname=$database;host=$conf->{host};port=$conf->{port}",
+         $superuser_flag ? undef : "_posemo_tests",
+         undef, { RaiseError => 1, AutoCommit => 0 }
+                         );
+   };
+
+   ok( $dbh, $message ) or diag "Error while connecting DB $database: $DBI::errstr";
+
+   return $dbh;
+   }
+
 
 
 =head2 result_ok( $check [, $clustername, $message] )
@@ -106,6 +135,7 @@ sub result_ok($;$$$)
       {
       skip "Got no conf for $message", 3 unless $tps_conf;    ## no critic(ValuesAndExpressions::ProhibitMagicNumbers)
 
+      my $host = pg_get_hostname("test");
       my ( $app, $check );
 
       # Get Monitoring Obj
