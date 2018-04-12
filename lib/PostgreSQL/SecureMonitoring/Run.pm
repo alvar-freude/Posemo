@@ -195,7 +195,7 @@ sub import
    my %params = @ARG;
 
    my $output = $params{output} // "JSON";
-   
+
    TRACE "Using $output as output class.";
 
    with "PostgreSQL::SecureMonitoring::Output::$output";
@@ -397,6 +397,7 @@ sub run_checks
 Writes the final result.
 
 May be overridden by output modules, e.g. don't write file, instead write it to a database ...
+
 
 =cut
 
