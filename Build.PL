@@ -60,7 +60,7 @@ my $builder = Module::Build->new(
       'DBD::Pg'                   => '3.5.1',
       'Moose'                     => 2.0401,
       'MooseX::Getopt'            => 0.37,
-      'MooseX::Types::Path::Tiny' => 0.012,        # missing(??) dependency in MooseX::ConfigFromFile
+      'MooseX::Types::Path::Tiny' => 0.011,        # missing(??) dependency in MooseX::ConfigFromFile
       'MooseX::SimpleConfig'      => 0.11,
       'MooseX::ConfigFromFile'    => 0.04,
       'Log::Log4perl'             => 1.29,
@@ -69,7 +69,7 @@ my $builder = Module::Build->new(
       'IO::All'                   => 0.84,
       'File::HomeDir'             => 1.00,         # used by Config::FindFile
       'File::ShareDir'            => 1.102,        # used by Config::FindFile
-      'JSON'                      => 2.94,
+      'JSON'                      => 2.90,
 
       # currently not used:
       # 'Config::Validate'  => '0.2.6',
@@ -106,7 +106,11 @@ $builder->create_build_script();
       libfile-sharedir-perl \
       libconfig-tiny-perl \
       libjson-perl \
-      libjson-xs-perl
+      libjson-xs-perl \
+      libmodule-build-perl
+
+  # Test Dependencies:
+  apt-get install libtap-parser-sourcehandler-pgtap-perl libtest-differences-perl libtest-exception-perl libtext-diff-perl
 
 
 =end
