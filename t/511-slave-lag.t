@@ -14,7 +14,7 @@ no_critical_ok $result;
 name_is $result,        "Slave Lag";
 result_type_is $result, "double precision";
 row_type_is $result,    "single";
-result_unit_is $result, "seconds";
+result_unit_is $result, "s";
 
 result_is $result, undef, "Host is master";
 

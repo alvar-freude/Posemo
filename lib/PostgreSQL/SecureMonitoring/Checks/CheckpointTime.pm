@@ -32,7 +32,7 @@ extends "PostgreSQL::SecureMonitoring::Checks";
 check_has
    description       => "Checkpoint write and sync duration.",
    result_type       => "double precision",
-   result_unit       => "milliseconds",
+   result_unit       => "ms",
    result_is_counter => 1,
    graph_type        => "stacked_area",
 

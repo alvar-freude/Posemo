@@ -18,7 +18,7 @@ no_error_ok $result;
 name_is $result,        "Checkpoint Time";
 result_type_is $result, "double precision";
 row_type_is $result,    "list";
-result_unit_is $result, "milliseconds";
+result_unit_is $result, "ms";
 result_is_counter $result;
 
 
