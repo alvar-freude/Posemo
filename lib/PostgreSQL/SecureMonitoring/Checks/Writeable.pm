@@ -48,7 +48,7 @@ check_has
    description    => 'Try to write and commit before timeout.',
    return_type    => "bool",                       # the SQL-functions returns true/false
    result_type    => "float",                      # but the check itself returns seconds as float
-   result_unit    => "seconds",
+   result_unit    => "s",
    volatility     => "VOLATILE",
    has_writes     => 1,
    warning_level  => 3,

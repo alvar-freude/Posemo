@@ -21,7 +21,7 @@ extends "PostgreSQL::SecureMonitoring::Checks";
 check_has
    description => 'When the server is a slave, then return the replication lag in seconds.',
    return_type => 'double precision',
-   result_unit => 'seconds',
+   result_unit => 's',
    code        => "SELECT CASE WHEN pg_is_in_recovery()
                                THEN extract(EPOCH FROM clock_timestamp() - pg_last_xact_replay_timestamp()) 
                                ELSE NULL
