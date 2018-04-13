@@ -10,6 +10,14 @@ Put extra non monitoring specific modules into their own CPAN distribution:
 
 
 
+
+Make it usable with older perls List::Util without uniqstr:
+
+e.g. via http://search.cpan.org/dist/List-Util-MaybeXS/lib/List/Util/MaybeXS.pm (in extlib) 
+or by manually use this sub from there
+
+
+
 Revoke login right on admin user (install.pm)
 
 
