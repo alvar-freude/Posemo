@@ -46,7 +46,6 @@ See App.pm
 
 use English qw( -no_match_vars );
 use FindBin qw($Bin);
-use List::Util qw(uniqstr);
 
 use Config::FindFile qw(search_conf);
 use Log::Log4perl::EasyCatch ( log_config => search_conf("posemo-logging.properties") );
@@ -142,7 +141,7 @@ sub get_all_checks
    return @all_checks;
    }
 
-
+# uniqstr is only available in newer List::Util versions
 sub _uniqstr ()                                    ## no critic (Subroutines::RequireArgUnpacking)
    {
    my %seen;
