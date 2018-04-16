@@ -137,10 +137,19 @@ my @all_checks_ordered;
 
 sub get_all_checks
    {
-   @all_checks = uniqstr( map { _file2checkname($ARG); } map { <$ARG/PostgreSQL/SecureMonitoring/Checks/*.pm> } @INC )
+   @all_checks = _uniqstr( map { _file2checkname($ARG); } map { <$ARG/PostgreSQL/SecureMonitoring/Checks/*.pm> } @INC )
       unless @all_checks;
    return @all_checks;
    }
+
+
+sub _uniqstr ()                                    ## no critic (Subroutines::RequireArgUnpacking)
+   {
+   my %seen;
+   my @uniq = grep { !$seen{$_}++ } @_;
+   return @uniq;
+   }
+
 
 sub get_all_checks_ordered
    {
