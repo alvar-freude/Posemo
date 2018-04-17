@@ -112,6 +112,7 @@ has create_user           => ( is => "ro", isa => "Bool", default => 0,         
 has drop_user             => ( is => "ro", isa => "Bool", default => 0,                  documentation => "Flag: drop user before creating, if exist", );
 has create_superuser      => ( is => "ro", isa => "Bool", default => 0,                  documentation => "Flag: create monitoring superuser", );
 has create_schema         => ( is => "ro", isa => "Bool", default => 0,                  documentation => "Flag: create SQL schema", );
+has drop_schema           => ( is => "ro", isa => "Bool", default => 0,                  documentation => "Flag: drop SQL schema (before creating)", );
 has installation_user     => ( is => "ro", isa => "Str",                                 documentation => "User for creating superuser", );
 has installation_passwd   => ( is => "ro", isa => "Str",                                 documentation => "Password for the connect_user", );
 has installation_database => ( is => "ro", isa => "Str",  default => "postgres",         documentation => "Connect DB for admin", );
@@ -321,8 +322,11 @@ sub _do_install_schema
       $revoke = "REVOKE ALL ON SCHEMA ${ \$self->schema } FROM PUBLIC;";
       }
 
+   my $drop = $self->drop_schema ? "DROP SCHEMA IF EXISTS ${ \$self->schema };" : "";
+
    $self->dbh->do(
       qq{ 
+      $drop
       CREATE SCHEMA IF NOT EXISTS ${ \$self->schema };
       $revoke
       GRANT  USAGE ON SCHEMA ${ \$self->schema } TO ${ \$self->user };
