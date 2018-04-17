@@ -7,10 +7,11 @@ use Test::More;
 
 use FindBin qw($Bin);
 
-unless ( $ENV{RELEASE_TESTING} || $ENV{TEST_AUTHOR} )
-   {
-   plan( skip_all => "Author tests not required for installation (set TEST_AUTHOR)" );
-   }
+# Run always!
+#unless ( $ENV{RELEASE_TESTING} || $ENV{TEST_AUTHOR} )
+#   {
+#   plan( skip_all => "Author tests not required for installation (set TEST_AUTHOR)" );
+#   }
 
 BEGIN
 {
