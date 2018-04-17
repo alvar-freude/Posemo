@@ -121,7 +121,10 @@ use IO::All -utf8;
 
 has configfile => ( is => "ro", isa => "Str",          default => search_conf("posemo.conf"),            documentation => "Configuration file", );
 has log_config => ( is => "rw", isa => "Str",                                                            documentation => "Alternative logging config", );
-has outfile    => ( is => "ro", isa => "Str",          default => q{-},                                  documentation => "Output file name; - for STDOUT (default)" );
+has outfile    => ( is => "ro", isa => "Str",          default => q{-},                                  documentation => "Output file name; - for STDOUT (default)", );
+has verbose    => ( is => "ro", isa => "Bool",                                                           documentation => "Enable verbose messages to screen", );
+has quiet      => ( is => "ro", isa => "Bool",                                                           documentation => "Silent mode: don't log messages to screen", );
+
 
 #>>>
 
@@ -214,6 +217,14 @@ sub BUILD
    {
    my $self = shift;
 
+   die "Uups, screen output can not be verbose and quiet at the same time!\n"
+      if $self->verbose and $self->quiet;
+
+   Log::Log4perl->appender_thresholds_adjust( $LOG_TRESHOLD_VERBOSE, ['SCREEN'] )
+      if $self->verbose;
+   Log::Log4perl->appender_thresholds_adjust( $LOG_TRESHOLD_SILENT, ['SCREEN'] )
+      if $self->quiet;
+
    # Log config logic:
    #
    # When log_config set (via CLI or ->new parameter): take this!
@@ -239,6 +250,13 @@ sub BUILD
       {
       die "Given log-config ${ \$self->log_config } does not exist\n" unless -f $self->log_config;
       Log::Log4perl->init( $self->log_config );
+
+      # after loading new config, repeat logging silent/verbose adjustments
+      Log::Log4perl->appender_thresholds_adjust( $LOG_TRESHOLD_VERBOSE, ['SCREEN'] )
+         if $self->verbose;
+      Log::Log4perl->appender_thresholds_adjust( $LOG_TRESHOLD_SILENT, ['SCREEN'] )
+         if $self->quiet;
+
       DEBUG "Logging initialised with non-default config " . $self->log_config;
       }
    else
