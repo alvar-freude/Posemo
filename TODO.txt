@@ -38,6 +38,9 @@ until this, use a dump:
   * install it
 
 
+Or install new
+  *  bin/posemo_install.pl --host=$MY_DB_HOST --create_schema --schema=posemo --create_superuser --create_user --superuser=posemo_admin --user=posemo --installation_user=temp --installation_passwd=temp 
+  
 
 
 TODO: Check this:
