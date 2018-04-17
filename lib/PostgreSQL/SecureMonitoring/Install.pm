@@ -328,6 +328,7 @@ sub _do_install_schema
       qq{ 
       $drop
       CREATE SCHEMA IF NOT EXISTS ${ \$self->schema };
+      ALTER  SCHEMA ${ \$self->schema } OWNER TO ${ \$self->superuser };
       $revoke
       GRANT  USAGE ON SCHEMA ${ \$self->schema } TO ${ \$self->user };
    }
