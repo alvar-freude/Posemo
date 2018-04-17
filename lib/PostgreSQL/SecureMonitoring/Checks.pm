@@ -350,8 +350,11 @@ sub _build_sql_function
 
    if ( $return_type =~ m{,} )
       {
-      $new_type    = "CREATE TYPE ${ \$self->sql_function_name }_type AS ($return_type);";
+      #<<<
+      $new_type    = "CREATE TYPE ${ \$self->sql_function_name }_type AS ($return_type);" 
+                   . "ALTER  TYPE ${ \$self->sql_function_name }_type OWNER TO ${ \$self->superuser };";
       $return_type = "${ \$self->sql_function_name }_type";
+      #>>>
       }
 
    return qq{$new_type
