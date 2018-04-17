@@ -53,4 +53,6 @@ Slave(?):
 
 INFO : Critical values: 0 0 0 0 25.5998 55.8631!  in check Cache Hit Ratio for host XXX
 INFO : Warning values: 0 0 0 0 25.5998 55.8631 in check Cache Hit Ratio for host XXX
- 
+
+
+rename "superuser" attribute to "admin" and change all in testing. It's no superuser anymore!

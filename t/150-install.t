@@ -28,7 +28,7 @@ lives_ok sub {
                                                           superuser        => "_posemo_superuser",
                                                           port             => 15432,
                                                           host             => $host,
-                                                          create_superuser => 1,
+                                                          create_schema    => 1,
                                                         );
    },
    "survive installer object creation";

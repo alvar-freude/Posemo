@@ -25,14 +25,16 @@ my $install;
 
 lives_ok sub {
    $install = PostgreSQL::SecureMonitoring::Install->new(
-                                                          database        => "_posemo_tests",
-                                                          user            => "_posemo_tests",
-                                                          superuser       => "_posemo_superuser",
-                                                          drop_database   => 0,
-                                                          create_database => 1,
-                                                          create_user     => 1,
-                                                          port            => 15432,
-                                                          host            => $host,
+                                                          database         => "_posemo_tests",
+                                                          user             => "_posemo_tests",
+                                                          superuser        => "_posemo_superuser",
+                                                          drop_database    => 0,
+                                                          create_database  => 1,
+                                                          create_superuser => 1,
+                                                          create_user      => 1,
+                                                          create_schema    => 1,
+                                                          port             => 15432,
+                                                          host             => $host,
                                                         );
    },
    "Got DB installer object";
@@ -62,10 +64,15 @@ lives_ok sub {
    $dbh->commit;
 }, "Created monitoring user (for pgTAP connection)";
 
+lives_ok sub {
+   $install->_do_create_superuser;
+   $dbh->commit;
+}, "Created monitoring superuser";
+
 
 
 lives_ok sub {
-   $dbh->do("CREATE EXTENSION pgtap;");
+   $dbh->do("CREATE SCHEMA pgtap; SET search_path TO pgtap; CREATE EXTENSION pgtap; SET search_path TO DEFAULT;");
    $dbh->commit;
 }, "pgTAP extention installed";
 
@@ -74,8 +81,13 @@ lives_ok sub {
 # used for pgTAP checking when access to tables are needed
 lives_ok sub {
    $dbh->do("CREATE USER _pgtap_superuser SUPERUSER;");
+   $dbh->do("ALTER  USER _pgtap_superuser  SET search_path TO posemo, pgtap;");
+   $dbh->do("ALTER  USER _posemo_superuser SET search_path TO posemo, pgtap;");
+   $dbh->do("ALTER  USER _posemo_tests     SET search_path TO posemo, pgtap;");
+   $dbh->do("GRANT  USAGE ON SCHEMA pgtap TO _posemo_tests;");
+   $dbh->do("GRANT  USAGE ON SCHEMA pgtap TO _posemo_superuser;");
    $dbh->commit;
-}, "my pgTAP superuser created";
+}, "my pgTAP superuser created and others prepared for testing";
 
 
 

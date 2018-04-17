@@ -56,9 +56,9 @@ use Moose;
 #<<< no perltidy
 
 has log_config     => ( is => "ro", isa => "Str", default   => $DEFAULT_LOG_CONFIG,                documentation => "Alternative logging config" );
-has user           => ( is => "ro", isa => "Str", default   => "monitoring",                       documentation => "User, running the tests" );
+has user           => ( is => "ro", isa => "Str", default   => "posemo",                           documentation => "User, running the tests" );
 has passwd         => ( is => "ro", isa => "Str",                                                  documentation => "Password for monitoring user" );
-has schema         => ( is => "ro", isa => "Str", default   => "public",                           documentation => "SQL schema name" );
+has schema         => ( is => "ro", isa => "Str", default   => "posemo",                           documentation => "SQL schema name" );
 has database       => ( is => "ro", isa => "Str", default   => "monitoring",                       documentation => "Name of monitoring DB", );
 has host           => ( is => "ro", isa => "Str", predicate => "has_host",                         documentation => "Hostname/IP to monitor", );
 has port           => ( is => "ro", isa => "Int", predicate => "has_port",                         documentation => "Port number for server to monitor", );

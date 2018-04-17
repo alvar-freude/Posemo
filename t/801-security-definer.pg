@@ -7,6 +7,8 @@
 -- http://www.postgresql.org/docs/current/static/sql-createfunction.html#SQL-CREATEFUNCTION-SECURITY
 --
 
+\c - _pgtap_superuser
+
 
 
 BEGIN;

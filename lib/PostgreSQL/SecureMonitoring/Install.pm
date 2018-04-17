@@ -105,7 +105,7 @@ Only used when necessary.
 
 #<<< no perltidy
 
-has superuser             => ( is => "ro", isa => "Str",  default => "monitoring_admin", documentation => "Owner of check functions (ususally a superuser)" );
+has superuser             => ( is => "ro", isa => "Str",  default => "posemo_admin",     documentation => "Owner of check functions (ususally a superuser)" );
 has create_database       => ( is => "ro", isa => "Bool", default => 0,                  documentation => "Flag: create new DB", );
 has drop_database         => ( is => "ro", isa => "Bool", default => 0,                  documentation => "Flag: drop old DB if exist", );
 has create_user           => ( is => "ro", isa => "Bool", default => 0,                  documentation => "Flag: create monitoring user", );
