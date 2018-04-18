@@ -179,6 +179,7 @@ sub _log_init
 
    } ## end sub _log_init
 
+
 =head2 get_log_dir($application)
 
 Returns a log dir; can be called from logging-properties file!
@@ -188,7 +189,7 @@ executable directory (C<$Bin/../logs>) exists, then take this. Else
 it uses File::HomeDir to get the dist data directory for the given application.
 
 So, for testing create a "logs" directory in your distributions directory; 
-othervise or after installation, the logic of L<File::HomeDir> is used.
+othervise or after installation, the logic of L<File::HomeDir|File::HomeDir> is used.
 
 
 =cut
