@@ -183,6 +183,14 @@ sub _log_init
 
 Returns a log dir; can be called from logging-properties file!
 
+The location if the log dir is: when directory ../logs relative to the 
+executable directory (C<$Bin/../logs>) exists, then take this. Else 
+it uses File::HomeDir to get the dist data directory for the given application.
+
+So, for testing create a "logs" directory in your distributions directory; 
+othervise or after installation, the logic of L<File::HomeDir> is used.
+
+
 =cut
 
 sub get_log_dir
