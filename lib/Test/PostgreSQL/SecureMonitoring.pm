@@ -74,6 +74,8 @@ our @EXPORT = qw(
 
 # use parent 'Test::Builder::Module';
 
+use English qw(-no_match_vars);
+
 use Test::More;
 use Test::Exception;
 use Data::Dumper;
@@ -101,7 +103,7 @@ sub get_connection_ok($;$$$)
    my $conf           = shift;
    my $database       = shift // "_posemo_tests";
    my $superuser_flag = shift;
-   my $message        = shift // "Get DBB Connection to $database";
+   my $message        = shift // "Get DB Connection to $database";
 
    my $dbh = eval {
       return
@@ -110,7 +112,8 @@ sub get_connection_ok($;$$$)
                        undef, { RaiseError => 1, AutoCommit => 0 } );
    };
 
-   ok( $dbh, $message ) or diag "Error while connecting DB $database: $DBI::errstr";
+   ok( $dbh, $message )
+      or diag "Error while connecting DB $database: Eval-Error: $EVAL_ERROR -- DBI-Error: $DBI::errstr";
 
    return $dbh;
    }
@@ -126,10 +129,11 @@ Returns the result object for check $check in the $clustername cluster.
 
 sub result_ok($;$$$)
    {
-   my $checkname   = shift;
-   my $clustername = shift;
-   my $params      = shift;
-   my $message     = shift // ( "Result for $checkname on cluster " . ( $clustername // "unnamed" ) );
+   my $checkname             = shift;
+   my $clustername           = shift;
+   my $params                = shift;
+   my $posemo_creator_params = shift // {};
+   my $message               = shift // ( "Result for $checkname on cluster " . ( $clustername // "unnamed" ) );
 
    my $tps_conf = pg_read_conf_ok( $clustername, "Read conf (for $message)" );
 
@@ -150,6 +154,7 @@ sub result_ok($;$$$)
                                                       user     => "_posemo_tests",
                                                       host     => $host,
                                                       port     => $tps_conf->{port},
+                                                      %$posemo_creator_params,
                                                     );
          },
          "Posemo Object (for $message)"

@@ -154,8 +154,8 @@ sub install
 
       # $self->dbh->do("SET search_path TO ${ \$self->schema }");
 
-      $self->_do_create_superuser() if $self->create_superuser;
       $self->_do_create_user if $self->create_user;
+      $self->_do_create_superuser() if $self->create_superuser;
 
       if ( $self->create_database )
          {
