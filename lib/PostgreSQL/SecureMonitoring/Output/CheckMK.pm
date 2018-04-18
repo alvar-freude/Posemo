@@ -107,9 +107,8 @@ sub generate_output
 
    foreach my $host_result ( @{ $complete_result->{result} } )
       {
-      my $name_or_host = $host_result->{name} // $host_result->{host};
       #<<< no pertidy formatting
-      $output .= "<<<<$name_or_host>>>>\n" 
+      $output .= "<<<<$host_result->{name}>>>>\n" 
               .  "<<<posemo>>>\n" 
               .  $json->encode( $host_result ) . "\n";
       #>>>
