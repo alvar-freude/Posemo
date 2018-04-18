@@ -436,7 +436,7 @@ sub run_check
    {
    my $self = shift;
 
-   INFO "Run check ${ \$self->name } for host ${ \$self->host_desc }";
+   INFO "  Run check ${ \$self->name } for host ${ \$self->host_desc }";
 
    # my $result = $self->enabled ? $self->execute : {};
    my $result = eval { return $self->execute; };

@@ -69,6 +69,7 @@ t/530-cache-hit-ratio.t
 t/531-crod-count.t
 t/701-run-json.t
 t/702-run-check_mk.t
+t/710-run-output.t
 t/801-security-definer.pg
 t/900-perlcritic.t
 t/910-boilerplate.t

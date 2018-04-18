@@ -103,13 +103,15 @@ use Carp qw(croak);
 use Storable qw(dclone);
 use Time::HiRes qw(time);
 use Sys::Hostname;
-use Module::Loaded;
+
+# use Module::Loaded;
 use Data::Dumper;
 
 use Config::Any;
 
 use Config::FindFile qw(search_conf);
 use Log::Log4perl::EasyCatch ( log_config => search_conf("posemo-logging.properties") );
+use Log::Log4perl::Level;
 
 use PostgreSQL::SecureMonitoring;
 
@@ -182,8 +184,11 @@ my %allowed_host_options  = map { $ARG => 1 } @host_options;
 my %allowed_other_options = map { $ARG => 1 } @other_options;
 my %allowed_options       = ( global_id => 1, %allowed_host_options, %allowed_other_options );
 
+=head2 Internal startup subs/methods
 
-=head2 import
+=over 4
+
+=item import
 
 Simple import method for importing "output => 'SomeOutput'"
 
@@ -206,12 +211,18 @@ sub import
    # TODO: more with with "with" parameter?
 
    # There is an error with t/00-load.t, so don't immutable if Test::More loaded
-   __PACKAGE__->meta->make_immutable unless is_loaded("Test::More");
+   __PACKAGE__->meta->make_immutable unless $PROGRAM_NAME =~ m{load.t$}x;    # unless is_loaded("Test::More");
 
    return;
    }
 
 
+=item BUILD
+
+Run some initializing stuff at object creation, e.g. logging initialization.
+
+
+=cut
 
 sub BUILD
    {
@@ -220,10 +231,8 @@ sub BUILD
    die "Uups, screen output can not be verbose and quiet at the same time!\n"
       if $self->verbose and $self->quiet;
 
-   Log::Log4perl->appender_thresholds_adjust( $LOG_TRESHOLD_VERBOSE, ['SCREEN'] )
-      if $self->verbose;
-   Log::Log4perl->appender_thresholds_adjust( $LOG_TRESHOLD_SILENT, ['SCREEN'] )
-      if $self->quiet;
+   # set log level before ANY logging
+   $self->_set_log_level;
 
    # Log config logic:
    #
@@ -252,11 +261,7 @@ sub BUILD
       Log::Log4perl->init( $self->log_config );
 
       # after loading new config, repeat logging silent/verbose adjustments
-      Log::Log4perl->appender_thresholds_adjust( $LOG_TRESHOLD_VERBOSE, ['SCREEN'] )
-         if $self->verbose;
-      Log::Log4perl->appender_thresholds_adjust( $LOG_TRESHOLD_SILENT, ['SCREEN'] )
-         if $self->quiet;
-
+      $self->_set_log_level;
       DEBUG "Logging initialised with non-default config " . $self->log_config;
       }
    else
@@ -266,6 +271,40 @@ sub BUILD
 
    return $self;
    } ## end sub BUILD
+
+
+sub _set_log_level
+   {
+   my $self = shift;
+
+   Log::Log4perl->appender_thresholds_adjust( $LOG_TRESHOLD_VERBOSE, ['SCREEN'] )
+      if $self->verbose;
+   Log::Log4perl->appender_thresholds_adjust( $LOG_TRESHOLD_SILENT, ['SCREEN'] )
+      if $self->quiet;
+
+   return;
+   }
+
+
+=item DEMOLISH 
+
+Cleanup and restore some old global states, e.g. log level adjustments
+
+=back
+
+=cut
+
+sub DEMOLISH
+   {
+   my $self = shift;
+
+   Log::Log4perl->appender_thresholds_adjust( -$LOG_TRESHOLD_VERBOSE, ['SCREEN'] )
+      if $self->verbose;
+   Log::Log4perl->appender_thresholds_adjust( -$LOG_TRESHOLD_SILENT, ['SCREEN'] )
+      if $self->quiet;
+
+   return;
+   }
 
 
 #  _build_conf
@@ -294,7 +333,7 @@ sub _build_conf
                                        }
                                      );
 
-   $conf = $conf->{ $self->configfile } or die "No config loaded, tried with ${ \$self->configfile }!\n";
+   $conf = $conf->{ $self->configfile } or die "Can not load config file ${ \$self->configfile }: $OS_ERROR\n";
 
    TRACE "Conf: ", Dumper($conf);
 
@@ -321,12 +360,12 @@ sub run
    my $starttime      = time;
    my $message = "PostgreSQL Secure Monitoring version $posemo_version, running on host $hostname at " . localtime($starttime);
 
-   DEBUG $message;
+   INFO $message;
 
    $self->run_checks;
    my $runtime = time - $starttime;
 
-   DEBUG "All Checks Done. Runtime: $runtime seconds.";
+   INFO "All Checks Done. Runtime: $runtime seconds.";
 
    my $output = $self->generate_output(
       {

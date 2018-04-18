@@ -16,7 +16,7 @@ use_ok("PostgreSQL::SecureMonitoring::Run");
 # use Carp qw(verbose);
 
 throws_ok sub { my $app = PostgreSQL::SecureMonitoring::Run->new( configfile => "$Bin/conf/does-not-exists.conf" ); },
-   qr(No config loaded, tried with .*conf/does-not-exists.conf), "not existing config file";
+   qr(Can not load config file .*conf/does-not-exists.conf), "not existing config file";
 
 throws_ok sub { my $app = PostgreSQL::SecureMonitoring::Run->new( log_config => "$Bin/conf/does-not-exists.conf" ); },
    qr(Given log-config .*conf/does-not-exists.conf does not exist), "given log_config, but does not exist";
