@@ -622,11 +622,15 @@ sub pg_wait_started_ok(;$$$)
 
    my $tb = __PACKAGE__->builder;
 
+   # Delete other search paths via ENV, because Debian/Ubuntu psql wrapper is junk (using system perl)
+   # and travis sets his own perl library search path.
+   delete $ENV{PERL5LIB};
+   delete $ENV{PERLLIB};
+
+   my $psql = _get_binary( $conf, "psql" );
    my $error;
    for ( 1 .. $retries )
       {
-      my $psql = _get_binary( $conf, "psql" );
-
       $error
          = system(
          qq{$psql postgres -h $conf->{host} -p $conf->{port} -c "SELECT 'I am ' || 'alive.';" 1>$conf->{cluster_path}/stop-stdout.log 2>$conf->{cluster_path}/stop-stderr.log}
@@ -646,6 +650,7 @@ sub pg_wait_started_ok(;$$$)
    my $rc = $error >> 8;                           ## no critic (ValuesAndExpressions::ProhibitMagicNumbers)
    $tb->ok( 0, $message );
    $tb->diag("Waiting for started server failed. Last RC: $rc. OS_ERROR: $OS_ERROR");
+   $tb->diag("psql executable used: $psql");
    $tb->diag( "STDERR: " . io("$conf->{cluster_path}/stop-stderr.log")->all );
    $tb->diag( "STDOUT: " . io("$conf->{cluster_path}/stop-stdout.log")->all );
 

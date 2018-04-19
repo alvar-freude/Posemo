@@ -20,8 +20,8 @@ pg_start_ok("test");
 pg_wait_started_ok("test");
 
 
-# Delete other search paths, because Debbian/Ubuntu psql wrapper is junk (using system perl)
-# and travis sets his own perl libbrary search path.
+# Delete other search paths, because Debian/Ubuntu psql wrapper is junk (using system perl)
+# and travis sets his own perl library search path.
 delete $ENV{PERL5LIB};
 delete $ENV{PERLLIB};
 my $host   = pg_get_hostname("test");
