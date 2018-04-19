@@ -625,15 +625,12 @@ sub pg_wait_started_ok(;$$$)
    my $error;
    for ( 1 .. $retries )
       {
-      my $pg_ctl = _get_binary( $conf, "psql" );
+      my $psql = _get_binary( $conf, "psql" );
 
       $error
          = system(
-         qq{$pg_ctl postgres -h $conf->{host} -p $conf->{port} -c "SELECT 'I am ' || 'alive.';" 1>$conf->{cluster_path}/stop-stdout.log 2>$conf->{cluster_path}/stop-stderr.log}
+         qq{$psql postgres -h $conf->{host} -p $conf->{port} -c "SELECT 'I am ' || 'alive.';" 1>$conf->{cluster_path}/stop-stdout.log 2>$conf->{cluster_path}/stop-stderr.log}
          );
-
-      # $tb->diag( "STDOUT: " . io("$conf->{cluster_path}/stop-stdout.log")->all );
-      # $tb->diag( "STDERR: " . io("$conf->{cluster_path}/stop-stderr.log")->all );
 
       if ( not $error )
          {
@@ -642,14 +639,15 @@ sub pg_wait_started_ok(;$$$)
          }
 
       sleep 1;
-      } ## end for ( 1 .. $retries )
+      }
 
    $tb->ok( 0, $message );
 
    my $rc = $error >> 8;                           ## no critic (ValuesAndExpressions::ProhibitMagicNumbers)
    $tb->ok( 0, $message );
    $tb->diag("Waiting for started server failed. Last RC: $rc. OS_ERROR: $OS_ERROR");
-   $tb->diag("Check $conf->{cluster_path}/stop-stdout.log and $conf->{cluster_path}/stop-stderr.log");
+   $tb->diag( "STDERR: " . io("$conf->{cluster_path}/stop-stderr.log")->all );
+   $tb->diag( "STDOUT: " . io("$conf->{cluster_path}/stop-stdout.log")->all );
 
    return 0;
    } ## end sub pg_wait_started_ok(;$$$)
