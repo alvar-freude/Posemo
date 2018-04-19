@@ -6,16 +6,6 @@ use Test::PostgreSQL::Starter;
 use Test::More;
 
 
-#
-# * pg_binary_ok($message)
-# * pg_initdb_ok($name, $is_master, $initdb_params, $config, $message)
-# * pg_initdb_unless_exists_ok($name, $is_master, $initdb_params, $config, $message)
-# * pg_dropcluster_ok($name, $message)
-# * pg_dropcluster_if_exists_ok($name, $message)
-# * pg_start_ok($name, $message) (undef: all)
-# * pg_stop_ok($name, $message) (undef: all)
-
-
 pg_binary_ok();
 
 pg_stop_if_running_ok("test");
@@ -27,8 +17,8 @@ pg_dropcluster_ok("test");
 pg_initdb_unless_exists_ok( "test", 1 );
 
 pg_start_ok("test");
+pg_wait_started_ok("test");
 
-sleep 2;
 
 # Delete other search paths, because Debbian/Ubuntu psql wrapper is junk (using system perl)
 # and travis sets his own perl libbrary search path.

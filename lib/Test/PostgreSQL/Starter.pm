@@ -95,6 +95,8 @@ use Readonly;
 use IO::All;
 use File::Path qw(make_path remove_tree);
 use Config::Tiny;
+use Time::HiRes qw(sleep);
+use Fatal qw(sleep);
 
 use parent 'Test::Builder::Module';
 
@@ -106,6 +108,7 @@ our @EXPORT = qw( pg_binary_ok
    pg_dropcluster_ok pg_dropcluster_if_exists_ok
    pg_start_ok       pg_stop_ok
    pg_stop_all_ok    pg_stop_if_running_ok
+   pg_wait_started_ok
    pg_drop_all_ok
    pg_stopdrop_all_ok
    );
@@ -601,6 +604,55 @@ sub pg_start_ok(;$$)
 
    return 1;
    } ## end sub pg_start_ok(;$$)
+
+
+=head2 pg_wait_started_ok($name, $retries, $message)
+
+Wait, until server is started.
+
+Between each retry, it waits one second; default is 10 retries.
+
+=cut
+
+sub pg_wait_started_ok(;$$$)
+   {
+   my $conf    = _build_conf(shift);
+   my $retries = shift // 10;
+   my $message = shift // "Waiting for start of cluster '$conf->{name}'";
+
+   my $tb = __PACKAGE__->builder;
+
+   my $error;
+   for ( 1 .. $retries )
+      {
+      my $pg_ctl = _get_binary( $conf, "psql" );
+
+      $error
+         = system(
+         qq{$pg_ctl postgres -h $conf->{host} -p $conf->{port} -c "SELECT 'I am ' || 'alive.';" 1>$conf->{cluster_path}/stop-stdout.log 2>$conf->{cluster_path}/stop-stderr.log}
+         );
+
+      # $tb->diag( "STDOUT: " . io("$conf->{cluster_path}/stop-stdout.log")->all );
+      # $tb->diag( "STDERR: " . io("$conf->{cluster_path}/stop-stderr.log")->all );
+
+      if ( not $error )
+         {
+         $tb->ok( 1, $message );
+         return 1;
+         }
+
+      sleep 1;
+      } ## end for ( 1 .. $retries )
+
+   $tb->ok( 0, $message );
+
+   my $rc = $error >> 8;                           ## no critic (ValuesAndExpressions::ProhibitMagicNumbers)
+   $tb->ok( 0, $message );
+   $tb->diag("Waiting for started server failed. Last RC: $rc. OS_ERROR: $OS_ERROR");
+   $tb->diag("Check $conf->{cluster_path}/stop-stdout.log and $conf->{cluster_path}/stop-stderr.log");
+
+   return 0;
+   } ## end sub pg_wait_started_ok(;$$$)
 
 
 =head2 pg_stop_ok($name, $message)

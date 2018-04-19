@@ -13,7 +13,7 @@ use Test::PostgreSQL::SecureMonitoring;
 use PostgreSQL::SecureMonitoring::Install;
 
 
-plan tests => 38;
+plan tests => 40;
 
 use Test::PostgreSQL::Starter;
 my $host = pg_get_hostname("test");
@@ -62,7 +62,7 @@ result_type_is $result, "boolean";
 # Close other connection, which is cached! ...
 pg_stop_ok("test");
 pg_start_ok("test");
-
+pg_wait_started_ok("test");
 
 #
 # Again, with drop DB and schame "public
@@ -109,6 +109,7 @@ result_type_is $result, "boolean";
 
 pg_stop_ok("test");
 pg_start_ok("test");
+pg_wait_started_ok("test");
 
 
 my $dbh = get_connection_ok( $conf, undef, 1 );
