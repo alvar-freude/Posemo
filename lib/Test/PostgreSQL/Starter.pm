@@ -645,8 +645,6 @@ sub pg_wait_started_ok(;$$$)
       sleep 1;
       }
 
-   $tb->ok( 0, $message );
-
    my $rc = $error >> 8;                           ## no critic (ValuesAndExpressions::ProhibitMagicNumbers)
    $tb->ok( 0, $message );
    $tb->diag("Waiting for started server failed. Last RC: $rc. OS_ERROR: $OS_ERROR");
