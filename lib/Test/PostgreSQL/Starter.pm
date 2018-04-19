@@ -7,7 +7,7 @@ package Test::PostgreSQL::Starter;
  
 =head1 VERSION
 
-Version 0.5.1
+Version 0.5.2
 
 =cut
 
@@ -17,7 +17,7 @@ use warnings;
 
 use 5.010;                                         # uses some 5.10 features
 
-use version; our $VERSION = qv("v0.5.1");
+use version; our $VERSION = qv("v0.5.2");
 
 
 
