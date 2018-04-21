@@ -127,7 +127,7 @@ Returns the result object for check $check in the $clustername cluster.
 =cut
 
 
-sub result_ok($;$$$)
+sub result_ok($;$$$$)
    {
    my $checkname             = shift;
    my $clustername           = shift;
@@ -176,7 +176,7 @@ sub result_ok($;$$$)
    ok( ref $result eq "HASH", "got Result for $message" ) or diag "Result is no hashref: " . Dumper($result);
 
    return $result;
-   } ## end sub result_ok($;$$$)
+   } ## end sub result_ok($;$$$$)
 
 
 
