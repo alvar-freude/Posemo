@@ -439,7 +439,11 @@ sub run_check
    INFO "  Run check ${ \$self->name } for host ${ \$self->host_desc }";
 
    # my $result = $self->enabled ? $self->execute : {};
-   my $result = eval { return $self->execute; };
+   my $result = eval {
+      my $return = $self->execute;
+      $self->commit if $self->has_writes;
+      return $return;
+   };
 
    unless ($result)
       {
@@ -535,8 +539,6 @@ sub execute
       }
 
    $sth->finish;
-
-   $self->commit if $self->has_writes;
 
    return \%result;
    } ## end sub execute
