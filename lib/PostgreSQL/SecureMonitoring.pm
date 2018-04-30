@@ -55,15 +55,15 @@ use Moose;
 
 #<<< no perltidy
 
-has log_config     => ( is => "ro", isa => "Str", default   => $DEFAULT_LOG_CONFIG,                documentation => "Alternative logging config" );
-has user           => ( is => "ro", isa => "Str", default   => "posemo",                           documentation => "User, running the tests" );
-has passwd         => ( is => "ro", isa => "Str",                                                  documentation => "Password for monitoring user" );
-has schema         => ( is => "ro", isa => "Str", default   => "posemo",                           documentation => "SQL schema name" );
-has database       => ( is => "ro", isa => "Str", default   => "monitoring",                       documentation => "Name of monitoring DB", );
-has host           => ( is => "ro", isa => "Str", predicate => "has_host",                         documentation => "Hostname/IP to monitor", );
-has port           => ( is => "ro", isa => "Int", predicate => "has_port",                         documentation => "Port number for server to monitor", );
-has name           => ( is => "ro", isa => "Str", builder   => "_build_name",           lazy => 1, documentation => "Name of the host, for Report (Default: Host)", );
-has server_version => ( is => "ro", isa => "Int", builder   => "_build_server_version", lazy => 1, documentation => "(internal) Server Version", );
+has log_config      => ( is => "ro", isa => "Str", default   => $DEFAULT_LOG_CONFIG,      documentation => "Alternative logging config" );
+has user            => ( is => "ro", isa => "Str", default   => "posemo",                 documentation => "User, running the tests" );
+has passwd          => ( is => "ro", isa => "Str",                                        documentation => "Password for monitoring user" );
+has schema          => ( is => "ro", isa => "Str", default   => "posemo",                 documentation => "SQL schema name" );
+has database        => ( is => "ro", isa => "Str", default   => "monitoring",             documentation => "Name of monitoring DB", );
+has host            => ( is => "ro", isa => "Str", predicate => "has_host",               documentation => "Hostname/IP to monitor", );
+has port            => ( is => "ro", isa => "Int", predicate => "has_port",               documentation => "Port number for server to monitor", );
+has name            => ( is => "ro", isa => "Str", builder   => "_build_name", lazy => 1, documentation => "Name of the host, for Report (Default: Host)", );
+has _server_version => ( is => "ro", isa => "Int", builder   => "_build_server_version",  reader => "server_version", lazy => 1, documentation => "(internal) Server Version", );
 
 #>>>
 
@@ -118,15 +118,15 @@ sub _build_server_version
 
 =head2 get_all_checks, get_all_checks_ordered
 
-Returns a list of all installed checks. A check is installed, when it is found as module. Therefore it 
+Returns a list of all installed checks. A check is installed, when it is found as module. Therefore it
 should be installed in C<@INC> in C<PostgreSQL/SecureMonitoring/Checks>.
 
 Both can be called as instance and class method.
 
 The results are cached, so changes during the runtime are not recognised.
 
-C<get_all_checks_ordered> returns an ordered and filtered list of all checks: 
-Sort order is by return value of an object method "order" (string order, default check name). 
+C<get_all_checks_ordered> returns an ordered and filtered list of all checks:
+Sort order is by return value of an object method "order" (string order, default check name).
 And grep for "enabled_on_this_platform" (default true).
 
 =cut
@@ -263,10 +263,10 @@ sub dbi_options
 
 =head2 ->host_desc
 
-This method returns a host description as string. When we have a host, 
+This method returns a host description as string. When we have a host,
 then this is returned.
 
-When no host is set, then this is talken from PGHOST environment, if available, 
+When no host is set, then this is talken from PGHOST environment, if available,
 or a message indicating that nohst is given.
 
 
@@ -373,4 +373,3 @@ ENHANCEMENTS, OR MODIFICATIONS.
 __PACKAGE__->meta->make_immutable;
 
 1;
-
