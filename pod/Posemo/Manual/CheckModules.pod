@@ -1,0 +1,17 @@
+=head1 Posemo Developer Manual: Check Modules
+
+This manual is about writing check modules for Posemo.
+
+
+=head2 Overview
+
+Writing check modules is simple and easy. Often you only have to wrinte some
+SQL and the Posemo sugar makes everything for you. Since Posemo is written in
+fully OO-Perl with L<Moose|Moose>, you usually has full access to all Moose features.
+
+
+
+
+
+
+=cut

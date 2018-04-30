@@ -1,0 +1,23 @@
+=head1 Posemo – PostgreSQL Secure Monitoring
+
+Posemo is a open source PostgreSQL monitoring backend system, which can
+collect a lot of PostgreSQL internals in a secure way without superuser
+access.
+
+For an overview, see the README.md in the main directory.
+
+
+=head2 User manuals
+
+* Users Guide to the config file ...
+
+
+=head2 Developer manuals
+
+  * How to write check Modules
+  * How to write a frontend connector / outout modules 
+  * Coding Styleguide
+
+
+
+=cut

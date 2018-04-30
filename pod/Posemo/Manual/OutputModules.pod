@@ -1,0 +1,15 @@
+=head1 Posemo Developer Manual: Output Modules
+
+This manual is about writing output modules (frontend connectors) for Posemo.
+
+
+=head2 Overview
+
+...
+...
+...
+
+
+
+
+=cut
