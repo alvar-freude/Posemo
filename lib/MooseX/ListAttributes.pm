@@ -28,10 +28,10 @@ use version; our $VERSION = qv("v0.9.0");
 =head1 SYNOPSIS
 
   with 'MooseX::ListAttributes';
-  
+
   # later, inside a method
   $self->usage if $self->show_options;
-  
+
 =head1 DESCRIPTION
 
 This Moose Role lists all attributes / Options which have documentation.
@@ -58,11 +58,12 @@ sub list_attributes
    foreach my $attr ( sort { $a->name cmp $b->name } $self->meta->get_all_attributes )
       {
       next unless $attr->documentation;
-      my $attr_name = $attr->name;
+      my $attr_name   = $attr->name;
+      my $attr_reader = $attr->reader;
 
       next if $attr_name =~ m{^_}x;
 
-      my $value = $self->$attr_name // $self->undef_string;
+      my $value = $self->$attr_reader // $self->undef_string;
       $value = "[" . join( ", ", @$value ) . "]" if ref $value eq "ARRAY";
 
       my $default = $attr->default // $self->undef_string;
