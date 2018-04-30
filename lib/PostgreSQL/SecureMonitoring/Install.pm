@@ -119,7 +119,7 @@ has installation_database => ( is => "ro", isa => "Str",  default => "postgres",
 
 #>>> no perltidy
 
-with "MooseX::Getopt";
+with "MooseX::Getopt::Dashes";
 with 'MooseX::ListAttributes';
 
 

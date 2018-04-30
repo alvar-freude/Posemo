@@ -11,7 +11,7 @@ package PostgreSQL::SecureMonitoring::Run;
 
 
    use PostgreSQL::SecureMonitoring::Run;
-   
+
    # or:
    use PostgreSQL::SecureMonitoring::Run output => "JSON";
 
@@ -20,7 +20,7 @@ package PostgreSQL::SecureMonitoring::Run;
 
    # or:
    PostgreSQL::SecureMonitoring::Run->new_with_options->run;
-   
+
 
 
 =head1 DESCRIPTION
@@ -164,7 +164,7 @@ has _errcount => (
 
 
 
-with "MooseX::Getopt";
+with "MooseX::Getopt::Dashes";
 with 'MooseX::ListAttributes';
 
 
@@ -286,7 +286,7 @@ sub _set_log_level
    }
 
 
-=item DEMOLISH 
+=item DEMOLISH
 
 Cleanup and restore some old global states, e.g. log level adjustments
 

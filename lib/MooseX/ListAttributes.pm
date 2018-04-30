@@ -10,7 +10,7 @@ use Data::Dumper;
 
 has show_options => ( is => "ro", isa => "Bool", default => 0, documentation => "List all Options" );
 has undef_string =>
-   ( is => "ro", isa => "Str", default => "<undef>", documentation => "String to display undef values with show_options" );
+   ( is => "ro", isa => "Str", default => "<undef>", documentation => "String to display undef values with show-options" );
 
 =head1 NAME
 
@@ -48,7 +48,8 @@ Lists all attributes of this class.
 
 sub list_attributes
    {
-   my $self = shift;
+   my $self      = shift;
+   my $no_dashes = shift;
 
    print "\n $PROGRAM_NAME was called with the following options:\n\n";
    print "   Attribute/Option      | Current value                  | Default \n";
@@ -62,6 +63,7 @@ sub list_attributes
       my $attr_reader = $attr->reader;
 
       next if $attr_name =~ m{^_}x;
+      $attr_name =~ s{_}{-}g unless $no_dashes;
 
       my $value = $self->$attr_reader // $self->undef_string;
       $value = "[" . join( ", ", @$value ) . "]" if ref $value eq "ARRAY";
@@ -73,7 +75,7 @@ sub list_attributes
       $value = "<like default>" if $value eq $default;
 
       printf " %-23s | %-30s | %-30s\n", "--$attr_name", $value, $default;
-      }
+      } ## end foreach my $attr ( sort { $a...})
 
    print "\n";
    print "CLI parameter at calling: ", join( " ", @{ $self->ARGV } ) . "\n\n";
