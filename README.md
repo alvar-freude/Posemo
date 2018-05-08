@@ -27,15 +27,15 @@ Posemo is a modern Perl application using Moose; at installation it generates Po
 For a simple check you may look below at the *Alive* Check, which simply returns always true. It uses a lot of defaults from `PostgreSQL::SecureMonitoring::Checks` and sugar from `PostgreSQL::SecureMonitoring::ChecksHelper`:
 
 ```perl
-package PostgreSQL::SecureMonitoring::Checks::Alive;      # by Default, the name of the check is build from this package name
+package PostgreSQL::SecureMonitoring::Checks::SimpleAlive; # by Default, the name of the check is build from this package name
 
 
-use PostgreSQL::SecureMonitoring::ChecksHelper;           # enables Moose, exports sugar functions; enables strict&warnings
-extends "PostgreSQL::SecureMonitoring::Checks";           # We extend our base class ::Checks
+use PostgreSQL::SecureMonitoring::ChecksHelper;            # enables Moose, exports sugar functions; enables strict&warnings
+extends "PostgreSQL::SecureMonitoring::Checks";            # We extend our base class ::Checks
 
-check_has code => "SELECT true";                          # This is our check SQL!
+check_has code => "SELECT true";                           # This is our check SQL!
 
-1;                                                        # every Perl module must return (end with) a true value
+1;                                                         # every Perl module must return (end with) a true value
 ```
 
 
