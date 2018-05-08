@@ -545,11 +545,11 @@ sub execute
    } ## end sub execute
 
 
-=head2 test_critical_warning
+=head2 ->test_critical_warning($result)
 
 This method checks, if the result is critical or warning.
 
-It may be overriden in the check to do more detailed checks.
+It may be overriden in the check to do more detailed checks, see below.
 
 Default check depends on C<result_type> value of the result:
 
@@ -568,6 +568,32 @@ Checks every value against C<warning_level> / C<critical_level> attribute.
 Checks checks every value except the first element of each row against C<warning_level> / C<critical_level> attribute
 
 =back
+
+
+=head3 Overriding
+
+You may want to override this method. It gets one parameter (beside C<$self>): the complete C<$result>. 
+You can use this to write your own critical/warning test in a check module.
+
+You can set the following attributes (hash keys!) in C<$result>:
+
+=over 4
+
+=item *
+
+C<message>: a message, usually used when there is a critical / warning level reached with a description what failed.
+
+=item *
+
+C<critical>: a flag; set it to 1, when the critical level is reached. 
+
+=item *
+
+C<warning>: a flag; set it to 1, when the warning level is reached. 
+
+=back
+
+It is possible to change everything in C<$result>, but usually you should not do this (here).
 
 
 =cut
@@ -650,8 +676,12 @@ This method returns a C<status> according to the warning/critical flags in the g
   1: warning
   2: critical
 
-It may be overriden in the check to do something else then looking in warning/critical, 
-but usually this here should be fine.
+This may be used by some frontend or output modules to interpret the result instead 
+of looking into critical/warning result.
+
+This method may be overriden in the check to do something very special and something else then 
+looking in warning/critical, but usually this here should be fine and you should 
+override C<test_critical_warning> instead (or too).
 
 =cut
 

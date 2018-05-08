@@ -3,11 +3,12 @@
 
 TODO!
 
-...
+You should format your code according to the PerlTidy config in C<t/perltidyrc>
+
+In Eclipse with the EPIC Perl plugin, you can easyly format the code with Cmd-Shift-F.
 
 
-...
-
+TODO: More.
 
 
 =cut
