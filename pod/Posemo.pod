@@ -1,4 +1,4 @@
-=head1 Posemo – PostgreSQL Secure Monitoring
+=head1 Posemo -- PostgreSQL Secure Monitoring
 
 Posemo is a open source PostgreSQL monitoring backend system, which can
 collect a lot of PostgreSQL internals in a secure way without superuser

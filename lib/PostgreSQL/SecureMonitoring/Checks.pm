@@ -6,31 +6,30 @@ package PostgreSQL::SecureMonitoring::Checks;
 
 =head1 SYNOPSIS
 
+The following example doesn't use the sugar from L<PostgreSQL::SecureMonitoring::ChecksHelper|PostgreSQL::SecureMonitoring::ChecksHelper>.
 
- package PostgreSQL::SecureMonitoring::Checks::Alive;  # by Default, the name of the check is build from this package name
+ package PostgreSQL::SecureMonitoring::Checks::SimpleAlive;  # by Default, the name of the check is build from this package name
  
- use Moose;                                            # This is a Moose class ...
- extends "PostgreSQL::SecureMonitoring::Checks";       # ... which extends our base check class
+ use Moose;                                                  # This is a Moose class ...
+ extends "PostgreSQL::SecureMonitoring::Checks";             # ... which extends our base check class
  
- sub _build_sql { return "SELECT true;"; }             # this sub simply returns the SQL for the check
+ sub _build_sql { return "SELECT true;"; }                   # this sub simply returns the SQL for the check
  
- 1;                                                    # every Perl module must return (end with) a true value
+ 1;                                                          # every Perl module must return (end with) a true value
 
 
 =head1 DESCRIPTION
 
-  TODO: Documentation!
-  TODO: Separate install methods?
-
-
+  TODO: more Documentation!
+  TODO: Separate install methods into their own module?
 
 
 This is the base class for all Posemo checks. It declares all base methods for 
 creating SQL in initialisation, calling the check at runtime etc.
 
-The above minimalistic example MyCheck creates the following SQL function:
+The above minimalistic example SimpleAlive creates the following SQL function:
 
-  CREATE OR REPLACE FUNCTION my_check() 
+  CREATE OR REPLACE FUNCTION simple_alive() 
     RETURNS  boolean 
     AS
     
@@ -43,9 +42,9 @@ The above minimalistic example MyCheck creates the following SQL function:
     SECURITY DEFINER
     SET search_path = monitoring, pg_temp;
   
-  ALTER FUNCTION my_check OWNER TO postgres;
-  REVOKE ALL     ON FUNCTION my_check() FROM PUBLIC;
-  GRANT  EXECUTE ON FUNCTION my_check() TO monitoring;
+  ALTER FUNCTION simple_alive OWNER TO postgres;
+  REVOKE ALL     ON FUNCTION simple_alive() FROM PUBLIC;
+  GRANT  EXECUTE ON FUNCTION simple_alive() TO monitoring;
   
 
 At runtime it is called with this SQL:
@@ -128,7 +127,7 @@ each value in the performance data
 
 
 =head2 TODO
-
+???
 TODO: SQL schema handling; 
 should be: default empty and user should have an search_path? (to "monitorin")???
 
@@ -149,43 +148,6 @@ use Carp;
 use Config::FindFile qw(search_conf);
 use Log::Log4perl::EasyCatch ( log_config => search_conf("posemo-logging.properties") );
 
-=begin temp
-
-Folgende Methoden:
-
-  * sql
-  * sql_function
-  * sql_function_name
-  * return_type (boolean)
-  * language (sql)
-  * name
-  * 
-  * 
-  
-von app/basis
-  * schema
-  * superuser
-  * user
-  * ...
-
-
-Wir brauchen: 
-
-  Funktion "is_critical"
-  Funktion "is_warning"
-  Funktion "is_ok"
-
-Wie Speichern Result?
-
-#diag $dbh->{pg_server_version}  ;
-#diag $dbh->{pg_server_version};
-
-
-=end temp
-
-
-
-=cut
 
 #<<< no pertidy formatting
 

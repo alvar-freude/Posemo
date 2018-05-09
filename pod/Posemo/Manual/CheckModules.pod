@@ -14,9 +14,14 @@ Each check module is a subclass of L<PostgreSQL::SecureMonitoring::Checks|Postgr
 and you can override each method or add something with all Moose method modifiers. e.g. when
 you want to change the ebhaviour of the C<ececute> method.
 
+Each check module should return generic values, independently from the frontend.
+
+=head2 Examples
+
+You can use all the check modules in C<lib/PostgreSQL/SecureMonitoring/Checks> as examples.
 
 
-=head2 Simple Example
+=head3 Simple Example
 
 A minimalistic check module looks like this:
 
@@ -50,7 +55,9 @@ want to override the C<_build_code> method instead.
 
 
 
-=head2 Recommended return values
+=head2 Return values
+
+=head3 Recommended return values
 
 Your check can theoretical return every value(s) you can imagine. It's possible to
 return complex things with a JSON data structure or something else. B<Don't do this!>
