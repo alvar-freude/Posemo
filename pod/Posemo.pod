@@ -14,10 +14,21 @@ For an overview, see the README.md in the main directory.
 
 =head2 Developer manuals
 
-  * L<Posemo::Manual::CheckModules|How to write check Modules>
-  * L<Posemo::Manual::OutputModules|How to write a frontend connector / outout modules>
-  * L<Posemo::Manual::StyleguideCoding Styleguide>
+=over 4
 
+=item *
+
+L<Posemo::Manual::CheckModules|How to write check Modules>
+
+=item *
+
+L<Posemo::Manual::OutputModules|How to write a frontend connector / outout modules>
+
+=item *
+
+L<Posemo::Manual::StyleguideCoding Styleguide>
+
+=back
 
 
 =cut
