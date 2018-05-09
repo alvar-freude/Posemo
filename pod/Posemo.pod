@@ -9,7 +9,7 @@ For an overview, see the README.md in the main directory.
 
 =head2 User manuals
 
-* L<Posemo::Manual::UserConfig|Users Guide to the config file>
+* L<Users Guide to the config file|Posemo/Manual/UserConfig.pod>
 
 
 =head2 Developer manuals
@@ -18,15 +18,15 @@ For an overview, see the README.md in the main directory.
 
 =item *
 
-L<Posemo::Manual::CheckModules|How to write check Modules>
+L<Posemo/Manual/CheckModules.pod|How to write check Modules>
 
 =item *
 
-L<Posemo::Manual::OutputModules|How to write a frontend connector / outout modules>
+L<Posemo/Manual/OutputModules.pod|How to write a frontend connector / outout modules>
 
 =item *
 
-L<Posemo::Manual::StyleguideCoding Styleguide>
+L<Posemo/Manual/Styleguide.pod|Coding Styleguide>
 
 =back
 
