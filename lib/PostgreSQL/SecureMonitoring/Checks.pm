@@ -42,9 +42,9 @@ The above minimalistic example SimpleAlive creates the following SQL function:
     SECURITY DEFINER
     SET search_path = monitoring, pg_temp;
   
-  ALTER FUNCTION simple_alive OWNER TO postgres;
+  ALTER FUNCTION simple_alive OWNER TO posemo_admin;
   REVOKE ALL     ON FUNCTION simple_alive() FROM PUBLIC;
-  GRANT  EXECUTE ON FUNCTION simple_alive() TO monitoring;
+  GRANT  EXECUTE ON FUNCTION simple_alive() TO posemo;
   
 
 At runtime it is called with this SQL:
