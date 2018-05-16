@@ -8,15 +8,17 @@ package PostgreSQL::SecureMonitoring::Checks::Writeable;
 
   # Example config, only necessary for overwriting the defaults 
   <Check Writeable>
-    timeout        = 6000         # timeout 6000 ms (extra parameter for this check); default: critical_level in ms (*1000)
-    warning_level  = 2            # warning after 2 seconds (default: 3)
-    critical_level = 4            # critical after 4 seconds (default: 5)
+    timeout          = 6000         # timeout 6000 ms (extra parameter for this check); default: critical_level in ms (*1000)
+    retention_period = "8 hours"    # delete old old table entries after 8 hours; ()default: 1 day)
+    warning_level    = 2            # warning after 2 seconds (default: 3)
+    critical_level   = 4            # critical after 4 seconds (default: 5)
   </Check>
  
 
 =head1 DESCRIPTION
 
-This check checks, if the database is writeable and commits before timeout.
+This check checks, if the database is writeable and commits before timeout. 
+With every call it writes a row to a table and deletes old entries.
 
 The purpose is to check if a group of master and syncronous slaves are 
 ready to accept write queries in time. When at least one streaming replication 
@@ -25,12 +27,36 @@ got the data. When all slaves are gone (or too much behind), then this check fai
 
 =head2 Parameters
 
-This check has one non-default parameter: C<timeout>. This is the amount of 
-milliseconds, after which the check will be canceled. Default is C<critical_level> 
+This check has the following additional parameters: 
+
+=over 4
+
+=item * C<timeout>.
+
+This is the amount of milliseconds, after which the check will be canceled. Default is C<critical_level> 
 in milliseconds (critical_level*1000).
 
-Timeout should not be shorter then critical_level, because with shorter timeout, 
+Timeout should not be shorter then C<critical_level*1000>, because with shorter timeout, 
 critical_level can't be reached.
+
+
+=item * C<retention_period>
+
+A string with an SQL-C<INTERVAL> value. If a row is older then this, it will be deleted.
+
+
+=item * C<message>
+
+A message, which is written to the table. The default message contains 
+info about the connecting and connected host.
+
+
+=item * C<warning_level>, C<critical_level>
+
+This are standard attributes, this check sets them to 3 and 5 seconds.
+
+
+=back
 
 =cut
 
@@ -44,13 +70,14 @@ use Sys::Hostname;
 use English qw( -no_match_vars );
 
 
+# Here check_has has NO code; this is defined below.
 check_has
    description    => 'Try to write and commit before timeout.',
    return_type    => "bool",                       # the SQL-functions returns true/false
    result_type    => "float",                      # but the check itself returns seconds as float
    result_unit    => "s",
-   volatility     => "VOLATILE",
-   has_writes     => 1,
+   volatility     => "VOLATILE",                   # Our check modifies the database ...
+   has_writes     => 1,                            # ... and needs a commit.
    warning_level  => 3,
    critical_level => 5,
    parameters => [ [ message => 'TEXT' ], [ retention_period => 'INTERVAL', '1 day' ], ],
