@@ -213,11 +213,42 @@ one summary row and per row one value.
          };
 
 
-At first there is an additional attribute C<skip_db_re>. This is a normal L<Moose attribute|Moose::Manual::Attributes>, 
+At first you can see the additional attribute C<skip_db_re>. This is a normal L<Moose attribute|Moose::Manual::Attributes>, 
 which can be set in a config for this check. You can define everything you need and decide, 
-if you want to pass this to the check SQL function. 
+if you want to pass this to the check SQL function. This attribute is read only (ro), and "is a" datatype "Str", 
+so it accepts any string.
 
-Here C<skip_db_re> stands for I<regular expression for skipping databases>. See below for Multiline best practices.
+Here C<skip_db_re> stands for I<regular expression for skipping databases>. See below for Multiline best practices. 
+You can set this attribute in the config file for this check:
+
+
+   <Check CacheHitRatio>
+     skip_db_re = "(^template[01]|_backup)$"
+   </Check>
+
+This skips template0 and template1 and all databases ending with _backup. 
+The regular expression is a PostgreSQL regular expression as used in the SQL!
+
+
+The new attribute C<parameters> for C<check_has> defines, which parameters are 
+passed to the SQL function. You can pass every class attribute, but usually you should define 
+your own like above.
+
+C<parameter> defines, which attributes are passed to the SQL function. 
+It takes a array reference of array references, which elements define the parameter 
+name, its SQL data type and the default value:
+
+
+   parameters => [ [ skip_db_re => 'TEXT',    '^template[01]$' ], ],
+   #             ^   ^              ^          ^
+   #             |   |              |          |
+   #             |   parameter name |          Default value
+   #             |                  SQL data type
+   #             Open outer arrayref
+
+
+See below for details.
+
 
 
 A result of this check may look like this, when you manually call the internally generated check function:
@@ -373,13 +404,95 @@ Hint: Usually you should return bytes instead ob megabytes etc and the frontend 
 
 =item * language
 
+The language used by your code for the function body. Default: C<sql>.
+
+You can use any language available in the PostgreSQL installation. For public checks it's recommended 
+to use SQL (default) or PL/pgSQL by setting the language attribute to C<plpgsl>. The value is passed 
+directly to the C<LANGUAGE> attribute of the C<CREATE FUNCTION> statement.
+
+
 =item * volatility
+
+The I<volatility> classification of the generated SQL function. Default: C<STABLE>.
+
+You should set this according the L<PostgreSQL Function Volatility Categories|https://www.postgresql.org/docs/current/static/xfunc-volatility.html>.
+
+Typically you can take the default when you don't write anything and take C<VOLATILE> 
+when modifying something in the database, e.g. inserting some rows as the C<Writeable> check does.
+
 
 =item * has_multiline_result
 
+A flag, indicating if the code (may) return multiple rows. Default: false.
+
+Set it to 1, if you return multiple rows.
+
+Hint: When returning multiple rows, the first column B<should> contain a 
+title for this row like a database name.
+
+
 =item * has_writes
 
-=item * parameters
+A flag, indicating if the code writes something to the database. Default: false.
+
+You B<must> set it to 1, if you update/insert/delete/... something.
+
+When set to 1, Posemo calls a C<COMMIT> after the check.
+
+
+=item * arguments
+
+With this attribute you can declare some arguments, which are passed to the function.
+
+Earch argument has a name, a SQL data type and optionally a default value. Can can 
+define any number of arguments. They are passed as named argument to the function.
+
+---
+
+
+   parameters => [ 
+                   [ timeout    => 'INTEGER', 1000 ], 
+                   [ skip_db_re => 'TEXT',    '^template[01]$' ], 
+                 ],
+
+
+
+   has skip_db_re => ( is => "ro", isa => "Str", );   # as above
+   has timeout    => ( is => "ro", isa => "Int", );   # the "timeout" attribute is a integer
+
+
+C<arguments> takes a array reference of array reference, e.g.:
+
+   parameters => [ 
+                   [ skip_db_re => 'TEXT',    '^template[01]$' ], 
+                   [ timeout    => 'INTEGER', 1000 ], 
+                 ],
+
+
+Here we habe two parameters for the check funcion: 
+
+C<skip_db_re>, which is of SQL type C<TEXT> and has a default value C<'^template[01]$'>.
+
+C<timeout> is of type C<INTEGER> and has the default value 1000.
+
+
+In the config file, you can set the defened attributes, but all default attribtes too:
+
+  # or, if you have enough memory
+  <Check CacheHitRatio>
+    warning_level  = 97   # default 80
+    critical_level = 95   # default 60
+  </Check>
+
+
+
+
+-----
+
+
+
+
+
 
 =item * result_is_counter
 
