@@ -46,7 +46,7 @@ check_has
    graph_mirrored       => 1,                      # display commit/rolback obove/below middle line
    graph_type           => "area",
    has_multiline_result => 1,
-   parameters           => [ [ skip_db_re => 'TEXT', '^template[01]$' ], ],
+   arguments            => [ [ skip_db_re => 'TEXT', '^template[01]$' ], ],
 
    # complex return type
    return_type => q{
