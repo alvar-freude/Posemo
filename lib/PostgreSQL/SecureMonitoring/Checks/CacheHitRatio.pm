@@ -62,7 +62,7 @@ check_has
    has_multiline_result => 1,
    result_unit          => q{%},
    result_type          => "real",
-   parameters           => [ [ skip_db_re => 'TEXT', '^template[01]$' ], ],
+   arguments            => [ [ skip_db_re => 'TEXT', '^template[01]$' ], ],
    min_value            => 0,
    max_value            => 100,
    warning_level        => 80,

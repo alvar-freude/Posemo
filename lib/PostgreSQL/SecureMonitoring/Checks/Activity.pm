@@ -43,7 +43,7 @@ check_has
    description          => 'Counts running and idling connections.',
    has_multiline_result => 1,
    result_type          => "integer",
-   parameters           => [ [ skip_db_re => 'TEXT', '^template[01]$' ], ],
+   arguments            => [ [ skip_db_re => 'TEXT', '^template[01]$' ], ],
 
    # complex return type
    return_type => q{

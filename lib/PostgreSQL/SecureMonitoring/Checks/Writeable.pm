@@ -80,7 +80,7 @@ check_has
    has_writes     => 1,                            # ... and needs a commit.
    warning_level  => 3,
    critical_level => 5,
-   parameters => [ [ message => 'TEXT' ], [ retention_period => 'INTERVAL', '1 day' ], ],
+   arguments => [ [ message => 'TEXT' ], [ retention_period => 'INTERVAL', '1 day' ], ],
    ;
 
 
