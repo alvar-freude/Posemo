@@ -47,7 +47,7 @@ check_has
    result_is_counter    => 1,
    result_unit          => "",
    result_type          => "bigint",
-   parameters           => [ [ skip_db_re => 'TEXT', '^template[01]$' ], ],
+   arguments            => [ [ skip_db_re => 'TEXT', '^template[01]$' ], ],
 
    # complex return type
    return_type => q{

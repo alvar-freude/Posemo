@@ -204,11 +204,11 @@ has language             => ( is => "ro", isa => "Str",           default   => "
 has volatility           => ( is => "ro", isa => "Str",           default   => "STABLE", );
 has has_multiline_result => ( is => "ro", isa => "Bool",          default   => 0, );
 has has_writes           => ( is => "ro", isa => "Bool",          default   => 0, );
-has parameters           => ( is => "ro", isa => "ArrayRef[Any]", default   => sub { [] }, traits  => ['Array'], 
+has arguments            => ( is => "ro", isa => "ArrayRef[Any]", default   => sub { [] }, traits  => ['Array'], 
                                                                                            handles => 
                                                                                              { 
-                                                                                             has_parameters => 'count', 
-                                                                                             all_parameters => 'elements', 
+                                                                                             has_arguments => 'count', 
+                                                                                             all_arguments => 'elements', 
                                                                                              }, );
 # options for graphs, display, ...
 # Graph type: line, area, stacked_area, ...
@@ -242,7 +242,7 @@ has _description_attr    => ( is => "ro", isa => "Str",           predicate => "
 has _result_type_attr    => ( is => "ro", isa => "Str",           predicate => "has_result_type_attr", );
 
 
-# Parameters, which may be set from check, or should be set here.
+# arguments, which may be set from check, or should be set here.
 #has result_is_warning    => ( is => "rw", isa => "Bool",          default   => 0, );
 #has result_is_critical   => ( is => "rw", isa => "Bool",          default   => 0, );
 
@@ -320,8 +320,8 @@ sub _build_sql_function
    {
    my $self = shift;
 
-   my ( @parameters, @parameters_with_default );
-   foreach my $par_ref ( $self->all_parameters )
+   my ( @arguments, @arguments_with_default );
+   foreach my $par_ref ( $self->all_arguments )
       {
       my $param              = "$par_ref->[0] $par_ref->[1]";
       my $param_with_default = $param;
@@ -333,12 +333,12 @@ sub _build_sql_function
          $default = $self->dbh->quote($default) unless looks_like_number($default);
          $param_with_default .= " DEFAULT $default";
          }
-      push @parameters,              $param;
-      push @parameters_with_default, $param_with_default;
+      push @arguments,              $param;
+      push @arguments_with_default, $param_with_default;
       }
 
-   my $parameters              = join( ", ", @parameters );
-   my $parameters_with_default = join( ", ", @parameters_with_default );
+   my $arguments              = join( ", ", @arguments );
+   my $arguments_with_default = join( ", ", @arguments_with_default );
 
    my $setof = "";
    $setof = "SETOF" if $self->has_multiline_result;
@@ -358,7 +358,7 @@ sub _build_sql_function
       }
 
    return qq{$new_type
-  CREATE OR REPLACE FUNCTION ${ \$self->sql_function_name }($parameters_with_default)
+  CREATE OR REPLACE FUNCTION ${ \$self->sql_function_name }($arguments_with_default)
     RETURNS $setof $return_type
     AS   
     \$code\$
@@ -369,9 +369,9 @@ sub _build_sql_function
     SECURITY DEFINER
     SET search_path = ${ \$self->schema }, pg_temp;
   
-  ALTER FUNCTION             ${ \$self->sql_function_name }($parameters) OWNER TO ${ \$self->superuser };
-  REVOKE ALL     ON FUNCTION ${ \$self->sql_function_name }($parameters) FROM PUBLIC;
-  GRANT  EXECUTE ON FUNCTION ${ \$self->sql_function_name }($parameters) TO ${ \$self->user };
+  ALTER FUNCTION             ${ \$self->sql_function_name }($arguments) OWNER TO ${ \$self->superuser };
+  REVOKE ALL     ON FUNCTION ${ \$self->sql_function_name }($arguments) FROM PUBLIC;
+  GRANT  EXECUTE ON FUNCTION ${ \$self->sql_function_name }($arguments) TO ${ \$self->user };
  };
 
    } ## end sub _build_sql_function
@@ -498,7 +498,7 @@ sub execute
 
    my ( @values, @placeholders );
 
-   foreach my $par_ref ( $self->all_parameters )
+   foreach my $par_ref ( $self->all_arguments )
       {
       my ( $name, $type, $default ) = @$par_ref;
       push @values, $self->$name // $default;
@@ -509,7 +509,7 @@ sub execute
 
    my $placeholders = join( ", ", @placeholders );
 
-   # SELECT with FROM, because function with multiple OUT parameters will result in multiple columns
+   # SELECT with FROM, because function with multiple OUT arguments will result in multiple columns
    TRACE "Prepare: SELECT * FROM ${ \$self->sql_function_name }($placeholders);";
    my $sth = $self->dbh->prepare("SELECT * FROM ${ \$self->sql_function_name }($placeholders);");
    DEBUG "All values for execute: " . join( ", ", map { "'$_'" } @values );
