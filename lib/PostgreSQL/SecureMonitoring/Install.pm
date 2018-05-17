@@ -322,7 +322,7 @@ sub _do_install_schema
       $revoke = "REVOKE ALL ON SCHEMA ${ \$self->schema } FROM PUBLIC;";
       }
 
-   my $drop = $self->drop_schema ? "DROP SCHEMA IF EXISTS ${ \$self->schema };" : "";
+   my $drop = $self->drop_schema ? "DROP SCHEMA IF EXISTS ${ \$self->schema } CASCADE;" : "";
 
    $self->dbh->do(
       qq{ 

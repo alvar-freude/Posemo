@@ -42,9 +42,7 @@ check_has
       sync_time     double precision
       },
 
-   code => q{
-      SELECT checkpoint_write_time, checkpoint_sync_time FROM pg_stat_bgwriter;
-      };
+   code => "SELECT checkpoint_write_time, checkpoint_sync_time FROM pg_stat_bgwriter;";
 
 
 1;

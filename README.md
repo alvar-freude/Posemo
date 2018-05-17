@@ -2,7 +2,7 @@
 
 # Posemo – PostgreSQL Secure Monitoring
 
-Posemo is a PostgreSQL monitoring framework, that can monitor everything in Postgres with an unprivileged user, which has no access to any data. Posemo conforms to the rules of the *German Federal Office for Information Security* ([Bundesamt für Sicherheit in der Informationstechnik](https://www.bsi.bund.de/), BSI).
+Posemo is a PostgreSQL monitoring framework, that can monitor everything in Postgres with an unprivileged user, which has no access to any data. Posemo conforms to the rules of the *German Federal Office for Information Security* ([Bundesamt für Sicherheit in der Informationstechnik](https://www.bsi.bund.de/), BSI). It is build to check tens, hundrets or thousands of servers fast.
 
 Posemo itself has no display capabilities, but can output the results for every monitoring environment (e.g. check_mk, Nagios, Zabbix, Icinga, …).
 
