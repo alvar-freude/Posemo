@@ -51,7 +51,7 @@ check_has
    # complex return type
    return_type => q{
       database                        VARCHAR(64), 
-      size                            NUMERIC
+      database_size                   NUMERIC
       },
 
    code => q{
