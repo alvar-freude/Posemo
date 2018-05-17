@@ -15,8 +15,8 @@ package PostgreSQL::SecureMonitoring::Checks::CacheHitRatio;
   
   # or, if you have enough memory
   <Check CacheHitRatio>
-    warning_level  = 95   # default 80
-    critical_level = 90   # default 60
+    warning_level  = 97   # default 80
+    critical_level = 95   # default 60
   </Check>
 
 
