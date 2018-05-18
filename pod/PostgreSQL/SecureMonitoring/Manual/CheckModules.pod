@@ -665,5 +665,16 @@ You may add other sections, e.g. typical Perl documentation sections like AUTHOR
 Your Documentation should be short but complete ...
 
 
+=head2 Testing
+
+Each check Modules must have some tests. You can write them with the  
+[pgTAP PostgreSQL extension](http://pgtap.org) ([pgTAP code on GitHub](https://github.com/theory/pgtap/)) 
+with the help of the C<Test::PostgreSQL::SecureMonitoring> module.
+
+See the folder C<t> for examples.
+
+B<TODO:> Write description and examples about testing.
+
+
 
 =cut
