@@ -8,11 +8,13 @@ package PostgreSQL::SecureMonitoring::Checks::Primary;
 
 This check has two options in config:
 
-  # fail, when host is no primary (master)
-  is_primary = 1
+  <Check Primary>
+    # fail, when host is no primary (master)
+    is_primary = 1
   
-  # or fail, when host is primary (master)
-  isnt_primary  = 1
+    # or fail, when host is primary (master)
+    isnt_primary  = 1
+  </Check>
 
 =head1 DESCRIPTION
 
