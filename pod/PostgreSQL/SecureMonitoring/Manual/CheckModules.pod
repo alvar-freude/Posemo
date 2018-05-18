@@ -605,8 +605,115 @@ with a L<Moose method modifier|Moose::Manual::MethodModifiers>, usually C<around
 
 For examples, see the checks C<Primary> and C<Writeable>.
 
+=head3 Example: override C<test_critical_warning>
 
-B<TODO:> include some examples (catch error in C<Alive> (not implemented yet), test in C<Primary>).
+This example is from the C<Primary> check:
+
+   has is_primary   => ( is => "ro", isa => "Bool", );
+   has isnt_primary => ( is => "ro", isa => "Bool", );
+   
+   check_has
+      description => 'Checks if server is primary (master) not (secondary, slave).',
+      code        => "SELECT not pg_is_in_recovery() AS primary;";
+   
+   sub test_critical_warning
+      {
+      my $self   = shift;
+      my $result = shift;
+      
+      if ( $self->is_primary and not $result )
+         {
+         $result->{message}  = "Failed ${ \$self->name } for host ${ \$self->host_desc }: not a primary (master).";
+         $result->{critical} = 1;
+         return;
+         }
+      
+      if ( $self->isnt_primary and $result )
+         {
+         $result->{message}
+            = "Failed ${ \$self->name } for host ${ \$self->host_desc }: it is a primary (master), not secondary (slave) as requested.";
+         $result->{critical} = 1;
+         return;
+         }
+      
+      return;
+      } ## end sub test_critical_warning
+
+Here the original C<test_critical_warning> is overridden by a special method, 
+which does the check according two new attributes, which may be configured in the config.
+
+   has is_primary   => ( is => "ro", isa => "Bool", );
+   has isnt_primary => ( is => "ro", isa => "Bool", );
+
+Example config to force a master (primary) server: 
+
+   <Check Primary>
+     # fail, when host is no primary (master)
+     is_primary = 1
+   </Check>
+
+The result hahshref is changed in the C<test_critical_warning> method when the conditions are met. 
+
+
+=head3 Example: modify C<execute>
+
+The C<Alive> check is an example for a method modifier at execute.
+
+The main code looks like:
+
+   […]
+   has no_critical    => ( is => "ro", isa => "Bool", );
+   has warn_if_failed => ( is => "ro", isa => "Bool", );
+   
+   check_has                                          # Without catching the error, 
+      description => 'Checks if server is alive.',    # ... this here would be everything 
+      code        => "SELECT true";
+   
+   around execute => sub {                            # modify the execute method
+      my $orig = shift;
+      my $self = shift;
+      
+      my $result;
+      eval {                                          # catch errors
+         $result = $self->$orig();                    # Call original execute method here
+         return 1;
+         } or do
+         {                                            # when failed, then set fail messages and build result.
+         $result->{result}   = 0;
+         $result->{row_type} = "single";
+         $result->{message}  = "Failed Alive check for host ${ \$self->host_desc }; error: $EVAL_ERROR";
+         $result->{critical} = 1 unless $self->no_critical;
+         $result->{warning}  = 1 if $self->warn_if_failed;
+         };
+      
+      return $result;
+      
+      sub test_critical_warning { return; }
+   };
+   […]
+
+
+At the beginning, it calls the original execute method inside C<eval> and therefore 
+catches all exceptions, e.g. connection errors.
+
+In the do-block, the result is build manually, when the check execution failed. 
+This also uses two attributes, which must be declared:
+
+   has no_critical    => ( is => "ro", isa => "Bool", );
+   has warn_if_failed => ( is => "ro", isa => "Bool", );
+
+So the behaviour can be changed in the configuration, here for instance to 
+give a warning (instead critical) when there are connection errors and 
+other hard errors. 
+
+Because C<test_critical_warning> change the result, this method must be overridden 
+with a emty method:
+
+   sub test_critical_warning { return; }
+
+It would be possible to set an internal attribute with the error message 
+instead doing everything in the do block above and write the logic into a 
+C<test_critical_warning> method.
 
 
 
@@ -616,7 +723,7 @@ B<TODO:> include some examples (catch error in C<Alive> (not implemented yet), t
 
 Your check can theoretical return every value(s) you can imagine. It's possible to 
 return complex things with a JSON data structure or something else. 
-B<Usually you should don't do this!>
+B<Usually you should not do this!>
 
 The reason is simple: B<Your return values should be generic and usable by every frontend.> 
 You should not return a result like C<critical> by your check SQL itself, because it usually don't 
@@ -669,7 +776,8 @@ Your Documentation should be short but complete ...
 
 Each check Modules must have some tests. You can write them with the  
 [pgTAP PostgreSQL extension](http://pgtap.org) ([pgTAP code on GitHub](https://github.com/theory/pgtap/)) 
-with the help of the C<Test::PostgreSQL::SecureMonitoring> module.
+and/or with the help of the C<Test::PostgreSQL::SecureMonitoring> module. This module 
+gives you an old style and simple procedural interface. 
 
 See the folder C<t> for examples.
 
