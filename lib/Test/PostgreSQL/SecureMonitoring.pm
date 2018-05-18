@@ -143,7 +143,6 @@ sub result_ok($;$$$$)
       {
       skip "Got no conf for $message", 3 unless $tps_conf;    ## no critic(ValuesAndExpressions::ProhibitMagicNumbers)
 
-      my $host = pg_get_hostname($clustername);
       my ( $app, $check );
 
       # Get Monitoring Obj
@@ -152,7 +151,7 @@ sub result_ok($;$$$$)
             $app = PostgreSQL::SecureMonitoring->new(
                                                       database => "_posemo_tests",
                                                       user     => "_posemo_tests",
-                                                      host     => $host,
+                                                      host     => $tps_conf->{host},
                                                       port     => $tps_conf->{port},
                                                       %$posemo_creator_params,
                                                     );
