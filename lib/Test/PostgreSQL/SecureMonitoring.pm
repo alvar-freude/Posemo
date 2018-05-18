@@ -143,7 +143,7 @@ sub result_ok($;$$$$)
       {
       skip "Got no conf for $message", 3 unless $tps_conf;    ## no critic(ValuesAndExpressions::ProhibitMagicNumbers)
 
-      my $host = pg_get_hostname("test");
+      my $host = pg_get_hostname($clustername);
       my ( $app, $check );
 
       # Get Monitoring Obj
