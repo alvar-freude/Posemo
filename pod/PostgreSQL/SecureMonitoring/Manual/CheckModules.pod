@@ -241,12 +241,12 @@ It takes an array reference of array references, which elements define the param
 name, its SQL data type and the default value:
 
 
-   parameters => [ [ skip_db_re => 'TEXT',    '^template[01]$' ], ],
-   #             ^   ^              ^          ^
-   #             |   |              |          |
-   #             |   parameter name |          Default value
-   #             |                  SQL data type
-   #             Open outer arrayref
+   arguments => [ [ skip_db_re => 'TEXT',    '^template[01]$' ], ],
+   #            ^   ^              ^          ^
+   #            |   |              |          |
+   #            |   parameter name |          Default value
+   #            |                  SQL data type
+   #            Open outer (and inner) arrayref
 
 
 See below for details.
@@ -285,25 +285,26 @@ one value, the C<cahe_hit_ratio>).
 
 Define an attribute C<skip_db_re> with default C<^template[01]$>
 and use this attribute in your SQL to filter out unwanted databases. 
-If your title is a table or name, use C<skip_table_re> or C<skip_user_re> or 
+If your title is something else like a table or user, use C<skip_table_re> or C<skip_user_re> or 
 something similar depending on your title.
 
 
 =item 3.
 
-The first row should return the sum of all databases (tables, users, …). You can use a Common Table Expression (CTE, C<WITH>-Statement)
-together with a C<UNION> like in the example above.
+The first row should return the sum of all databases (tables, users, …). 
+You can use a <L Common Table Expression|https://www.postgresql.org/docs/current/static/queries-with.html> 
+(CTE, C<WITH>-Statement) together with a C<UNION> like in the example above.
 
 =item 4.
 
-The following rows contain the values for each database including the database name.
-
+The following rows contain the values for each database (table, user or other title) 
+including the title in the fist column.
 
 =back
 
 
 Hint: When you write a check, which reads something out of a specific 
-database, you should can not use such an attribute, because you need to 
+database, you can not use such an attribute, because you need to 
 check contents of this database. You have to configure a connection 
 to this databases – see the configuration manual.
 
@@ -319,6 +320,9 @@ You can view the source of all main Posemo check modules and take them as Exampl
 C<check_has> accepts a lot of attributes, which are full Moose attributes. You can define them 
 in C<check_has>, but also use them when overriding some of the methods of 
 L<PostgreSQL::SecureMonitoring::Checks|PostgreSQL::SecureMonitoring::Checks>.
+
+Some attributes can be configured in the configfile, globally, by host, 
+by hostgroup or by check.
 
 
 =over 4
@@ -479,7 +483,7 @@ Each argument must be an attribute in your check. Therefore you should declare t
 attribute in your class (remember: each check is a Perl Moose class!):
 
    has timeout    => ( is => "ro", isa => "Int", );   # the "timeout" attribute is a integer
-   has skip_db_re => ( is => "ro", isa => "Str", );   # as above
+   has skip_db_re => ( is => "ro", isa => "Str", );   # the skip db regexpt is a string
 
 You can use any feature of Moose attributes here and re-use them in your code.
 
@@ -491,7 +495,7 @@ C<arguments> takes a array reference of array reference, e.g.:
                  ],
 
 
-Here we habe two parameters for the check funcion:
+Here we have two parameters for the check funcion:
 
 C<skip_db_re>, which is of SQL type C<TEXT> and has the default value C<'^template[01]$'>.
 
@@ -513,23 +517,80 @@ In the config file, you can set the defened attributes, but all default attribte
 
 =item * result_is_counter
 
+A flag, indicating thhat the result is a counter, an (ever) raising value like 
+accumulated time or I/O. A frontend should display the rate by timerange (usually seconds). 
+
+This value is not used internally, only forwarded to the output module.
+
+Default: off/disabled.
+
 =item * graph_type
+
+A check module can define a graph type for the frontend. 
+Valid values are: line, area, stacked_area. 
+
+An output module should handle this. This value is not used internally, only forwarded to the output module.
+
+Default: empty.
+
 
 =item * graph_mirrored
 
+A flag, indicating that the graph should be mirrored at the null level. 
+Usually this is used for input/outpiut graphs or similar. 
+For instance, it is used for committed/rollbbacked transactions in the 
+C<Transactions> check.
+
+This value is not used internally, only forwarded to the output module.
+
+Default: off/false; set it to 1 (true), if you want to enable this for your checks.
+
+
 =item * enabled
 
-=item * warning_level
+A flag, indicating if the check is enabled or disabled. 
 
-=item * critical_level
+Usually all checks are enabled by default. But maybe you want 
+to disable some checks by default and enable them in the config. 
 
-=item * min_value
+Default: enabled (1).
 
-=item * max_value
+May be changed in configuration.
+
+
+=item * warning_level, critical_level
+
+Numerical treshold values of the critical and warning levels. The default C<test_critical_warning> 
+method uses this to test if the result is critical or warning.
+
+All result values are tested by default, when multiline is active, then the first column skipped.
+
+If you need other tests, override tht C<test_critical_warning> method (see below).
+
+Default: none. No test for critcal and warning values.
+
+May be changed in configuration.
+
 
 =item * lower_is_worse
 
+By default C<test_critical_warning> tests, if the result values are bigger then the tresholds 
+in C<warning_level> and C<critical_level>. When the flag C<lower_is_worse> is set, then 
+this is reversed. You can use this when a lower value should trigger a warning or critical message, 
+e.g. for cache hit ratio in the C<CacheHitRatio> check: lower percent is worse then higher.
 
+Default: off.
+
+
+=item * min_value, max_value
+
+Usable as hint for the displaying frontend. e.g. set it to 0 and 100 for percent values.
+
+This values are not used internally, only forwarded to the output module.
+
+Default: none.
+
+May be changed in configuration.
 
 
 =back
@@ -537,7 +598,15 @@ In the config file, you can set the defened attributes, but all default attribte
 
 =head2 Overriding Methods
 
-....  TODO ...
+All checks are subclasses of L<PostgreSQL::SecureMonitoring::Checks|PostgreSQL::SecureMonitoring::Checks>. 
+You can override all methods from there, but typically you may want to override or modify 
+C<test_critical_warning>, C<execute> and C<_build_code>. C<execute> should only modified 
+with a L<Moose method modifier|Moose::Manual::MethodModifiers>, usually C<around>.
+
+For examples, see the checks C<Primary> and C<Writeable>.
+
+
+B<TODO:> include some examples (catch error in C<Alive> (not implemented yet), test in C<Primary>).
 
 
 

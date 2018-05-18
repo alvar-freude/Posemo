@@ -1,5 +1,7 @@
 # Posemo – Documentation
 
-The Posemo Documentation is mostly written in Pod format. It is inside the code (see lib) and in extra pod files (see pod). The (coming) scripts here in Documentation/bin generate HTML and Markdown files from it.
+The Posemo Documentation is mostly written in Pod format. It is inside 
+the code (see lib) and in extra pod files (see pod). Later, there will 
+be a script, which generates HTML from the Pod. (TODO)
 
-The results are in the appropriate folders.
+
