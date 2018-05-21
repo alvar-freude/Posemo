@@ -9,7 +9,7 @@ or L<write me a mail|mailto:alvar@a-blast.org>.
 
 =head2 Overview
 
-Writing check modules is simple and easy. Often you only have to wrinte some 
+Writing check modules is simple and easy. Often you only have to write some 
 SQL, define the return type, maybe some other attributes and the Posemo sugar 
 makes everything else for you.
 
@@ -17,14 +17,14 @@ Each check generates a PostgreSQL function, which encapsulates your code.
 You can write the check in every L<proceducal language|https://www.postgresql.org/docs/current/static/xplang.html>, 
 default is simply L<SQL|https://www.postgresql.org/docs/current/static/xfunc-sql.html>.
 
-Since Posemo is written in fully OO-Perl with L<Moose|Moose>, you usually has 
+Since Posemo is written in fully OO-Perl with L<Moose|Moose>, you usually have 
 full access to all Moose features. For most checks, you don't need to write Perl code, only SQL.
 
 Each check module is a subclass of L<PostgreSQL::SecureMonitoring::Checks|PostgreSQL::SecureMonitoring::Checks> 
-and you can use and override each method or add something with all Moose method modifiers. e.g. when 
-you want to change the ebhaviour of the C<execute> method.
+and you can use and override each method or add something with all Moose method modifiers. E.g. when 
+you want to change the behaviour of the C<execute> method.
 
-Or in other words: each check module is a B<Perl and Moose class>. Often they 
+Or, in other words: each check module is a B<Perl and Moose class>. Often they 
 look like configuration files, but they simply are Perl classes, where you can do 
 everything you can do in L<Moose|Moose> classes. Therefore it is very flexible and extensible.
 
@@ -41,7 +41,7 @@ You can use all the check modules in C<lib/PostgreSQL/SecureMonitoring/Checks> a
 
 A minimalistic check module looks like this:
 
-   package PostgreSQL::SecureMonitoring::Checks::SimpleAlive; # by Default, the name of the check is build from this package name
+   package PostgreSQL::SecureMonitoring::Checks::SimpleAlive; # by Default, the name of the check is built from this package name
    
    use PostgreSQL::SecureMonitoring::ChecksHelper;            # enables Moose, exports sugar functions; enables strict&warnings
    extends "PostgreSQL::SecureMonitoring::Checks";            # We extend our base class ::Checks
@@ -98,25 +98,25 @@ for full file with user documentation):
                                   THEN extract(EPOCH FROM clock_timestamp() - pg_last_xact_replay_timestamp())
                                   ELSE NULL
                                   END
-                             AS backup_age;";
+                             AS slave_lag;";
 
-Here you can see, that more attributes beside the C<code> are defined:
+Here you can see that more attributes beside the C<code> are defined:
 
 C<description> is a short description of the check. Each check should have a description!
 
 C<return_type> defines the return type of the SQL function. This is passed directly to 
-PostgreSQL and is also the default C<result_type>. Default return type is C<boolean>, 
-where true is OK and false a failure.
+PostgreSQL. It is also used as the default C<result_type>. Default C<return_type> is C<boolean>, 
+where true means "OK" and false a failure.
 
-C<result_init> is forwarded to the frontend via the output module as is. It should be displayed in the frontend.
+C<result_unit> is forwarded as is to the frontend via the output module. It should be displayed in the frontend.
 
-C<Code> is as usual the SQL for the check. Each column (here: only one) should have a name, which 
+C<code> is, as usual, the SQL for the check. Each column (here: only one) should have a name, which 
 is displayed by the frontend.
 
 
 =head3 Example with multiple return values
 
-A check may return multiple values in one row. Here an example from the check C<CheckpointTime>:
+A check may return multiple values in one row. Here is an example from the check C<CheckpointTime>:
 
    check_has
       description       => "Checkpoint write and sync duration.",
@@ -134,19 +134,19 @@ A check may return multiple values in one row. Here an example from the check C<
       code => "SELECT checkpoint_write_time, checkpoint_sync_time FROM pg_stat_bgwriter;";
 
 
-Beside some new attributes, you can see heere a complex return type, containing two 
-values (C<write_time> and C<sync_time>). (Here it is defined with the Perl quoting operator q, 
-which is the sme like ', but takes every character or bracket as seperator, here { and}. )
+Beside some new attributes, you can see a complex return type here, containing two 
+values (C<write_time> and C<sync_time>). (Here it is defined with the Perl quoting operator C<q>, 
+which is the same as C<'>, but takes every character or bracket as seperator, in this case C<{> and C<}>. )
 
-Posemo recognises that the return type is more then one value and builds internally a special 
-SQL-Type for this, whcih is set as return data type. The C<code> must return the same types, 
+Posemo recognises that the C<return_type> is more than one value and internally builds a special 
+SQL-Type for this, which is set as return data type. The C<code> must return the same types, 
 here two double precision values.
 
 New attributes introduced in this example:
 
 
-C<result_is_counter>: this flag (boolean) is a information for output and display modules, that the value 
-is no absolute value but a incremental counter. Here it ios the total checkpoint write and sync time.
+C<result_is_counter>: this flag (boolean) is an information for output and display modules that the value 
+is not an absolute value, but an incremental counter. Here it is the total checkpoint write and sync time.
 
 C<graph_type>: this defines how the performance data should be rendered, here as a stacked area graph.
 
@@ -165,7 +165,7 @@ A result of this check may look like this, when you manually call the internally
 Here is a more complex example, which gives a multiline result.
 
 It is the code from the C<CacheHitRatio> check, which gives one row for each database, 
-one summary row and per row one value.
+one summary row and one value per row.
 
    has skip_db_re => ( is => "ro", isa => "Str", );
    
@@ -216,7 +216,7 @@ one summary row and per row one value.
          };
 
 
-At first you can see the additional attribute C<skip_db_re>. This is a normal L<Moose attribute|Moose::Manual::Attributes>, 
+At the start, we see the definition of an additional attribute C<skip_db_re>. This is a normal L<Moose attribute|Moose::Manual::Attributes>, 
 which can be set in a config for this check. You can define everything you need and decide, 
 if you want to pass this to the check SQL function. This attribute is read only (ro), and "is a" datatype "Str", 
 so it accepts any string.
@@ -269,23 +269,23 @@ A result of this check may look like this, when you manually call the internally
 
 =head4 Multiline Results: Best Practices
 
-If you create multiline results which gives one row for each database, you really B<should> do it 
-in the same way as here and all other Posemo checks do it:
+If you create multiline results which give one row for each database, you really B<should> do it 
+in the same way as the above example and all other Posemo checks do it:
 
 =over 4
 
 =item 1.
 
-The first column should always contain a row title: the database name or other title 
-like table name, user name or something similar. All other columns take the 
-values for this database (or tabe, user, …) (which is in the above example only 
+The first column should always contain a row title: the database name or other titles
+like "table name", "user name" or something similar. All other columns take the 
+values for this database (or table, user, …) (which in the above example is only 
 one value, the C<cahe_hit_ratio>).
 
 =item 2.
 
 Define an attribute C<skip_db_re> with default C<^template[01]$>
 and use this attribute in your SQL to filter out unwanted databases. 
-If your title is something else like a table or user, use C<skip_table_re> or C<skip_user_re> or 
+If your title is something else, like a table or user, use C<skip_table_re> or C<skip_user_re> or 
 something similar depending on your title.
 
 
@@ -298,20 +298,19 @@ You can use a <L Common Table Expression|https://www.postgresql.org/docs/current
 =item 4.
 
 The following rows contain the values for each database (table, user or other title) 
-including the title in the fist column.
+with the database (table, user, ...) name in the fist column.
 
 =back
 
 
-Hint: When you write a check, which reads something out of a specific 
-database, you can not use such an attribute, because you need to 
-check contents of this database. You have to configure a connection 
-to this databases – see the configuration manual.
+Hint: to write a check that reads something from a specific 
+database, you can not use such an attribute to define the database.
+You have to configure a connection to this database instead – see the configuration manual.
 
 
 =head3 More Examples
 
-You can view the source of all main Posemo check modules and take them as Examples.
+You can view the source of all main Posemo check modules and take them as examples.
 
 
 
@@ -321,7 +320,7 @@ C<check_has> accepts a lot of attributes, which are full Moose attributes. You c
 in C<check_has>, but also use them when overriding some of the methods of 
 L<PostgreSQL::SecureMonitoring::Checks|PostgreSQL::SecureMonitoring::Checks>.
 
-Some attributes can be configured in the configfile, globally, by host, 
+Some attributes can be configured in the config file, either globally, by host, 
 by hostgroup or by check.
 
 
@@ -337,8 +336,8 @@ built by the C<_build_class> method in L<PostgreSQL::SecureMonitoring::Checks|Po
 
 The name of the current check. It is automatically generated from C<class>.
 
-Sometimes you want to define the check name by yourself, e.g. when the 
-autogenerated name is wrong. The name should be like the last part of the class name.
+Sometimes you might want to define the check name by yourself, e.g. when the 
+autogenerated name is wrong or misleading. The name should be like the last part of the class name.
 
 
 =item * B<description>
@@ -360,13 +359,13 @@ Some additional SQL, which will be executed at install time before the function 
 
 Sometimes you may want to execute extra SQL at installation time, e.g. to create some tables. 
 Usually you must change the owner of the objects etc. and need access to the other 
-attributes via C<$self>. This is not possible when defining this attribute in C<check_has>. 
-You should override C<_build_install_sql> instead, see the C<Writeable> check as example.
+attributes via C<$self>. This is not possible when defining this attribute in C<check_has>, 
+instead you should override C<_build_install_sql>. Refer to the C<Writeable> check as an example.
 
 
 =item * B<sql_function>
 
-In this attribute the complete SQL function is stored (by the C<_build_sql_function> method). 
+In this attribute, the complete SQL function is stored (by the C<_build_sql_function> method). 
 In very rare situations you may write it by your own or override the build method. But usually 
 you should not do this!
 
@@ -383,12 +382,12 @@ You may change it here to some other value. Usually you should not change this a
 
 The data type of the result. For the output modules and frontends. By default the same as the C<return_type>.
 
-You may set an explicit result_type, if it differs from the return_type, e.g. when the return_type is multi-column.
+You may set an explicit C<result_type> if it differs from the C<return_type>, e.g. when the C<return_type> is multi-column.
 
 
 =item * B<order>
 
-You may set an execution order for your check. This is an alphynumerically (string) value.
+You may set an execution order for your check. This is an alphanumerical (string) value.
 
 Default: Name of the check.
 
@@ -397,8 +396,8 @@ Default: Name of the check.
 
 The SQL return type of the generated function.
 
-If Posemo recognises that the return type is more then one value it builds internally a special 
-SQL Type for this, which is set as return data type. The C<code> must return the same types.
+If Posemo recognises that the return type is more than one value, it internally builds a special 
+SQL Type for it, which is set as return data type. The C<code> must return the same types.
 
 See the existing check modules and above for examples.
 
@@ -410,15 +409,15 @@ are C<s> for seconds, C<ms> for millilseconds, C<%> for percent, ...
 
 Default: empty string
 
-Hint: Usually you should return bytes instead ob megabytes etc and the frontend should display/calculate everything.
+Hint: Usually you should return bytes instead ob megabytes etc. and let the frontend manage the display.
 
 
 =item * B<language>
 
 The language used by your code for the function body. Default: C<sql>.
 
-You can use any language available in the PostgreSQL installation. For public checks it's recommended 
-to use SQL (default) or PL/pgSQL by setting the language attribute to C<plpgsl>. The value is passed 
+You can use any language available in the PostgreSQL installation. For common checks, it's recommended 
+to use SQL (default) or PL/pgSQL by setting the language attribute to C<plpgsql>. The value is passed 
 directly to the C<LANGUAGE> attribute of the C<CREATE FUNCTION> statement.
 
 
@@ -428,18 +427,18 @@ The I<volatility> classification of the generated SQL function. Default: C<STABL
 
 You should set this according the L<PostgreSQL Function Volatility Categories|https://www.postgresql.org/docs/current/static/xfunc-volatility.html>.
 
-Typically you can take the default when you don't write anything and take C<VOLATILE> 
-when modifying something in the database, e.g. inserting some rows as the C<Writeable> check does.
+Typically - when you don't write anything - you will use the default and take C<VOLATILE> 
+when modifying something in the database, e.g. inserting some rows, as the C<Writeable> check does.
 
 
 =item * B<has_multiline_result>
 
 A flag, indicating if the code (may) return multiple rows. Default: false.
 
-Set it to 1, if you return multiple rows.
+Set this to 1 if you return multiple rows.
 
 Hint: When returning multiple rows, the first column B<should> contain a
-title for this row like a database name.
+title for this row, like a database name.
 
 
 =item * B<has_writes>
@@ -453,7 +452,7 @@ When set to 1, Posemo calls a C<COMMIT> after running the check.
 
 =item * B<arguments>
 
-With the attribute C<arguments> you can declare some arguments, which are passed to the function.
+With the attribute C<arguments> you can declare some arguments which are passed to the function.
 
 Earch argument has a name, a SQL data type and optionally a default value. You can 
 define any number of arguments. They are passed as named argument to the function.
@@ -489,6 +488,7 @@ You can use any feature of Moose attributes here and re-use them in your code.
 
 C<arguments> takes a array reference of array reference, e.g.:
 
+   FIXME   arguments => [  FIXME
    parameters => [
                    [ skip_db_re => 'TEXT',    '^template[01]$' ],
                    [ timeout    => 'INTEGER', 1000 ],
@@ -502,7 +502,7 @@ C<skip_db_re>, which is of SQL type C<TEXT> and has the default value C<'^templa
 C<timeout> is of type C<INTEGER> and has the default value 1000.
 
 
-In the config file, you can set the defened attributes, but all default attribtes too:
+In the config file, you can set the defined attributes, but all default attribtes too:
 
   # example for setting check attributes in config file 
   <Check MyTestCheck>
@@ -537,8 +537,8 @@ Default: empty.
 =item * B<graph_mirrored>
 
 A flag, indicating that the graph should be mirrored at the null level. 
-Usually this is used for input/outpiut graphs or similar. 
-For instance, it is used for committed/rollbbacked transactions in the 
+Usually this is used for input/output graphs or similar. 
+For instance, it is used for committed/rolled back transactions in the 
 C<Transactions> check.
 
 This value is not used internally, only forwarded to the output module.
@@ -560,10 +560,11 @@ May be changed in configuration.
 
 =item * B<warning_level, critical_level>
 
-Numerical treshold values of the critical and warning levels. The default C<test_critical_warning> 
+Numerical threshold values of the critical and warning levels. The default C<test_critical_warning> 
 method uses this to test if the result is critical or warning.
 
-All result values are tested by default, when multiline is active, then the first column skipped.
+By default, all result values are tested.
+For multiline checks, the first column (the row title, see above) is skipped.
 
 If you need other tests, override tht C<test_critical_warning> method (see below).
 
@@ -574,19 +575,19 @@ May be changed in configuration.
 
 =item * B<lower_is_worse>
 
-By default C<test_critical_warning> tests, if the result values are bigger then the tresholds 
-in C<warning_level> and C<critical_level>. When the flag C<lower_is_worse> is set, then 
+By default, C<test_critical_warning> tests if the result values are bigger than the thresholds 
+in C<warning_level> and C<critical_level>. When the flag C<lower_is_worse> is set, 
 this is reversed. You can use this when a lower value should trigger a warning or critical message, 
-e.g. for cache hit ratio in the C<CacheHitRatio> check: lower percent is worse then higher.
+e.g. for cache hit ratio in the C<CacheHitRatio> check: lower hit ratio is obviously worse than higher one.
 
 Default: off.
 
 
 =item * B<min_value, max_value>
 
-Usable as hint for the displaying frontend. e.g. set it to 0 and 100 for percent values.
+Usable as a hint for the displaying frontend. E.g., set it to 0 and 100 for percent values.
 
-This values are not used internally, only forwarded to the output module.
+These values are not used internally, only forwarded to the output module.
 
 Default: none.
 
@@ -602,8 +603,8 @@ Usually you don't need to override the buildin methods. So, don't fear the code 
 if you are a SQL but no Perl developer. You B<can> do this in special conditions.
 
 All checks are subclasses of L<PostgreSQL::SecureMonitoring::Checks|PostgreSQL::SecureMonitoring::Checks>. 
-You can override all methods from there, but typically you may want to override or modify 
-C<test_critical_warning>, C<execute> and C<_build_code>. C<execute> should only modified 
+You can override all methods in there, but typically you may want to override or modify 
+C<test_critical_warning>, C<execute> and C<_build_code>. C<execute> should only be modified 
 with a L<Moose method modifier|Moose::Manual::MethodModifiers>, usually C<around>.
 
 For complete examples, see the checks C<Primary>, C<Alive> and C<Writeable>.
@@ -725,15 +726,15 @@ C<test_critical_warning> method.
 
 =head3 Recommended return values
 
-Your check can theoretical return every value(s) you can imagine. It's possible to 
+Your check can theoretically return every value(s) you can imagine. It's possible to 
 return complex things with a JSON data structure or something else. 
 B<Usually you should not do this!>
 
 The reason is simple: B<Your return values should be generic and usable by every frontend.> 
-You should not return a result like C<critical> by your check SQL itself, because it usually don't 
-know the thresholds etc. Instead, use the buildin C<test_critical_warning> method 
+You should not return a result like C<critical> by your check SQL itself, because it usually doesn't 
+know the thresholds etc. Instead, use the builtin C<test_critical_warning> method 
 or write your own and override it. If you want to return a list of texts 
-(e.g. "unused indexes") beside a counter, you should override the C<execude> method, 
+(e.g. "unused indexes") besides a counter, you should override the C<execude> method, 
 change the result and set the C<message> inside the result in C<test_critical_warning>.
 
 
@@ -748,13 +749,13 @@ Each check must have the following sections for surviving the tests (see the oth
 
 =item * B<NAME>
 
-The Name of your module and a short description. If the documentation is rendered as HTML, 
-this is the title and or description for earch sites etc.
+The Name of your module and a short description. When the documentation is rendered as HTML, 
+this is the title and/or description for search sites etc.
 
 
 =item * B<SYNOPSIS>
 
-A short Synopsis for the configuration with your check specific configuration options (attributes).
+A short synopsis for the configuration, including your check specific configuration options (attributes).
 
 When there is nothing special, mention this.
 
@@ -773,12 +774,12 @@ the config file options and for the results.
 
 
 You may add other sections, e.g. typical Perl documentation sections like AUTHOR etc. 
-Your Documentation should be short but complete ...
+Your documentation should be short but complete ...
 
 
 =head2 Testing
 
-Each check Modules must have some tests. You can write them with the  
+Each check module must have some tests. You can write them using
 [pgTAP PostgreSQL extension](http://pgtap.org) ([pgTAP code on GitHub](https://github.com/theory/pgtap/)) 
 and/or with the help of the C<Test::PostgreSQL::SecureMonitoring> module. This module 
 gives you an old style and simple procedural interface. 
