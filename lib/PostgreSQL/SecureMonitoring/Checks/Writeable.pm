@@ -44,19 +44,16 @@ use Sys::Hostname;
 use English qw( -no_match_vars );
 
 
-<<<<<<< HEAD
-=======
 # Extra attribute declaration
 # attribute message/timeout with it's builder MUST be declared lazy,
 # because builder method uses other attributes!
-# Retention_period has no default, because the default is encoded 
+# Retention_period has no default, because the default is encoded
 # in the SQL function definition via the "arguments" attribute
 
 has retention_period => ( is => "ro", isa => "Str", predicate => "has_retention_period", );
 has timeout          => ( is => "ro", isa => "Int", builder   => "_build_timeout", lazy => 1, );
 has message          => ( is => "ro", isa => "Str", builder   => "_build_message", lazy => 1, predicate => "has_message", );
 
->>>>>>> 33e5011... code and install_sql via atrributes
 check_has
    description    => 'Try to write and commit before timeout.',
    return_type    => "bool",                       # the SQL-functions returns true/false
