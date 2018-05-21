@@ -65,6 +65,7 @@ my %attr_map = (
                  result_type => "_result_type_attr",
                  name        => "_name_attr",
                  description => "_description_attr",
+                 install_sql => "_install_sql_attr",
                );
 
 sub check_has
