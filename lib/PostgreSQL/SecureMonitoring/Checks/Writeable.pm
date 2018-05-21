@@ -70,7 +70,16 @@ use Sys::Hostname;
 use English qw( -no_match_vars );
 
 
-# Here check_has has NO code; this is defined below.
+# Extra attribute declaration
+# attribute message/timeout with it's builder MUST be declared lazy,
+# because builder method uses other attributes!
+# Retention_period has no default, because the default is encoded 
+# in the SQL function definition via the "arguments" attribute
+
+has retention_period => ( is => "ro", isa => "Str", predicate => "has_retention_period", );
+has timeout          => ( is => "ro", isa => "Int", builder   => "_build_timeout", lazy => 1, );
+has message          => ( is => "ro", isa => "Str", builder   => "_build_message", lazy => 1, predicate => "has_message", );
+
 check_has
    description    => 'Try to write and commit before timeout.',
    return_type    => "bool",                       # the SQL-functions returns true/false
@@ -81,42 +90,16 @@ check_has
    warning_level  => 3,
    critical_level => 5,
    arguments => [ [ message => 'TEXT' ], [ retention_period => 'INTERVAL', '1 day' ], ],
-   ;
-
-
-# Extra attribute declaration
-# attribute message/timeout with it's builder MUST be declared lazy,
-# because builder method uses other attributes!
-# Retention_period has no default, because the default is encoded in the SQL function definition
-
-has retention_period => ( is => "ro", isa => "Str", predicate => "has_retention_period", );
-has timeout          => ( is => "ro", isa => "Int", builder   => "_build_timeout", lazy => 1, );
-has message          => ( is => "ro", isa => "Str", builder   => "_build_message", lazy => 1, predicate => "has_message", );
-
-
-# The code for building the check is given by the following method.
-# We need a real build method for code and install_sql, because access to $self.
-sub _build_code
-   {
-   my $self = shift;
-   return qq{
-         DELETE FROM ${ \$self->schema }.writeable WHERE age(statement_timestamp(), date_inserted) > retention_period;
-         INSERT INTO ${ \$self->schema }.writeable VALUES (message) RETURNING true;
-   };
-   }
-
-sub _build_install_sql
-   {
-   my $self = shift;
-
-   return qq{
-      CREATE TABLE ${ \$self->schema }.writeable (message text, date_inserted TIMESTAMP WITH TIME ZONE DEFAULT now());
-      ALTER TABLE ${ \$self->schema }.writeable OWNER TO ${ \$self->superuser };
-      REVOKE ALL ON ${ \$self->schema }.writeable FROM PUBLIC;
-      GRANT INSERT, DELETE ON ${ \$self->schema }.writeable TO ${ \$self->superuser };
-    };
-   }
-
+   code      => q{
+         DELETE FROM writeable WHERE age(statement_timestamp(), date_inserted) > retention_period;
+         INSERT INTO writeable VALUES (message) RETURNING true;
+      },
+   install_sql => q{
+         CREATE TABLE            writeable (message text, date_inserted TIMESTAMP WITH TIME ZONE DEFAULT now());
+         REVOKE ALL           ON writeable FROM PUBLIC;
+         REVOKE ALL           ON writeable FROM current_user;
+         GRANT INSERT, DELETE ON writeable TO   current_user;
+       };
 
 # Default timeout is the critical level (which is in seconds)
 sub _build_timeout
