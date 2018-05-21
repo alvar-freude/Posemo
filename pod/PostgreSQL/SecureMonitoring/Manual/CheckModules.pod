@@ -66,7 +66,7 @@ In line 4, C<PostgreSQL::SecureMonitoring::Checks> is defined via Moose as base
 class, our module inherits everything from that. See the L<Moose::Manual|Moose Manual> 
 for more documentation about moose.
 
-In line 6, all check parameters are defined. The only parameter (which must be 
+In line 6, all check attribbutes are defined. The only attribbute (which must be 
 set by every check module) is the code. If you have a very special case, you might 
 want to override the C<_build_code> method instead.
 
@@ -237,14 +237,14 @@ The new attribute C<arguments> for C<check_has> defines, which arguments are
 passed to the SQL function. You can pass every class attribute, but usually you should define 
 your own like above.
  
-It takes an array reference of array references, which elements define the parameter 
+It takes an array reference of array references, which elements define the argument 
 name, its SQL data type and the default value:
 
 
    arguments => [ [ skip_db_re => 'TEXT',    '^template[01]$' ], ],
    #            ^   ^              ^          ^
    #            |   |              |          |
-   #            |   parameter name |          Default value
+   #            |   argument name  |          Default value
    #            |                  SQL data type
    #            Open outer (and inner) arrayref
 
@@ -307,6 +307,58 @@ Hint: to write a check that reads something from a specific
 database, you can not use such an attribute to define the database.
 You have to configure a connection to this database instead – see the configuration manual.
 
+=head3 Example with arguments, install_sql and writing to DB
+
+This example is an excerpt from the C<Writeable> check. The real check has some more 
+code for overriding the C<execute> method, timeout handling and more, which 
+doesn't matter here.
+
+   # Extra attribute declaration
+   # attribute message with it's builder MUST be declared lazy,
+   # because builder method uses other attributes!
+   # Retention_period has no default, because the default is encoded 
+   # in the SQL function definition via the "arguments" attribute
+
+   has retention_period => ( is => "ro", isa => "Str", predicate => "has_retention_period", );
+   has message          => ( is => "ro", isa => "Str", builder   => "_build_message", lazy => 1, predicate => "has_message", );
+
+   check_has
+      description    => 'Only incomplete example.',
+      volatility     => "VOLATILE",                   # Our check modifies the database ...
+      has_writes     => 1,                            # ... and needs a commit.
+      arguments => [ [ message => 'TEXT' ], [ retention_period => 'INTERVAL', '1 day' ], ],
+      code      => q{
+            DELETE FROM writeable WHERE age(statement_timestamp(), date_inserted) > retention_period;
+            INSERT INTO writeable VALUES (message) RETURNING true;
+         },
+      install_sql => q{
+            CREATE TABLE            writeable (message text, date_inserted TIMESTAMP WITH TIME ZONE DEFAULT now());
+            REVOKE ALL           ON writeable FROM PUBLIC;
+            REVOKE ALL           ON writeable FROM current_user;
+            GRANT INSERT, DELETE ON writeable TO   current_user;
+          };
+   
+   # Create a default message from the host names
+   sub _build_message
+      {
+      my $self   = shift;
+      my $dbhost = $self->host // "<local>";
+      my $myhost = hostname;
+      return "Written by $myhost to $dbhost via ${ \$self->name }";
+      }
+
+In the code, the argument C<retention_period> and C<message> are used like a 
+normal argument to a function.
+
+Beside this, the check is volatile (attribute C<volatility>) because it writes 
+something and indicates that it needs a C<COMMIT> via C<has_writes>. And it has
+some extra SQL, defined in C<install_sql>. The default message is build in 
+Perl with access to other attribbutes (C<host> and C<name>). therefore there is 
+a builder method. Instead the C<message> attribute builder method, it would be 
+possible to write method called C<message> with the same content. The difference 
+is, that with builder method the result is reused in this instance. Since the 
+code is usually only called once, this is only a question of style. 
+
 
 =head3 More Examples
 
@@ -361,6 +413,8 @@ Sometimes you may want to execute extra SQL at installation time, e.g. to create
 Usually you must change the owner of the objects etc. and need access to the other 
 attributes via C<$self>. This is not possible when defining this attribute in C<check_has>, 
 instead you should override C<_build_install_sql>. Refer to the C<Writeable> check as an example.
+
+You B<must> set proper access rights if you create some objects like tables (see example above).
 
 
 =item * B<sql_function>
@@ -454,8 +508,9 @@ When set to 1, Posemo calls a C<COMMIT> after running the check.
 
 With the attribute C<arguments> you can declare some arguments which are passed to the function.
 
-Earch argument has a name, a SQL data type and optionally a default value. You can 
-define any number of arguments. They are passed as named argument to the function.
+Earch argument has a name, a SQL data type and optionally a default value, which is 
+included in the function definition. You can define any number of arguments. 
+They are passed as named argument to the function.
 
 Example:
 
@@ -478,38 +533,68 @@ contains one attribute definition: argument name is "timeout", data type
 is "INTEGER" and the default value is 1000.
 
 
-Each argument must be an attribute in your check. Therefore you should declare these  
-attribute in your class (remember: each check is a Perl Moose class!):
+Each argument must be an attribute or method in your check (callable as 
+C<$obj_of_your_check-E<gt>argument_name>). Therefore you should declare these  
+attributes in your class (remember: each check is a Perl Moose class!):
 
    has timeout    => ( is => "ro", isa => "Int", );   # the "timeout" attribute is a integer
    has skip_db_re => ( is => "ro", isa => "Str", );   # the skip db regexpt is a string
 
-You can use any feature of Moose attributes here and re-use them in your code.
+Alternativelly you can also write a method with the name of the argument instead, e.g.:
+
+   sub timeout 
+      {
+      my $self = shift;
+      return $self->critical_level * 1000;
+      }
+
+For more or less static arguments like a timeout, it is more elegant to write a 
+builder method and declare an attribute like this:
+
+   has timeout => ( is => "ro", isa => "Int", builder   => "_build_timeout", lazy => 1, );
+   […]
+   sub _build_timeout
+      {
+      my $self = shift;
+      return $self->critical_level * 1000;
+      }
+
+You can use any feature of Moose attributes or Moose in general. 
+
 
 C<arguments> takes a array reference of array reference, e.g.:
 
-   FIXME   arguments => [  FIXME
-   parameters => [
+   arguments => [
                    [ skip_db_re => 'TEXT',    '^template[01]$' ],
                    [ timeout    => 'INTEGER', 1000 ],
                  ],
 
 
-Here we have two parameters for the check funcion:
+Here we have two arguments for the check funcion:
 
 C<skip_db_re>, which is of SQL type C<TEXT> and has the default value C<'^template[01]$'>.
 
 C<timeout> is of type C<INTEGER> and has the default value 1000.
 
+Inside the PostgreSQL function, you can access the argument like usual. 
+If the Language is SQL e.g. like this:
 
-In the config file, you can set the defined attributes, but all default attribtes too:
+   […]
+   WHERE ( CASE WHEN length(skip_db_re) > 0 THEN datname !~ skip_db_re ELSE true END )
+   […]
+
+When C<skip_db_re> is empty, then nothing is skipped, else it depends if the regexp patches.
+
+
+
+In the config file, you can set the defined attributes, but also all default attributes too:
 
   # example for setting check attributes in config file 
   <Check MyTestCheck>
     timeout        = 100,
     skip_db_re     = "^(template[01]|unwanted_db|other_unwanted_db)$"
     
-    # Additional other parameters (available by default in all checks)
+    # Additional other attributes (available by default in all checks)
     warning_level  = 1000
     critical_level = 2000
   </Check>
