@@ -375,6 +375,9 @@ L<PostgreSQL::SecureMonitoring::Checks|PostgreSQL::SecureMonitoring::Checks>.
 Some attributes can be configured in the config file, either globally, by host, 
 by hostgroup or by check.
 
+TODO: group by types of attributes. (Maybe: put description of C<arguments> in own 
+chapter, then the description in the list here can be short.)
+
 
 =over 4
 
@@ -409,19 +412,15 @@ you should override the _build_code method instead.
 
 Some additional SQL, which will be executed at install time before the function is created.
 
-Sometimes you may want to execute extra SQL at installation time, e.g. to create some tables. 
-Usually you must change the owner of the objects etc. and need access to the other 
-attributes via C<$self>. This is not possible when defining this attribute in C<check_has>, 
-instead you should override C<_build_install_sql>. Refer to the C<Writeable> check as an example.
-
 You B<must> set proper access rights if you create some objects like tables (see example above).
 
+You may override C<_build_install_sql> instead.
 
 =item * B<sql_function>
 
 In this attribute, the complete SQL function is stored (by the C<_build_sql_function> method). 
-In very rare situations you may write it by your own or override the build method. But usually 
-you should not do this!
+In very rare situations you may write it by your own or override (or modify) the build method. But usually 
+you should not do this, because in this case you have to do much things manually! 
 
 
 =item * B<sql_function_name>
@@ -825,7 +824,7 @@ change the result and set the C<message> inside the result in C<test_critical_wa
 
 =head2 Documentation
 
-Every check module should have some documentation in L<perlpod|Pod format>. 
+Every check module should have some documentation in L<Pod format|perlpod>. 
 If a check module is part of the main Posemo distribution, this is tested by the tests.
 
 Each check must have the following sections for surviving the tests (see the other check modules for examples).
