@@ -240,6 +240,7 @@ has _code_attr           => ( is => "ro", isa => "Str",           predicate => "
 has _name_attr           => ( is => "ro", isa => "Str",           predicate => "has_name_attr", );
 has _description_attr    => ( is => "ro", isa => "Str",           predicate => "has_description_attr", );
 has _result_type_attr    => ( is => "ro", isa => "Str",           predicate => "has_result_type_attr", );
+has _install_sql_attr    => ( is => "ro", isa => "Str",           predicate => "has_install_sql_attr", );
 
 
 # arguments, which may be set from check, or should be set here.
@@ -313,6 +314,8 @@ sub _build_code
 
 sub _build_install_sql
    {
+   my $self = shift;
+   return $self->_install_sql_attr if $self->has_install_sql_attr;
    return "";
    }
 
