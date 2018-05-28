@@ -15,6 +15,39 @@ More documentation will come. Posemo is in active development!
 Some parts of the documentation are missing.
 
 
+
+
+## HOWTOs and Manuals 
+
+### User manuals
+
+* |PostgreSQL::SecureMonitoring::Manual::UserConfig
+
+
+[Users Guide to the config file](../)
+
+=head2 Developer manuals
+
+=over 4
+
+=item *
+
+L<How to write check Modules|Posemo::Manual::CheckModules>
+
+=item *
+
+L<How to write a frontend connector / outout modules|PostgreSQL::SecureMonitoring::Manual::OutputModules>
+
+=item *
+
+L<Coding Styleguide|PostgreSQL::SecureMonitoring::Manual::Styleguide>
+
+=back
+
+
+
+
+
 ## Concepts
 
 Posemo is a modular framework for creating monitoring checks for PostgreSQL. It is simple to add a new check. Usually just have to write the SQL for the check and add some configuration. And it is recommended, to write some tests for every check.
