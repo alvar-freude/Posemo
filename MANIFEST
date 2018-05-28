@@ -29,6 +29,7 @@ lib/PostgreSQL/SecureMonitoring/Checks/ConnectionLimit.pm
 lib/PostgreSQL/SecureMonitoring/Checks/CRUDCount.pm
 lib/PostgreSQL/SecureMonitoring/Checks/DBSize.pm
 lib/PostgreSQL/SecureMonitoring/Checks/Primary.pm
+lib/PostgreSQL/SecureMonitoring/Checks/ReadWriteTime.pm
 lib/PostgreSQL/SecureMonitoring/Checks/SlaveLag.pm
 lib/PostgreSQL/SecureMonitoring/Checks/Transactions.pm
 lib/PostgreSQL/SecureMonitoring/Checks/Writeable.pm
