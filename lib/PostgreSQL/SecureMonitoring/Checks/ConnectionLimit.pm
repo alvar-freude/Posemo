@@ -45,11 +45,9 @@ check_has
    max_value      => 100,
    warning_level  => 75,
    critical_level => 90,
-
-   code =>
-   q{ SELECT ((sum(numbackends) / current_setting('max_connections')::real)*100)::real AS connection_limit_reached FROM pg_stat_database; };
+   code           => q{ SELECT ((sum(numbackends) / current_setting('max_connections')::real)*100)::real 
+                            AS connection_limit_reached 
+                          FROM pg_stat_database; };
 
 
 1;
-
-
