@@ -2,7 +2,7 @@
 
 # Posemo – PostgreSQL Secure Monitoring
 
-Posemo is a PostgreSQL monitoring framework, that can monitor everything in Postgres with an unprivileged user, which has no access to any data. Posemo conforms to the rules of the *German Federal Office for Information Security* ([Bundesamt für Sicherheit in der Informationstechnik](https://www.bsi.bund.de/), BSI).
+Posemo is a PostgreSQL monitoring framework, that can monitor everything in Postgres with an unprivileged user, which has no access to any data. Posemo conforms to the rules of the *German Federal Office for Information Security* ([Bundesamt für Sicherheit in der Informationstechnik](https://www.bsi.bund.de/), BSI). It is build to check tens, hundrets or thousands of servers fast.
 
 Posemo itself has no display capabilities, but can output the results for every monitoring environment (e.g. check_mk, Nagios, Zabbix, Icinga, …).
 
@@ -13,6 +13,39 @@ This is now a **usable** pre-release with limited checks. It is not feature comp
 More documentation will come. Posemo is in active development!
 
 Some parts of the documentation are missing.
+
+
+
+
+## HOWTOs and Manuals 
+
+### User manuals
+
+* |PostgreSQL::SecureMonitoring::Manual::UserConfig
+
+
+[Users Guide to the config file](../)
+
+=head2 Developer manuals
+
+=over 4
+
+=item *
+
+L<How to write check Modules|Posemo::Manual::CheckModules>
+
+=item *
+
+L<How to write a frontend connector / outout modules|PostgreSQL::SecureMonitoring::Manual::OutputModules>
+
+=item *
+
+L<Coding Styleguide|PostgreSQL::SecureMonitoring::Manual::Styleguide>
+
+=back
+
+
+
 
 
 ## Concepts
@@ -27,15 +60,15 @@ Posemo is a modern Perl application using Moose; at installation it generates Po
 For a simple check you may look below at the *Alive* Check, which simply returns always true. It uses a lot of defaults from `PostgreSQL::SecureMonitoring::Checks` and sugar from `PostgreSQL::SecureMonitoring::ChecksHelper`:
 
 ```perl
-package PostgreSQL::SecureMonitoring::Checks::Alive;      # by Default, the name of the check is build from this package name
+package PostgreSQL::SecureMonitoring::Checks::SimpleAlive; # by Default, the name of the check is build from this package name
 
 
-use PostgreSQL::SecureMonitoring::ChecksHelper;           # enables Moose, exports sugar functions; enables strict&warnings
-extends "PostgreSQL::SecureMonitoring::Checks";           # We extend our base class ::Checks
+use PostgreSQL::SecureMonitoring::ChecksHelper;            # enables Moose, exports sugar functions; enables strict&warnings
+extends "PostgreSQL::SecureMonitoring::Checks";            # We extend our base class ::Checks
 
-check_has code => "SELECT true";                          # This is our check SQL!
+check_has code => "SELECT true";                           # This is our check SQL!
 
-1;                                                        # every Perl module must return (end with) a true value
+1;                                                         # every Perl module must return (end with) a true value
 ```
 
 

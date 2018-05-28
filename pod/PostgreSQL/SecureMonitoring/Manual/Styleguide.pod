@@ -1,0 +1,19 @@
+=head1 Posemo Developer Manual: Coding Styleguide
+
+
+You should format your code according to the PerlTidy config in C<t/perltidyrc>. 
+(if someone has good arguments, I may change the rules to the PBP defaults) 
+
+This is part of the test suite, so, the tests fail if the code is not tidy!
+
+
+In Eclipse with the EPIC Perl plugin, you can easyly format the code with Cmd-Shift-F (or Ctrl-Shift-F).
+
+
+B<TODO:> More description.
+
+
+=cut
+
+
+

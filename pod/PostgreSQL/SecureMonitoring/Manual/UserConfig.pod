@@ -1,0 +1,16 @@
+=head1 Posemo User Manual: Configuration
+
+This manual is about configuring Posemo.
+
+
+=head2 Overview
+
+...
+
+TODO
+
+
+
+
+
+=cut

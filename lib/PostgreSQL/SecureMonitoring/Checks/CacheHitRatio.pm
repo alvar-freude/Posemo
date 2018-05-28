@@ -15,8 +15,8 @@ package PostgreSQL::SecureMonitoring::Checks::CacheHitRatio;
   
   # or, if you have enough memory
   <Check CacheHitRatio>
-    warning_level  = 95   # default 80
-    critical_level = 90   # default 60
+    warning_level  = 97   # default 80
+    critical_level = 95   # default 60
   </Check>
 
 
@@ -86,7 +86,7 @@ check_has
                    ELSE 100::float8*blks_hit::float8/(blks_read+blks_hit)
                 END AS cache_hit_ratio
            FROM pg_stat_database 
-           WHERE ( CASE WHEN length(skip_db_re) > 0 THEN datname !~ skip_db_re ELSE true END )
+          WHERE ( CASE WHEN length(skip_db_re) > 0 THEN datname !~ skip_db_re ELSE true END )
        ORDER BY database
          )
        SELECT '$TOTAL' AS database,

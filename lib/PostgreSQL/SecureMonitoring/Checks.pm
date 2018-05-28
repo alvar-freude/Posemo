@@ -6,31 +6,30 @@ package PostgreSQL::SecureMonitoring::Checks;
 
 =head1 SYNOPSIS
 
+The following example doesn't use the sugar from L<PostgreSQL::SecureMonitoring::ChecksHelper|PostgreSQL::SecureMonitoring::ChecksHelper>.
 
- package PostgreSQL::SecureMonitoring::Checks::Alive;  # by Default, the name of the check is build from this package name
+ package PostgreSQL::SecureMonitoring::Checks::SimpleAlive;  # by Default, the name of the check is build from this package name
  
- use Moose;                                            # This is a Moose class ...
- extends "PostgreSQL::SecureMonitoring::Checks";       # ... which extends our base check class
+ use Moose;                                                  # This is a Moose class ...
+ extends "PostgreSQL::SecureMonitoring::Checks";             # ... which extends our base check class
  
- sub _build_sql { return "SELECT true;"; }             # this sub simply returns the SQL for the check
+ sub _build_sql { return "SELECT true;"; }                   # this sub simply returns the SQL for the check
  
- 1;                                                    # every Perl module must return (end with) a true value
+ 1;                                                          # every Perl module must return (end with) a true value
 
 
 =head1 DESCRIPTION
 
-  TODO: Documentation!
-  TODO: Separate install methods?
-
-
+  TODO: more Documentation!
+  TODO: Separate install methods into their own module?
 
 
 This is the base class for all Posemo checks. It declares all base methods for 
 creating SQL in initialisation, calling the check at runtime etc.
 
-The above minimalistic example MyCheck creates the following SQL function:
+The above minimalistic example SimpleAlive creates the following SQL function:
 
-  CREATE OR REPLACE FUNCTION my_check() 
+  CREATE OR REPLACE FUNCTION simple_alive() 
     RETURNS  boolean 
     AS
     
@@ -43,9 +42,9 @@ The above minimalistic example MyCheck creates the following SQL function:
     SECURITY DEFINER
     SET search_path = monitoring, pg_temp;
   
-  ALTER FUNCTION my_check OWNER TO postgres;
-  REVOKE ALL     ON FUNCTION my_check() FROM PUBLIC;
-  GRANT  EXECUTE ON FUNCTION my_check() TO monitoring;
+  ALTER FUNCTION simple_alive OWNER TO posemo_admin;
+  REVOKE ALL     ON FUNCTION simple_alive() FROM PUBLIC;
+  GRANT  EXECUTE ON FUNCTION simple_alive() TO posemo;
   
 
 At runtime it is called with this SQL:
@@ -128,7 +127,7 @@ each value in the performance data
 
 
 =head2 TODO
-
+???
 TODO: SQL schema handling; 
 should be: default empty and user should have an search_path? (to "monitorin")???
 
@@ -149,43 +148,6 @@ use Carp;
 use Config::FindFile qw(search_conf);
 use Log::Log4perl::EasyCatch ( log_config => search_conf("posemo-logging.properties") );
 
-=begin temp
-
-Folgende Methoden:
-
-  * sql
-  * sql_function
-  * sql_function_name
-  * return_type (boolean)
-  * language (sql)
-  * name
-  * 
-  * 
-  
-von app/basis
-  * schema
-  * superuser
-  * user
-  * ...
-
-
-Wir brauchen: 
-
-  Funktion "is_critical"
-  Funktion "is_warning"
-  Funktion "is_ok"
-
-Wie Speichern Result?
-
-#diag $dbh->{pg_server_version}  ;
-#diag $dbh->{pg_server_version};
-
-
-=end temp
-
-
-
-=cut
 
 #<<< no pertidy formatting
 
@@ -240,6 +202,7 @@ has _code_attr           => ( is => "ro", isa => "Str",           predicate => "
 has _name_attr           => ( is => "ro", isa => "Str",           predicate => "has_name_attr", );
 has _description_attr    => ( is => "ro", isa => "Str",           predicate => "has_description_attr", );
 has _result_type_attr    => ( is => "ro", isa => "Str",           predicate => "has_result_type_attr", );
+has _install_sql_attr    => ( is => "ro", isa => "Str",           predicate => "has_install_sql_attr", );
 
 
 # arguments, which may be set from check, or should be set here.
@@ -313,6 +276,8 @@ sub _build_code
 
 sub _build_install_sql
    {
+   my $self = shift;
+   return $self->_install_sql_attr if $self->has_install_sql_attr;
    return "";
    }
 
@@ -456,6 +421,7 @@ sub run_check
    $result->{description} = $self->description;
    $result->{result_unit} = $self->result_unit;
    $result->{result_type} = $self->result_type;
+   $result->{return_type} = $self->return_type;
 
    foreach my $attr (
                       qw(warning_level critical_level
@@ -544,11 +510,11 @@ sub execute
    } ## end sub execute
 
 
-=head2 test_critical_warning
+=head2 ->test_critical_warning($result)
 
 This method checks, if the result is critical or warning.
 
-It may be overriden in the check to do more detailed checks.
+It may be overriden in the check to do more detailed checks, see below.
 
 Default check depends on C<result_type> value of the result:
 
@@ -567,6 +533,32 @@ Checks every value against C<warning_level> / C<critical_level> attribute.
 Checks checks every value except the first element of each row against C<warning_level> / C<critical_level> attribute
 
 =back
+
+
+=head3 Overriding
+
+You may want to override this method. It gets one parameter (beside C<$self>): the complete C<$result>. 
+You can use this to write your own critical/warning test in a check module.
+
+You can set the following attributes (hash keys!) in C<$result>:
+
+=over 4
+
+=item *
+
+C<message>: a message, usually used when there is a critical / warning level reached with a description what failed.
+
+=item *
+
+C<critical>: a flag; set it to 1, when the critical level is reached. 
+
+=item *
+
+C<warning>: a flag; set it to 1, when the warning level is reached. 
+
+=back
+
+It is possible to change everything in C<$result>, but usually you should not do this (here).
 
 
 =cut
@@ -589,8 +581,6 @@ sub test_critical_warning
    return unless $self->has_critical_level or $self->has_warning_level;
 
    my @values;
-
-   $result->{return_type} = $self->return_type;
 
    if ( $result->{row_type} eq "single" )
       {
@@ -651,8 +641,12 @@ This method returns a C<status> according to the warning/critical flags in the g
   1: warning
   2: critical
 
-It may be overriden in the check to do something else then looking in warning/critical, 
-but usually this here should be fine.
+This may be used by some frontend or output modules to interpret the result instead 
+of looking into critical/warning result.
+
+This method may be overriden in the check to do something very special and something else then 
+looking in warning/critical, but usually this here should be fine and you should 
+override C<test_critical_warning> instead (or too).
 
 =cut
 

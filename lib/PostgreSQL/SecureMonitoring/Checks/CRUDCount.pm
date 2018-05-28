@@ -15,13 +15,17 @@ This check returns a list of databases with fetched/returned/inserted/updated/de
 
 The SQL generates a result like this:
 
-......
-    database    | size  
- ---------------+-------
-  $TOTAL        |    14 
-  _posemo_tests |     7 
-  postgres      |     7 
- (3 rows)
+
+   >  SELECT * FROM crud_count();
+     database  | rows_returned | rows_fetched | rows_inserted | rows_updated | rows_deleted 
+   ------------+---------------+--------------+---------------+--------------+--------------
+    $TOTAL     |    4319036903 |    815248355 |       3015595 |      6440502 |        75179
+    monitoring |      62921444 |     13044164 |         18996 |          668 |        18293
+    my_cms     |    2175313445 |    710610692 |       2777476 |      5871634 |         4494
+    my_webapp  |    1481707499 |      7525438 |            18 |           27 |            8
+    postgres   |      78751513 |     30510312 |             2 |            7 |            2
+   (5 rows)
+
 
 
 =head3 Filter by database name
