@@ -85,7 +85,7 @@ my $builder = Module::Build->new(
 
    },
 
-   add_to_cleanup     => ['Posemo-*'],
+   add_to_cleanup     => [' Posemo-*'],
    create_makefile_pl => 'traditional',
                                 );
 
