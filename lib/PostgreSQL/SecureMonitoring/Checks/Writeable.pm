@@ -47,7 +47,7 @@ use English qw( -no_match_vars );
 # Extra attribute declaration
 # attribute message/timeout with it's builder MUST be declared lazy,
 # because builder method uses other attributes!
-# Retention_period has no default, because the default is encoded 
+# Retention_period has no default, because the default is encoded
 # in the SQL function definition via the "arguments" attribute
 
 has retention_period => ( is => "ro", isa => "Str", predicate => "has_retention_period", );
