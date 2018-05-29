@@ -5,9 +5,107 @@ This manual is about writing output modules (frontend connectors) for Posemo.
 
 =head2 Overview
 
-...
-...
-...
+Posemo can write output to any frontend. The default output is a JSON file with 
+
+
+
+
+
+
+Folgende Werte sind derzeit optional und werden direkt von den im
+Check-Modul angegebenen Attributen gesetzt (wenn dort gesetzt, ansonsten
+sind sie nicht da und undefiniert):
+
+ warning_level
+ critical_level
+ min_value
+ max_value
+ result_is_counter  (Flag)
+ graph_type
+ graph_mirrored     (Flag)
+ lower_is_worse     (Flag; NOCH nicht durchgereicht, mache ich noch)
+
+
+Optional da:
+
+ error              (wenn DB-Fehler, also: Check nicht ausführbar)
+
+
+Wird com Test auf Critical/Warning gesetzt, wenn das jeweilige relevant;
+nicht gesetzt wenn nicht critical oder warning -- oder wenn die
+jeweiligen levels (siehe oben) nicht gesetzt sind:
+
+ message
+ critical (Flag)
+ warning  (Flag)
+ status   (Int: 0 (OK), 1 (warn), 2 (crit))
+
+Die "message" könnte ich natürlich passend auch immer auf irgendwas
+setzen? Wäre das hilfreich?
+
+
+Immer da (ausser row_type von den Check-Attributen):
+
+ row_type      (single, list, multiline)
+ check_name    (AUs dem Dateiname, aber überschreibbar)
+ description   (aus Check-Attribut)
+ result_unit   (default "")
+ result_type   (default: Check-Attribut return_type (vom SQL))
+
+
+
+Das Atribut "lower_is_worse" schiebe ich gerade noch nicht durch, kommt
+aber; wird vom critical-warning-check intern benutzt, aber kann ja auch
+nach außen gegeben werden.
+
+
+Diese Angaben gibt es pro Check.
+
+
+
+Die folgenden gibt es noch pro Host in der Datenstruktur an der Stelle
+vom Host:
+
+
+Verbindungs-Daten zur DB:
+
+ port
+ user
+ database
+ schema
+ host
+
+
+Die Ergebnisse, Liste mit je einem Hash pro Check, dessen Werte siehe oben:
+
+ results
+
+
+Weiteres:
+
+ hostgroup    (In der Konfiguration konfigurierbare Hostgruppe)
+ name         (bisher optionaler (!) Name von dem Host)
+
+
+Ich denke, den "name" setze ich immer, wenn nicht angegeben auf den Wert
+von "host"; da ist ja dafür da, wenn die unterschiedlich sind. Sonst
+musst Du das in der Auswertung dauernd abfragen.
+
+
+
+Und ganz außen rum, das kennst Du ja:
+
+       message        => $message,
+       posemo_version => $posemo_version . "",   # convert to string!
+       runtime        => $runtime,
+       hostname       => $hostname,
+       result         => $self->results,
+       error_count    => $self->errcount,
+       configfile     => $self->configfile,
+       global_id      => $self->conf->{global_id},
+
+
+
 
 
 
