@@ -61,7 +61,6 @@ for my $testnum ( 1 .. 10 )
    no_critical_ok $writeable, "Writing Nr. $testnum no critical";
    no_error_ok $writeable,    "Writing Nr. $testnum no error";
 
-<<<<<<< HEAD
    sleep 1;                                        # Sleep a little bit, PG needs some time to update
 
    my $result = result_ok "Transactions", "test", undef, undef, "Transaction Test Nr. $testnum";
@@ -77,18 +76,7 @@ for my $testnum ( 1 .. 10 )
    $expected_total    = $result->{result}[0][1] + 1;
    $expected          = $result->{result}[1][1] + 1;
    $expected_rollabck = $result->{result}[0][2] + 1;
-=======
-cmp_deeply [ map { $_->[0] } @{ $result->{result} } ], [qw( $TOTAL _posemo_tests postgres )], "Database names";
-cmp_ok $result->{result}[1][1], '>', 5,  "Database _posemo_tests has more then 5 committed transactions";
-cmp_ok $result->{result}[1][1], '<', 1000, "Database _posemo_tests has fewer then 1000 committed transactions";
-
-is $result->{result}[1][1] + $result->{result}[2][1], $result->{result}[0][1], "Sum of committed transactions is the same as TOTAL";
-is $result->{result}[1][2] + $result->{result}[2][2], $result->{result}[0][2], "Sum of rollbacked transactions is the same as TOTAL";
-
-# TODO: do some transactions and look into count ...
->>>>>>> 650436d... $TOTAL first row in multiline checks
 
    } ## end for my $testnum ( 1 .. ...)
 
 done_testing();
-
