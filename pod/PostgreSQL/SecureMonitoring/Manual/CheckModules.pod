@@ -687,9 +687,10 @@ Usually you don't need to override the buildin methods. So, don't fear the code 
 if you are a SQL but no Perl developer. You B<can> do this in special conditions.
 
 All checks are subclasses of L<PostgreSQL::SecureMonitoring::Checks|PostgreSQL::SecureMonitoring::Checks>. 
-You can override all methods in there, but typically you may want to override or modify 
-C<test_critical_warning>, C<execute> and C<_build_code>. C<execute> should only be modified 
-with a L<Moose method modifier|Moose::Manual::MethodModifiers>, usually C<around>.
+You can override all methods of this class, but typically you may want to override or modify 
+C<test_critical_warning>, C<execute>, C<_build_code> and C<_build_install_sql>. C<execute> should only be modified 
+with a L<Moose method modifier|Moose::Manual::MethodModifiers>; when modifying with C<around>, the original 
+method should be called.
 
 For complete examples, see the checks C<Primary>, C<Alive> and C<Writeable>.
 
