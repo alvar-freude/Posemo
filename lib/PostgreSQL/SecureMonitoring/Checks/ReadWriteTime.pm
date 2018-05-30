@@ -1,8 +1,8 @@
-package PostgreSQL::SecureMonitoring::Checks::ReadWritetime;
+package PostgreSQL::SecureMonitoring::Checks::ReadWriteTime;
 
 =head1 NAME
 
- PostgreSQL::SecureMonitoring::Checks::ReadWritetime -- Time spent reading/writing data file blocks  
+ PostgreSQL::SecureMonitoring::Checks::ReadWriteTime -- Time spent reading/writing data file blocks  
 
 =head1 SYNOPSIS
 
@@ -64,9 +64,9 @@ check_has
 
    # complex return type
    return_type => q{
-      database          VARCHAR(64), 
-      xact_commit       BIGINT,
-      xact_rollback     BIGINT
+      database       VARCHAR(64), 
+      read_time      double precision,
+      write_time     double precision
       },
 
    code => q{

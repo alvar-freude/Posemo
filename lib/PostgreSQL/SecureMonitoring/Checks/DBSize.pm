@@ -44,27 +44,27 @@ check_has
    name                 => "DB Size",
    description          => 'Get database sizes.',
    has_multiline_result => 1,
-   result_unit          => "MB",
+   result_unit          => "bytes",
    result_type          => "integer",
    arguments            => [ [ skip_db_re => 'TEXT', '^template[01]$' ], ],
 
    # complex return type
    return_type => q{
       database                        VARCHAR(64), 
-      size                            INTEGER
+      database_size                   NUMERIC
       },
 
    code => q{
       WITH sizes AS 
          (
-         SELECT datname::VARCHAR(64) AS database, (pg_database_size(datname)/1024/1024)::INTEGER AS size
+         SELECT datname::VARCHAR(64) AS database, pg_database_size(datname) AS database_size
            FROM pg_database 
           WHERE ( CASE WHEN length(skip_db_re) > 0 THEN datname !~ skip_db_re ELSE true END )
        ORDER BY database
          )
-       SELECT '$TOTAL', sum(size)::INTEGER FROM sizes
+       SELECT '$TOTAL', sum(database_size) FROM sizes
        UNION ALL
-       SELECT database, size               FROM sizes;
+       SELECT database, database_size      FROM sizes;
       };
 
 

@@ -301,7 +301,7 @@ sub _camel_case_to_words
 sub _build_sql_function_name
    {
    my $self = shift;
-   ( my $function_name = $self->name ) =~ s{\s}{_}gx;
+   ( my $function_name = $self->name ) =~ s{\W}{_}gx;
    return lc("${ \$self->schema }.$function_name");
    }
 
@@ -459,6 +459,7 @@ sub run_check
    $result->{description} = $self->description;
    $result->{result_unit} = $self->result_unit;
    $result->{result_type} = $self->result_type;
+   $result->{return_type} = $self->return_type;
 
    foreach my $attr (
                       qw(warning_level critical_level
@@ -592,8 +593,6 @@ sub test_critical_warning
    return unless $self->has_critical_level or $self->has_warning_level;
 
    my @values;
-
-   $result->{return_type} = $self->return_type;
 
    if ( $result->{row_type} eq "single" )
       {

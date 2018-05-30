@@ -152,8 +152,6 @@ sub install
    eval {
       # Transaction starts here!
 
-      # $self->dbh->do("SET search_path TO ${ \$self->schema }");
-
       $self->_do_create_user if $self->create_user;
       $self->_do_create_superuser() if $self->create_superuser;
 
@@ -166,6 +164,8 @@ sub install
       $self->dbh->do("GRANT  CONNECT ON DATABASE ${ \$self->database } TO ${ \$self->user }");
 
       $self->_do_install_schema if $self->create_schema;
+      $self->dbh->do("SET search_path TO ${ \$self->schema }");
+      $self->dbh->do("SET role ${ \$self->superuser }");
 
       INFO "Install all check functions";
       $self->install_checks;
@@ -322,7 +322,7 @@ sub _do_install_schema
       $revoke = "REVOKE ALL ON SCHEMA ${ \$self->schema } FROM PUBLIC;";
       }
 
-   my $drop = $self->drop_schema ? "DROP SCHEMA IF EXISTS ${ \$self->schema };" : "";
+   my $drop = $self->drop_schema ? "DROP SCHEMA IF EXISTS ${ \$self->schema } CASCADE;" : "";
 
    $self->dbh->do(
       qq{ 
