@@ -210,7 +210,7 @@ sub import
 
    # TODO: more with with "with" parameter?
 
-   # There is an error with t/00-load.t, so don't immutable if Test::More loaded
+   # There is an error with t/00-load.t, so don't immutable if called there
    __PACKAGE__->meta->make_immutable unless $PROGRAM_NAME =~ m{load.t$}x;    # unless is_loaded("Test::More");
 
    return;
