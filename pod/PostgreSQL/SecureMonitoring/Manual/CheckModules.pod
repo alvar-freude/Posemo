@@ -637,6 +637,10 @@ A flag, indicating if the check is enabled or disabled.
 Usually all checks are enabled by default. But maybe you want 
 to disable some checks by default and enable them in the config. 
 
+When you write a check for an application, e.g. counting NextCloud users, 
+then this check should be disabled by default and only enabled on request 
+for a specific database and host.
+
 Default: enabled (1).
 
 May be changed in configuration.
@@ -872,6 +876,13 @@ gives you an old style and simple procedural interface.
 See the folder C<t> for examples.
 
 B<TODO:> Write description and examples about testing.
+
+
+=head2 Licenses, Publication
+
+You can write your Check modules under any license you want. If they are not only 
+for internal use, please make them public. The PostgreSQL License is preferred 
+for integration into main Posemo.
 
 
 
