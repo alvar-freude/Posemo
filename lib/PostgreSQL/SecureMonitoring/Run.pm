@@ -119,17 +119,15 @@ use IO::All -utf8;
 
 #<<<
 
-# conf must be lazy, because in the builder must be called after initialization of all other attributes!
-
 has configfile => ( is => "ro", isa => "Str",          default => search_conf("posemo.conf"),            documentation => "Configuration file", );
 has log_config => ( is => "rw", isa => "Str",                                                            documentation => "Alternative logging config", );
 has outfile    => ( is => "ro", isa => "Str",          default => q{-},                                  documentation => "Output file name; - for STDOUT (default)", );
 has verbose    => ( is => "ro", isa => "Bool",                                                           documentation => "Enable verbose messages to screen", );
 has quiet      => ( is => "ro", isa => "Bool",                                                           documentation => "Silent mode: don't log messages to screen", );
 
-
 #>>>
 
+# conf must be lazy, because in the builder must be called after initialization of all other attributes!
 has _conf => (
                reader        => "conf",
                is            => "ro",
