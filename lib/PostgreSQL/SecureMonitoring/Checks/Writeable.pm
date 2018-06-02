@@ -81,7 +81,7 @@ has timeout          => ( is => "ro", isa => "Int", builder   => "_build_timeout
 has message          => ( is => "ro", isa => "Str", builder   => "_build_message", lazy => 1, predicate => "has_message", );
 
 check_has
-   description    => 'Try to write and commit before timeout.',
+   description    => 'Database is writeable before timeout',
    return_type    => "bool",                       # the SQL-functions returns true/false
    result_type    => "float",                      # but the check itself returns seconds as float
    result_unit    => "s",
