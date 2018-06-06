@@ -21,30 +21,16 @@ Some parts of the documentation are missing.
 
 ### User manuals
 
-* |PostgreSQL::SecureMonitoring::Manual::UserConfig
+* [Users Guide to the config file](pod/PostgreSQL/SecureMonitoring/Manual/UserConfig.pod)
 
 
-[Users Guide to the config file](../)
+### Developer manuals
 
-=head2 Developer manuals
+* [How to write check Modules](pod/PostgreSQL/SecureMonitoring/Manual/CheckModules.pod)
 
-=over 4
+* [How to write a frontend connector / outout modules](pod/PostgreSQL/SecureMonitoring/Manual/OutputModules.pod)
 
-=item *
-
-L<How to write check Modules|Posemo::Manual::CheckModules>
-
-=item *
-
-L<How to write a frontend connector / outout modules|PostgreSQL::SecureMonitoring::Manual::OutputModules>
-
-=item *
-
-L<Coding Styleguide|PostgreSQL::SecureMonitoring::Manual::Styleguide>
-
-=back
-
-
+* [Coding Styleguide](pod/PostgreSQL/SecureMonitoring/Manual/Styleguide.pod)
 
 
 
