@@ -601,7 +601,7 @@ In the config file, you can set the defined attributes, but also all default att
 
 =item * B<result_is_counter>
 
-A flag, indicating thhat the result is a counter, an (ever) raising value like 
+A flag, indicating that the result is a counter, an (ever) raising value like 
 accumulated time or I/O. A frontend should display the rate by timerange (usually seconds). 
 
 This value is not used internally, only forwarded to the output module.
