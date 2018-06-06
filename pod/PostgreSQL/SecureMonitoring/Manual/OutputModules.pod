@@ -222,28 +222,6 @@ configured by the check module itself. You find additional informations
 about each key in the documentation for writing check modules.
 
 
-check_name    (AUs dem Dateiname, aber überschreibbar)
-description   (aus Check-Attribut)
-row_type      (single, list, multiline)
-result_unit   (default "")
-return_type   
-result_type   (default: Check-Attribut return_type (vom SQL))
-status   (Int: 0 (OK), 1 (warn), 2 (crit))
-
-check_name     => 'Writeable',
-description    => 'Database is writeable before timeout'
-status         => 0,
-columns        => [ 'writeable' ],
-row_type       => 'single',
-result         => 0.00235891342163086,
-result_unit    => 's',
-return_type    => 'bool',
-result_type    => 'float',
-warning_level  => 3,
-critical_level => 5,
-
-
-
 =head4 Non optional values
 
 =over 4
@@ -306,119 +284,153 @@ Usually a frontend module should display a multiline result in one graph per row
 and usually the best way is to display all on one page, but not all frontends can 
 handle a dynamic number of graphs per service.
 
-
-=item * C<>
-
-
-=item * C<>
+When there is a hard error, the result is undef.
 
 
-=item * C<>
+=item * C<result_type>
+
+Data type of the result; as SQL types.
+
+Per default it is the same as C<return_type>.
+
+When the C<row_type> is C<multiline> or C<list>, then usually all values 
+should have this type, bit in C<multiline> the first column is a name (of a 
+database or table or something else).
+
+=item * C<return_type>
+
+The SQL return type, defined by the check. Usually a frontend module 
+should check the C<result_type> instead. 
+
+=item * C<result_unit>
+
+The unit of the result. Default: empty.
+
+At the moment, there is no complete list oif result units. 
+The buildin checks use the following units:
+
+  s   seconds
+  ms  milliseconds
+  %   percent
+
+This is work in progress and there may be added new units or the existing 
+may change etc.
+
+An output module should use a lookup table or hash to rewrite it to the used 
+frontend monitoring system.
 
 
-=item * C<>
+=item * C<columns>
 
+The value of this key containt a arrayref with a list of the names for each column.
+
+The names are directly taken from the SQL result and depend on the check. 
+They may be used as name/description for each graph element in output.
 
 =item * C<status>
 
+The warning/critical status. May contain the following values:
+
+  0: Everything is OK
+  1: Warning level reached
+  2: Critical level reached
+
+
+=back
+
+
+=head4 Values about thresholds and errors (optional)
+
+The following keys may exist in the result, depending on the 
+check und it's result, and are about warning/critical thresholds or errors.
+
+=over 4
+
+=item C<warning_level>
+
+Check configuration: a numerical value with the warning level. 
+From config file or a default may be set by the check. 
+
+=item C<critical_level>
+
+Check configuration: a numerical value with the critical level. 
+From config file or a default may be set by the check. 
+
+=item C<lower_is_worse>
+
+Check configuration. Hint, if a lower value is worse then a higher value. 
+
+e.g. a lower cache hit ratio is worse then a higher one.
+
+
+=item C<critical>
+
+Flag: result has reached critical level. (0: false; 1: true)
+
+=item C<warning>
+
+Flag: result has reached warning level. (0: false; 1: true)
+
+=item C<message>
+
+String with an optional message. When warning/critical level is reached, there is usually a message.
+
+=item C<error>
+
+String with error message, when there is an fatal error (e.g. connection problem).
+
+In this case, the state and result values are unknown.
+
+=back
+
+=head4 Values for graphs and display (optional)
+
+The following keys may exist in the result, depending on the 
+check and its configuration.
+
+=over 4
+
+=item C<min_value> and C<max_value>
+
+Configured by the check itself or via config file.
+
+Usable as a hint for the displaying frontend, e.g., this contains a 0 and 100 for percent values.
+
+Default: none.
+
+=item C<result_is_counter>
+
+Configured by the check itself.
+
+A flag, indicating that the result is a counter, an (ever) raising value like 
+accumulated time or I/O. The frontend should display the rate by timerange (usually seconds). 
+
+Default: off/disabled.
+
+
+=item C<graph_type>
+
+A check module can define a graph type for the frontend. 
+Valid values are: line, area, stacked_area. 
+
+Output modules should handle this, forward it to the frontend. 
+
+=item C<graph_mirrored>
+
+A flag, indicating that the graph should be mirrored at the null level. 
+Usually this is used for input/output graphs or similar. 
+For instance, it is used for committed/rolled back transactions in the 
+C<Transactions> check.
 
 
 =back
 
 
 
+
 =head2 Recommendations for frontends
 
-
-
-=head2 TODO/Old/Temp
-
-
-Folgende Werte sind derzeit optional und werden direkt von den im
-Check-Modul angegebenen Attributen gesetzt (wenn dort gesetzt, ansonsten
-sind sie nicht da und undefiniert):
-
- warning_level
- critical_level
- min_value
- max_value
- result_is_counter  (Flag)
- graph_type
- graph_mirrored     (Flag)
- lower_is_worse     (Flag; NOCH nicht durchgereicht, mache ich noch)
-
-
-Optional da:
-
- error              (wenn DB-Fehler, also: Check nicht ausführbar)
-
-
-Wird com Test auf Critical/Warning gesetzt, wenn das jeweilige relevant;
-nicht gesetzt wenn nicht critical oder warning -- oder wenn die
-jeweiligen levels (siehe oben) nicht gesetzt sind:
-
- message
- critical (Flag)
- warning  (Flag)
- status   (Int: 0 (OK), 1 (warn), 2 (crit))
-
-Die "message" könnte ich natürlich passend auch immer auf irgendwas
-setzen? Wäre das hilfreich?
-
-
-Immer da (ausser row_type von den Check-Attributen):
-
- row_type      (single, list, multiline)
- check_name    (AUs dem Dateiname, aber überschreibbar)
- description   (aus Check-Attribut)
- result_unit   (default "")
- result_type   (default: Check-Attribut return_type (vom SQL))
-
-
-
-Das Atribut "lower_is_worse" schiebe ich gerade noch nicht durch, kommt
-aber; wird vom critical-warning-check intern benutzt, aber kann ja auch
-nach außen gegeben werden.
-
-
-Diese Angaben gibt es pro Check.
-
-
-
-Die folgenden gibt es noch pro Host in der Datenstruktur an der Stelle
-vom Host:
-
-
-Verbindungs-Daten zur DB:
-
- port
- user
- database
- schema
- host
-
-
-Die Ergebnisse, Liste mit je einem Hash pro Check, dessen Werte siehe oben:
-
- results
-
-
-Weiteres:
-
- hostgroup    (In der Konfiguration konfigurierbare Hostgruppe)
- name         (bisher optionaler (!) Name von dem Host)
-
-
-Ich denke, den "name" setze ich immer, wenn nicht angegeben auf den Wert
-von "host"; da ist ja dafür da, wenn die unterschiedlich sind. Sonst
-musst Du das in der Auswertung dauernd abfragen.
-
-
-
-Und ganz außen rum, das kennst Du ja:
-
-
-
+...
 
 
 
