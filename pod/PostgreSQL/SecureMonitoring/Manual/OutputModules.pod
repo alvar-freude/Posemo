@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1 Posemo Developer Manual: Output Modules
 
 This manual is about writing output modules (frontend connectors) for Posemo.
