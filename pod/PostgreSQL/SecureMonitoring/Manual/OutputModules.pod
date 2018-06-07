@@ -63,7 +63,7 @@ encoder is called, that's all.
 
 The result is consists of three parts: global meta data, host meta data, check results for each host.
 
-Is is one big data structure and as always, hash keys are in random order and very likely 
+It is one big data structure and as usual, hash keys are in random order and very likely 
 not in the order of the following example.
 
 =head3 Example data structure
@@ -110,7 +110,7 @@ not in the order of the following example.
 =head3 Global meta data
 
 The global meta data contains the following values as outer key/value pairs 
-in the result hash. An output module may use this values for any purpose.
+in the result hash. An output module may use these values for any purpose.
 
 =over 4
 
@@ -120,7 +120,7 @@ A string with a human readable short message.
 
 =item * C<posemo_version>
 
-Versio information, taken from C<$VERSION> in C<PostgreSQL::SecureMonitoring>.
+Version information, taken from C<$VERSION> in C<PostgreSQL::SecureMonitoring>.
 
 =item * C<runtime>
 
@@ -128,13 +128,13 @@ The complete runtime (excluding Perl startup time) in seconds.
 
 =item * C<hostname>
 
-The hostname of the machine, where Posemo is running.
+The hostname of the machine where Posemo is running.
 
 =item * C<error_count>
 
 Number of (hard) errors, e.g. connection problems. Should be 0.
 
-A hard error occurs, when a check dies. This can happen, when a 
+A hard error occurs when a check dies. This can happen when a 
 check dies, e.g. when it can't get a connection to the database.
 
 =item * C<configfile>
@@ -159,7 +159,7 @@ results for all hosts. See below.
 The value of the C<result> key in the first level is an array reference 
 of hash references, each element of the array represents one host. 
 
-Most values are informal values and may used by a frontend to display 
+Most values are informal values and may be used by a frontend to display 
 some (additional) infos. The most important value is the C<name>, which 
 should be used to identify the server. 
 
@@ -215,12 +215,12 @@ ArrayRef with results for each check configured for this host. See below.
 
 =head3 Check results
 
-The C<results> key for each host (see above) contains an Arrayref of HashRefs 
+The C<results> key for each host (see above) contains an ArrayRef of HashRefs 
 with the results for each check for this host.
 
 Each check gives some informational values, some information about the 
 result type, information about how to display the result and other things 
-configured by the check module itself. You find additional informations 
+configured by the check module itself. You find additional information 
 about each key in the documentation for writing check modules.
 
 
@@ -277,8 +277,8 @@ As example see the checks C<DBSize>, C<Transactions> or C<Activity>.
 
 =item * C<result>
 
-The real result value(s), according to C<row_type>. This are the raw values 
-directly from PostgrteSQL. A frontend module must distinguish all C<row_types> and 
+The actual result value(s), according to C<row_type>. These are raw values 
+directly from PostgreSQL. A frontend module must distinguish all C<row_types> and 
 use the given values. There may be some hints how to display the values in graphs 
 (see keywords below).
 
@@ -286,7 +286,7 @@ Usually a frontend module should display a multiline result in one graph per row
 and usually the best way is to display all on one page, but not all frontends can 
 handle a dynamic number of graphs per service.
 
-When there is a hard error, the result is undef.
+When there is a hard error, the result is C<undef>.
 
 
 =item * C<result_type>
@@ -296,7 +296,7 @@ Data type of the result; as SQL types.
 Per default it is the same as C<return_type>.
 
 When the C<row_type> is C<multiline> or C<list>, then usually all values 
-should have this type, bit in C<multiline> the first column is a name (of a 
+should have this type, but in C<multiline> the first column is a name (of a 
 database or table or something else).
 
 =item * C<return_type>
@@ -308,14 +308,14 @@ should check the C<result_type> instead.
 
 The unit of the result. Default: empty.
 
-At the moment, there is no complete list oif result units. 
+At the moment, there is no complete list of result units. 
 The buildin checks use the following units:
 
   s   seconds
   ms  milliseconds
   %   percent
 
-This is work in progress and there may be added new units or the existing 
+This is work in progress and new units may be added or the existing ones
 may change etc.
 
 An output module should use a lookup table or hash to rewrite it to the used 
@@ -324,10 +324,10 @@ frontend monitoring system.
 
 =item * C<columns>
 
-The value of this key containt a arrayref with a list of the names for each column.
+The value of this key containt an arrayref with a list of the names for each column.
 
-The names are directly taken from the SQL result and depend on the check. 
-They may be used as name/description for each graph element in output.
+The names are directly taken from the SQL result and depend on the individual check. 
+They may be used as name/description for each graph element in the output.
 
 =item * C<status>
 
@@ -344,25 +344,25 @@ The warning/critical status. May contain the following values:
 =head4 Values about thresholds and errors (optional)
 
 The following keys may exist in the result, depending on the 
-check und it's result, and are about warning/critical thresholds or errors.
+check and its result, and are about warning/critical thresholds or errors.
 
 =over 4
 
 =item C<warning_level>
 
-Check configuration: a numerical value with the warning level. 
+Check configuration: a numerical value for the warning level. 
 From config file or a default may be set by the check. 
 
 =item C<critical_level>
 
-Check configuration: a numerical value with the critical level. 
+Check configuration: a numerical value for the critical level. 
 From config file or a default may be set by the check. 
 
 =item C<lower_is_worse>
 
-Check configuration. Hint, if a lower value is worse then a higher value. 
+Check configuration. Hint, if a lower value is worse than a higher value. 
 
-e.g. a lower cache hit ratio is worse then a higher one.
+e.g. a lower cache hit ratio is worse than a higher one.
 
 
 =item C<critical>
@@ -379,7 +379,7 @@ String with an optional message. When warning/critical level is reached, there i
 
 =item C<error>
 
-String with error message, when there is an fatal error (e.g. connection problem).
+String with error message when there was a fatal error (e.g. connection problem).
 
 In this case, the state and result values are unknown.
 
@@ -396,7 +396,7 @@ check and its configuration.
 
 Configured by the check itself or via config file.
 
-Usable as a hint for the displaying frontend, e.g., this contains a 0 and 100 for percent values.
+Usable as a hint for the displaying frontend, e.g. for percent values, these contain 0 and 100.
 
 Default: none.
 
@@ -404,8 +404,8 @@ Default: none.
 
 Configured by the check itself.
 
-A flag, indicating that the result is a counter, an (ever) raising value like 
-accumulated time or I/O. The frontend should display the rate by timerange (usually seconds). 
+A flag indicating if the result is a counter, i.e. an (ever) raising value, like 
+accumulated time or I/O. The frontend should display the rate by timerange (usually seconds).
 
 Default: off/disabled.
 
