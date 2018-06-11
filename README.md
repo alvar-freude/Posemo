@@ -132,53 +132,30 @@ When all dependencies are installed, you may start the tests, see below.
 Before running Posemo, all the check functions must be installed in a database. It is also recommended to use an own user and superuser only for the checks. The Posemo installer does everything. To install all checks with `posemo_install.pl` on the local host:
 
 ```
-$ bin/posemo_install.pl --create-database --create-superuser --create-user --create-schema --drop-database --drop-user
+$ bin/posemo_install.pl --create_database --create_superuser --create_user
 INFO : Install Posemo and Checks
-INFO : INSTALL: drop monitoring database 'monitoring', but only if exists
 INFO : INSTALL: create monitoring database 'monitoring'
-INFO : INSTALL: drop monitoring user 'posemo', but only if exists
-INFO : INSTALL: create monitoring user 'posemo'
-INFO : INSTALL: create monitoring superuser 'posemo_admin'
-INFO : Install Schema posemo;
+INFO : INSTALL: create monitoring superuser 'monitoring_admin'
+INFO : INSTALL: create monitoring user 'monitoring'
 INFO : Install all check functions
 INFO : Install all checks
 INFO :   => Check Activity
 INFO :   => Check Alive
-INFO :   => Check AllocatedBuffers
 INFO :   => Check BackupAge
-INFO :   => Check CacheHitRatio
-INFO :   => Check CheckpointTime
-INFO :   => Check ConnectionLimit
-INFO :   => Check CRUDCount
-INFO :   => Check DBSize
-INFO :   => Check Primary
-INFO :   => Check SlaveLag
-INFO :   => Check Transactions
 INFO :   => Check Writeable
 INFO : Posemo installed.
 ```
 
 You can see all options with a short description via `--help` (Short: `-h`) or with default values via `--show_options`.
 
-Now you can run the checks with `posemo.pl`:
+Now you can run the checks with `posemo_json.pl`:
 
 ```
-$ bin/posemo.pl --pretty --outfile=monitoring-result.json
-INFO : PostgreSQL Secure Monitoring version v0.5.1, running on host Chefkoch-plus.fritz.box at Mon Apr 30 16:08:50 2018
-INFO :   Run check Activity for host localhost
-INFO :   Run check Alive for host localhost
-INFO :   Run check Allocated Buffers for host localhost
-INFO :   Run check Backup Age for host localhost
-INFO :   Run check CRUD Count for host localhost
-INFO :   Run check Cache Hit Ratio for host localhost
-INFO :   Run check Checkpoint Time for host localhost
-INFO :   Run check Connection Limit for host localhost
-INFO :   Run check DB Size for host localhost
-INFO :   Run check Primary for host localhost
-INFO :   Run check Slave Lag for host localhost
-INFO :   Run check Transactions for host localhost
-INFO :   Run check Writeable for host localhost
-INFO : All Checks Done. Runtime: 0.211238861083984 seconds. 
+$ bin/posemo_json.pl --pretty --outfile=monitoring-result.json
+INFO : Run check Activity for host localhost
+INFO : Run check Alive for host localhost
+INFO : Run check Backup Age for host localhost
+INFO : Run check Writeable for host localhost
 ```
 
 You can see all options with a short description via `--help` (Short: `-h`) or with default values via `--show_options`.
