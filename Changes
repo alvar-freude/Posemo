@@ -3,3 +3,9 @@ Revision history for Posemo -- PostgreSQL-Secure-Monitoring
 0.10    2017-05-18 
         First public version, Pre-Release!
 
+...
+
+0.6.0  2018-04-30 
+       Full usable Version with some checks and output modules
+       as JSON and CheckMK. 
+       A lot of changes since last enty above, see git log for more.

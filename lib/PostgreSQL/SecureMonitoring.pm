@@ -14,7 +14,7 @@ Version 0.4.0
 
 =cut
 
-use version; our $VERSION = qv("v0.5.1");
+use version; our $VERSION = qv("v0.6.0");
 
 
 =head1 SYNOPSIS

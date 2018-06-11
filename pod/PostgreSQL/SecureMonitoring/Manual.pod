@@ -1,0 +1,40 @@
+=head1 Posemo -- PostgreSQL Secure Monitoring
+
+Posemo is a open source PostgreSQL monitoring backend system, which can
+collect a lot of PostgreSQL internals in a secure way without superuser
+access.
+
+For an overview, see the README.md in the main directory 
+or the L<GitHub repository|https://github.com/alvar-freude/Posemo>.
+
+If you view this on GitHub, the following links may go to a CPAN site 
+instead of local documentation. B<Until released on CPAN, the links are broken!>, 
+and when released they may be older then the development version in the repository.
+
+
+=head2 User manuals
+
+* L<Users Guide to the config file|PostgreSQL::SecureMonitoring::Manual::UserConfig>
+
+
+=head2 Developer manuals
+
+=over 4
+
+=item *
+
+L<How to write check Modules|Posemo::Manual::CheckModules>
+
+=item *
+
+L<How to write a frontend connector E<sol> output modules|PostgreSQL::SecureMonitoring::Manual::OutputModules>
+
+=item *
+
+L<Coding Styleguide|PostgreSQL::SecureMonitoring::Manual::Styleguide>
+
+=back
+
+
+=cut
+

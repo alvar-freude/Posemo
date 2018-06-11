@@ -102,7 +102,7 @@ sub generate_output
 
 
    #
-   # Nost Data
+   # Host Data
    #
 
    foreach my $host_result ( @{ $complete_result->{result} } )

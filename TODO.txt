@@ -11,12 +11,6 @@ Put extra non monitoring specific modules into their own CPAN distribution:
 
 
 
-Make it usable with older perls List::Util without uniqstr:
-
-e.g. via http://search.cpan.org/dist/List-Util-MaybeXS/lib/List/Util/MaybeXS.pm (in extlib) 
-or by manually use this sub from there
-
-
 
 Revoke login right on admin user (install.pm)
 
@@ -55,4 +49,12 @@ INFO : Critical values: 0 0 0 0 25.5998 55.8631!  in check Cache Hit Ratio for h
 INFO : Warning values: 0 0 0 0 25.5998 55.8631 in check Cache Hit Ratio for host XXX
 
 
-rename "superuser" attribute to "admin" and change all in testing. It's no superuser anymore!
+
+
+Performance:
+
+  * Add Daemon mode (no startup time, keep all connections open)
+  * Add parallel mode: Run Checks on multiple servers parallel.
+
+
+

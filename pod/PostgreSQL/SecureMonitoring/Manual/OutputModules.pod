@@ -1,0 +1,439 @@
+=encoding utf8
+
+=head1 Posemo Developer Manual: Output Modules
+
+This manual is about writing output modules (frontend connectors) for Posemo.
+
+The default output module just gives a JSON data structure. For other 
+build-in output modules see the modules in C<lib/PostgreSQL/SecureMonitoring/Output>.
+
+
+=head2 Overview
+
+Posemo can write output to any frontend. The default output is a JSON file with 
+all check results including critical/warning, some global meta data, some meta 
+data for each host and some meta data (e.g. how to display graphs, names 
+and titles) per check. 
+
+Some fontends like C<check_mk> need some global "metrics" configuration 
+(infos about titles, graphs, … ), this may be generated too.
+
+=head3 Output Modules
+
+Output Modules are L<Moose Roles|Moose::Role> which must implement one 
+method: C<generate_output>. The role will be consumed by C<PostgreSQL::SecureMonitoring::Run> 
+(or maybe any subclass). 
+
+Output Modules may have any number of Moose attributes, which 
+a user can use as command line parameters.
+
+
+=head3 Global Metrics
+
+[…] 
+TODO, not implemented yet.
+[…]
+
+
+=head2 Simple Example
+
+The output code may be simple or complex. In the simplest form, it converts 
+the result data structure into another format and returns it. Here is the 
+variant for JSON, the default output module:
+
+   has pretty => ( is => "ro", isa => "Bool", default => 0, );
+
+   sub generate_output
+      {
+      my $self            = shift;
+      my $complete_result = shift;
+
+      my $json = JSON->new->pretty( $self->pretty );
+
+      return $json->encode($complete_result);
+      }
+
+This defines a new attibute C<pretty>, which can be set via command line. 
+It is a flag, which is forwarded to the JSON converter. Then the JSON 
+encoder is called, that's all.
+
+
+
+=head2 The Result
+
+The result is consists of three parts: global meta data, host meta data, check results for each host.
+
+It is one big data structure and as usual, hash keys are in random order and very likely 
+not in the order of the following example.
+
+=head3 Example data structure
+
+   {
+   message        => 'PostgreSQL Secure Monitoring version v0.6.0, running on host Chefkoch-plus.local at Fri Jun  1 16:40:14 2018'
+   posemo_version => 'v0.6.0',
+   runtime        => '0.109699878692627',
+   hostname       => 'Chefkoch-plus.local',
+   error_count    => 0,
+   configfile     => 't/conf/simple.conf',
+   global_id      => 'Simple test',
+   result         => [
+                     {
+                      host      => 'localhost',
+                      name      => 'localhost',
+                      hostgroup => '_GLOBAL',
+                      database  => '_posemo_tests',
+                      user      => '_posemo_tests'
+                      port      => '15432',
+                      results   => [
+                                    {
+                                      check_name     => 'Writeable',
+                                      description    => 'Database is writeable before timeout'
+                                      result_unit    => 's',
+                                      return_type    => 'bool',
+                                      result_type    => 'float',
+                                      columns        => [ 'writeable' ],
+                                      status         => 0,
+                                      row_type       => 'single',
+                                      result         => 0.00235891342163086,
+                                      warning_level  => 3,
+                                      critical_level => 5,
+                                    },
+                                   ],
+                      },
+                      # […] more hosts
+                  ], # End result list
+   }
+
+
+
+
+=head3 Global meta data
+
+The global meta data contains the following values as outer key/value pairs 
+in the result hash. An output module may use these values for any purpose.
+
+=over 4
+
+=item * C<message>
+
+A string with a human readable short message.
+
+=item * C<posemo_version>
+
+Version information, taken from C<$VERSION> in C<PostgreSQL::SecureMonitoring>.
+
+=item * C<runtime>
+
+The complete runtime (excluding Perl startup time) in seconds.
+
+=item * C<hostname>
+
+The hostname of the machine where Posemo is running.
+
+=item * C<error_count>
+
+Number of (hard) errors, e.g. connection problems. Should be 0.
+
+A hard error occurs when a check dies. This can happen when a 
+check dies, e.g. when it can't get a connection to the database.
+
+=item * C<configfile>
+
+Path to the config file.
+
+=item * C<global_id>
+
+C<global_id> from the config file. An optional ID which can be 
+set per config file.
+
+=item * C<result>
+
+Not a global meta data, but on the same level: ArrayRef with 
+results for all hosts. See below.
+
+=back
+
+
+=head3 Host meta data
+
+The value of the C<result> key in the first level is an array reference 
+of hash references, each element of the array represents one host. 
+
+Most values are informal values and may be used by a frontend to display 
+some (additional) infos. The most important value is the C<name>, which 
+should be used to identify the server. 
+
+
+=over 4
+
+=item * C<host>
+
+Hostname or IP address of the destination host. This address was used for connecting 
+and is given by the config file. Output modules usually should use the name 
+(see next item) to identify the machine.
+
+=item * C<name>
+
+Name of the host. Given by the config file and may be any string. 
+Default (when not given in the config): the same as C<host>.
+
+The administrator may use the name to specify which host was meant, 
+e.g. when the connection address is different from the name usually 
+used by the host of if the connecting host is an IP address. 
+
+Therefore: output modules B<really should> use the C<name> and not C<host> to 
+identify the machine.
+
+=item * C<hostgroup>
+
+An administrator may group several servers to host groups 
+(see config manual for details). The value for this key contains 
+the name of the host group. Or C<_GLOBAL>, when no no host group 
+is used (for this host).
+
+Output modules can use this for grouping hosts too.
+
+=item * C<database>
+
+Name of the connected database.
+
+=item * C<user>
+
+Name of the connecting user.
+
+=item * C<port>
+
+The port used for connection.
+
+=item * C<results>
+
+ArrayRef with results for each check configured for this host. See below.
+
+
+=back
+
+
+=head3 Check results
+
+The C<results> key for each host (see above) contains an ArrayRef of HashRefs 
+with the results for each check for this host.
+
+Each check gives some informational values, some information about the 
+result type, information about how to display the result and other things 
+configured by the check module itself. You find additional information 
+about each key in the documentation for writing check modules.
+
+
+=head4 Non optional values
+
+=over 4
+
+=item * C<check_name>
+
+The name of the check. Default: derived from the class name, 
+but may be changed by the check itself. 
+
+May be used as headline.
+
+=item * C<description>
+
+A desciption of the check, given by the check.
+
+May be used as (sub) headline.
+
+
+=item * C<row_type>
+
+The row type of the result, depending on the return value and the 
+C<has_multiline_result> attribute of the check module.
+
+Possible values:
+
+=over 4
+
+=item * C<single>
+
+A single result value. Usually a number or boolean flag. 
+C<result> contains only one single value. As example 
+see the checks C<SlaveLag>, C<AllocatedBuffers> or C<Writeable>.
+
+=item * C<list>
+
+The result is a list of values. Therefore the key C<result> contains 
+a B<array reference>. As example see C<CheckpointTime>.
+
+=item * C<multiline>
+
+A complex result, the SQL function returns multiple lines. 
+Therefore the key C<result> contains a B<array reference of array references>.
+
+Usually each first column contains a title like a database name or table name. 
+The first row usually contains a column with the title C<$TOTAL> and summary values 
+of all other rows.
+
+As example see the checks C<DBSize>, C<Transactions> or C<Activity>.
+
+=back
+
+=item * C<result>
+
+The actual result value(s), according to C<row_type>. These are raw values 
+directly from PostgreSQL. A frontend module must distinguish all C<row_types> and 
+use the given values. There may be some hints how to display the values in graphs 
+(see keywords below).
+
+Usually a frontend module should display a multiline result in one graph per row; 
+and usually the best way is to display all on one page, but not all frontends can 
+handle a dynamic number of graphs per service.
+
+When there is a hard error, the result is C<undef>.
+
+
+=item * C<result_type>
+
+Data type of the result; as SQL types.
+
+Per default it is the same as C<return_type>.
+
+When the C<row_type> is C<multiline> or C<list>, then usually all values 
+should have this type, but in C<multiline> the first column is a name (of a 
+database or table or something else).
+
+=item * C<return_type>
+
+The SQL return type, defined by the check. Usually a frontend module 
+should check the C<result_type> instead. 
+
+=item * C<result_unit>
+
+The unit of the result. Default: empty.
+
+At the moment, there is no complete list of result units. 
+The buildin checks use the following units:
+
+  s   seconds
+  ms  milliseconds
+  %   percent
+
+This is work in progress and new units may be added or the existing ones
+may change etc.
+
+An output module should use a lookup table or hash to rewrite it to the used 
+frontend monitoring system.
+
+
+=item * C<columns>
+
+The value of this key containt an arrayref with a list of the names for each column.
+
+The names are directly taken from the SQL result and depend on the individual check. 
+They may be used as name/description for each graph element in the output.
+
+=item * C<status>
+
+The warning/critical status. May contain the following values:
+
+  0: Everything is OK
+  1: Warning level reached
+  2: Critical level reached
+
+
+=back
+
+
+=head4 Values about thresholds and errors (optional)
+
+The following keys may exist in the result, depending on the 
+check and its result, and are about warning/critical thresholds or errors.
+
+=over 4
+
+=item C<warning_level>
+
+Check configuration: a numerical value for the warning level. 
+From config file or a default may be set by the check. 
+
+=item C<critical_level>
+
+Check configuration: a numerical value for the critical level. 
+From config file or a default may be set by the check. 
+
+=item C<lower_is_worse>
+
+Check configuration. Hint, if a lower value is worse than a higher value. 
+
+e.g. a lower cache hit ratio is worse than a higher one.
+
+
+=item C<critical>
+
+Flag: result has reached critical level. (0: false; 1: true)
+
+=item C<warning>
+
+Flag: result has reached warning level. (0: false; 1: true)
+
+=item C<message>
+
+String with an optional message. When warning/critical level is reached, there is usually a message.
+
+=item C<error>
+
+String with error message when there was a fatal error (e.g. connection problem).
+
+In this case, the state and result values are unknown.
+
+=back
+
+=head4 Values for graphs and display (optional)
+
+The following keys may exist in the result, depending on the 
+check and its configuration.
+
+=over 4
+
+=item C<min_value> and C<max_value>
+
+Configured by the check itself or via config file.
+
+Usable as a hint for the displaying frontend, e.g. for percent values, these contain 0 and 100.
+
+Default: none.
+
+=item C<result_is_counter>
+
+Configured by the check itself.
+
+A flag indicating if the result is a counter, i.e. an (ever) raising value, like 
+accumulated time or I/O. The frontend should display the rate by timerange (usually seconds).
+
+Default: off/disabled.
+
+
+=item C<graph_type>
+
+A check module can define a graph type for the frontend. 
+Valid values are: line, area, stacked_area. 
+
+Output modules should handle this, forward it to the frontend. 
+
+=item C<graph_mirrored>
+
+A flag, indicating that the graph should be mirrored at the null level. 
+Usually this is used for input/output graphs or similar. 
+For instance, it is used for committed/rolled back transactions in the 
+C<Transactions> check.
+
+
+=back
+
+
+
+
+=head2 Recommendations for frontends
+
+...
+
+
+
+=cut

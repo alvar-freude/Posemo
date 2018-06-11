@@ -132,7 +132,7 @@ unlike $stderr, qr{TRACE.*DEBUG}ms, "With STDOUT-Result: STDERR has no verbose o
 
 
 my $result;
-lives_ok sub { $result = decode_json($out) }, "lives decode JSSON from STDOUT";
+lives_ok sub { $result = decode_json($out) }, "lives OK for decode JSON from STDOUT";
 
 is ref $result, "HASH", "Decoded result is a hashref";
 

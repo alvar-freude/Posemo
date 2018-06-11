@@ -9,6 +9,7 @@ conf/posemo-logging.properties
 conf/posemo.conf
 conf/simple-local.conf
 conf/test-example.conf
+Documentation/README.md
 extra-dummy-tests/insert-and-delete.pl
 extra-dummy-tests/performance_hash_slices_loops.pl
 ignore.txt
@@ -41,6 +42,11 @@ lib/Test/PostgreSQL/SecureMonitoring.pm
 lib/Test/PostgreSQL/Starter.pm
 LICENSE.txt
 MANIFEST			This list of files
+pod/PostgreSQL/SecureMonitoring/Manual.pod
+pod/PostgreSQL/SecureMonitoring/Manual/CheckModules.pod
+pod/PostgreSQL/SecureMonitoring/Manual/OutputModules.pod
+pod/PostgreSQL/SecureMonitoring/Manual/Styleguide.pod
+pod/PostgreSQL/SecureMonitoring/Manual/UserConfig.pod
 README.md
 t/000-load.t
 t/001-postgresql-start.t
