@@ -5,43 +5,67 @@ This manual is about configuring Posemo.
 
 =head2 Overview
 
-...
+You can write simple and complex but flexible config files. It may contain the definition 
+for only one host, or for any number of hosts and databases you want.
 
-Usually use Apache style config.
+The simplest (default) config file consists only of one line (beside comments):
 
-...
+  hosts = localhost
+
+
+The Posemo config file is parsed via L<Config::Any|Config::Any> and therefore understands each 
+supported config file format, e.g. Apache style config files, YAML, JSON, .INI style and more, 
+depending on the extension. 
+
+Usually you should use the well known Apche style config file format (extension C<.conf>); 
+this is parsed via L<Config::General|Config::General>. For an obverview see example below, 
+for details about the underlaying syntax see the L<Config::General|Config::General> documentation.
+
+When using Apache style cionfig, all keywords are converted to lower case, so you can use a mix 
+lower and upper case keywords (when using other config file formats, you have to write every 
+keyword in lower case). Includes are enabled (C<UseApacheInclude>, C<IncludeRelative>, 
+C<IncludeDirectories>, C<IncludeGlob>). 
+C<AutoTrue> is also enabled, so you can write a I<true> value as C<1>, C<on>, C<true> or C<yes> 
+and a I<false> value as C<0>, C<off>, C<false> or C<no>.
 
 
 =head2 Example
+
+A complex example with some documentation. 
+You can include any number of hosts and host groups in your config as in the example below.
+
 
    #
    # Test / Example config file
    #
 
-   global_id = "This is only a test"
+   global_id = "This is only a test"           # You may set a global id (or name)
 
-   hosts = database.internal.project.tld
+   hosts = database.internal.project.tld       # Global list of hosts. May be changed in HostGroups
 
+   # Some basic (and global) connection Options
    user      = monitoring                      # Monitoring user (unprivileged)
-   passwd    = default-blah                    # Password for this user; default: empty
-   schema    = public                          # SQL schema name for our tests; default: posemo
+   passwd    = change_me_in_production         # Password for this user; default: empty
+   # schema    = other_schema                  # SQL schema name for our tests; default: posemo
    database  = monitoring                      # Name of monitoring DB
-   port      = 54321                           # Port number for server to monitor
+   # port      = 54321                         # Port number of server to monitor; default is none (take PostgreSQL/libpq default)
 
-
-   <Check Alive>
-     Enabled false
-   </Check>
+   
+   #
+   # Set some global none default options for specific Checks   
+   #
 
    <Check Writeable>
-     Timeout 5000
+     Enabled false      # Disable Writeable checks globally; e.g. don't run on slaves
+     Timeout 6000       # But when enabled, set a parametzer: (non default) timeout
    </Check>
 
 
    #
    # or more complex definition with host groups
    #
-   # Host group Elephant contains 4 hosts, all with the same config
+   # In the following example the host group Elephant contains 4 hosts, 
+   # all with the same config
    # 
 
    <HostGroup Elephant>
@@ -50,10 +74,31 @@ Usually use Apache style config.
 
      <Check Writeable>
        Enabled true
-       Timeout 100                               # timeout 100 ms  (internal parameter from check)
+       Timeout 1000                              # shorter timeout 1000 ms  (internal parameter from check)
      </Check>
      
    </HostGroup>
+
+
+   #
+   # Other example:
+   # Run checks on some master servers 
+   # They may reachable over their own IPs; other checks are disabled,
+   # e.g. because the machines are in other host groups too.
+   # 
+
+   <HostGroup MasterServers>
+     Order 10
+     Hosts = 10.1.1.1=elephant_master 10.1.2.1=mammut_master 10.1.3.1=zebra_master
+     
+     enabled = false    # disable all checks
+     
+     <Check Writeabe>
+       enabled = true   # But re-enable (only) the write check
+     </Check>
+     
+   </HostGroup>
+
 
    #
    # Host group Mammut contains 2 hosts, all with different config (here: port)
@@ -62,7 +107,7 @@ Usually use Apache style config.
    <HostGroup Mammut>
      Order = 20
 
-     <Check Trunk>
+     <Check SomeCheck>
        Timeout 123
      </Check>
      
@@ -74,7 +119,7 @@ Usually use Apache style config.
      <Hosts>
        hosts = loc1_db2
        port  = 5434
-       <Check Trunk>
+       <Check SomeCheck>
          Timeout 456
        </Check>
        # ....
@@ -93,11 +138,6 @@ Usually use Apache style config.
      
    </HostGroup>
 
-
-   <HostGroup MultiWithName>
-     Order 40
-     Hosts = 1.1.1.1=master_server 2.2.2.2=slave_server
-   </HostGroup>
 
 
    #
@@ -138,14 +178,13 @@ Usually use Apache style config.
 
 
 
-=head2 Description ....
+=head2 Description 
 
+TODO: add more description here. 
 
+Until added more documentation, see example above and the documentation/code 
+in C<lib/PostgreSQL/SecureMonitoring/Run.pm>.
 
-TODO
-
-
-
-
+But it should be self-explaining.
 
 =cut
