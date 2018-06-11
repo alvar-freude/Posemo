@@ -2,12 +2,16 @@
 
 
 You should format your code according to the PerlTidy config in C<t/perltidyrc>. 
-(if someone has good arguments, I may change the rules to the PBP defaults) 
+The coding style differs from the Perl Style Guide (if someone has good arguments, I may change the rules to the PBP defaults) 
 
-This is part of the test suite, so, the tests fail if the code is not tidy!
+Checking for tidy code is part of the test suite; so, the tests fail if the code is not tidy!
 
 
-In Eclipse with the EPIC Perl plugin, you can easyly format the code with Cmd-Shift-F (or Ctrl-Shift-F).
+In Eclipse with the L<EPIC Perl plugin|http://www.epic-ide.org>, you can easyly format the code with Cmd-Shift-F 
+(or Ctrl-Shift-F). 
+When using L<Atom|https://atom.io> you can use the L<Perltidy plugin|https://atom.io/packages/perltidy>. 
+When using vim, the L<Perl-Support utility|https://www.vim.org/scripts/script.php?script_id=556> 
+or the simple L<PerlTidy Plgin|https://github.com/rdunklau/vim-perltidy> should work (both not tested).
 
 
 B<TODO:> More description.
