@@ -6,15 +6,13 @@ Posemo is a PostgreSQL monitoring framework, that can monitor everything in Post
 
 Posemo itself has no display capabilities, but can output the results for every monitoring environment (e.g. check_mk, Nagios, Zabbix, Icinga, …).
 
-## This is a Pre-Release, for Developers only!
+## This is a Pre-Release!
 
 This is now a **usable** pre-release with limited checks. It is not feature comple. **See quick installation instructions below.**
 
-More documentation will come. Posemo is in active development!
+Posemo is in active development, more checks are coming!
 
-Some parts of the documentation are missing.
-
-
+Pull requests are welcome, feature requests too.
 
 
 ## HOWTOs and Manuals 
@@ -40,10 +38,10 @@ Posemo is a modular framework for creating monitoring checks for PostgreSQL. It 
 
 You may look in [PostgreSQL::SecureMonitoring::Checks](lib/PostgreSQL/SecureMonitoring/Checks) for the checks which are currently ready to use.
 
-Posemo is a modern Perl application using Moose; at installation it generates PostgerSQL functions for every check. These functions are called by an unprivileged user who can only call there functions, nothing else. But since they are `SECURITY DEFINER` functions, they run with more privileges (usually as superuser, since PostgreSQL 10 as a user, which is member of `pg_monitor`). You need a superuser for installation, but checks can run (from remote or local) by an unprivileged user. Therefore, **the monitoring server need no access to your databases, no access to PostgreSQL internals – it can only call some predefined functions.**
+Posemo is a modern Perl application using Moose; at installation it generates PostgerSQL functions for every check. These functions are called by an unprivileged user who can only call these functions, nothing else. But since they are `SECURITY DEFINER` functions, they run with more privileges (usually as superuser, and since PostgreSQL 10 as a user, which is member of `pg_monitor`). You need a superuser for installation, but checks can run (from remote or local) by an unprivileged user. Therefore, **the monitoring server need no access to your databases, no access to PostgreSQL internals; it can't change or read your data – it can only call some predefined functions.**
 
 
-For a simple check you may look below at the *Alive* Check, which simply returns always true. It uses a lot of defaults from `PostgreSQL::SecureMonitoring::Checks` and sugar from `PostgreSQL::SecureMonitoring::ChecksHelper`:
+For a simple check you may look below at the *SimpleAlive* Check, which simply returns always true. It uses a lot of defaults from `PostgreSQL::SecureMonitoring::Checks` and sugar from `PostgreSQL::SecureMonitoring::ChecksHelper`:
 
 ```perl
 package PostgreSQL::SecureMonitoring::Checks::SimpleAlive; # by Default, the name of the check is build from this package name
@@ -56,6 +54,8 @@ check_has code => "SELECT true";                           # This is our check S
 
 1;                                                         # every Perl module must return (end with) a true value
 ```
+
+(The real C<Alive> check has more code, because it's the only one, which catches connection errors by itself.)
 
 
 A more advanced check is *BackupAge* check, which checks how long a backup is running and returns the seconds as integer:
@@ -80,13 +80,12 @@ check_has                                                 # here more options an
 
 ```
 
-For more examples see the modules in `lib/PostgreSQL/SecureMonitoring/Checks` and the base class `PostgreSQL::SecureMonitoring::Checks` (in [lib/PostgreSQL/SecureMonitoring/Checks.pm](lib/PostgreSQL/SecureMonitoring/Checks.pm)).
+For a lot more examples see the [full documentation about writing modules](pod/PostgreSQL/SecureMonitoring/Manual/CheckModules.pod), the existing modules in [lib/PostgreSQL/SecureMonitoring/Checks](lib/PostgreSQL/SecureMonitoring/Checks) and the base class `PostgreSQL::SecureMonitoring::Checks` (in [lib/PostgreSQL/SecureMonitoring/Checks.pm](lib/PostgreSQL/SecureMonitoring/Checks.pm)).
 
-More documentation is on my TODO list … ;-)
 
-### Users
+### PostgreSQL Roles
 
-Posemo needs two users: one superuser as owner of all check functions (or beginning with PostgreSQL 10.0: a user, which is member of `pg_monitor`) and an unprivileged user, which only can call the check functions.
+Posemo needs two roles (users): one superuser as owner of all check functions (or beginning with PostgreSQL 10.0: a user, which is member of `pg_monitor`) and an unprivileged user, which only can call the check functions. You can create this users at installation time automatically or manually by yourself. Each role should have the most least privileges.
 
 
 ## Installation
@@ -218,10 +217,11 @@ You may want run only some tests:
 
 ##  Author
 
-Posemo is written by [Alvar C.H. Freude](http://alvar.a-blast.org/), 2016–2018.
+Posemo is written by [Alvar C.H. Freude](https://alvar.a-blast.org/), 2016–2018.
 
 alvar@a-blast.org
 
+Contributions are welcome!
 
 ## License
 
