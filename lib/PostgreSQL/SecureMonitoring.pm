@@ -1,8 +1,6 @@
 package PostgreSQL::SecureMonitoring;
 
-use Moose;
-use 5.010;
-
+=encoding utf8
 
 =head1 NAME
 
@@ -14,31 +12,32 @@ Version 0.4.0
 
 =cut
 
+use Moose;
+use 5.010;
+
 use version; our $VERSION = qv("v0.6.1");
 
 
 =head1 SYNOPSIS
 
-=encoding utf8
+  use PostgreSQL::SecureMonitoring;
+  
+  my $posemo = PostgreSQL::SecureMonitoring->new(%host_params);
+  my @checks = $posemo->get_all_checks_ordered;
+  my $check  = $posemo->new_check( $check_name, $check_params );
 
 
 =head1 DESCRIPTION
 
+This is the Posemo base class.
 
-Posemo base class.
+It's for connection handling, loading checks and similar basic tasks.
 
-...
+The documentation in this file only contains the description 
+of all the methods in this class. 
 
-
-
-
-
-=head2 Config
-
-Config with Config::General.
-
-See App.pm
-
+For the user and developer manuals and the complete documentation look at the links in the C<README.md> 
+in the base source directory or the L<GitHub repository|https://github.com/alvar-freude/Posemo>.
 
 
 
@@ -52,6 +51,37 @@ use Log::Log4perl::EasyCatch ( log_config => search_conf("posemo-logging.propert
 
 
 use Moose;
+
+=head1 ATTRIBBUTES
+
+=head2 log_config
+
+Alternative logging config file. Used for logging with L<Log::Log4perl|Log::Log4perl>. 
+
+=head2 user, passwd, database, host, port, schema
+
+Attributes for connecting to a PostgreSQL server, for running the checks.
+
+C<schema> is the SQL schema for all check functions.
+
+Defaults:
+
+  user      posemo
+  database  monitoring
+  schema    posemo
+
+C<host> and C<port> have no defaults. All the defaults of PostgreSQL / libpq are used.
+
+
+=head2 name
+
+Optional name of the host. Used for reporting / output. Usually used internally.
+
+
+=cut
+
+
+
 
 #<<< no perltidy
 
@@ -88,6 +118,8 @@ sub BUILD
    my $self = shift;
 
    # Re-Init loggig, if there is an alternative log config
+   # TODO: not only check for DEFAULT config, also check for LAST used config?
+   #       => subsequent runs after first start with different/changed config. ???
    if ( $self->log_config ne $DEFAULT_LOG_CONFIG )
       {
       Log::Log4perl->init( $self->log_config );
@@ -145,7 +177,7 @@ sub get_all_checks
 sub _uniqstr ()                                    ## no critic (Subroutines::RequireArgUnpacking)
    {
    my %seen;
-   my @uniq = grep { !$seen{$_}++ } @_;
+   my @uniq = grep { !$seen{$_}++ } @ARG;
    return @uniq;
    }
 
@@ -212,21 +244,17 @@ sub _load_module
    }
 
 
-#has dbi_dsn     => ( is => "ro", isa => "Str", );
-#has dbi_user    => ( is => "ro", isa => "Str", );
-#has dbi_passwd  => ( is => "ro", isa => "Str", );
-#has dbi_options => ( is => "ro", isa => "HashRef", default => sub { return { RaiseError => 1, AutoCommit => 0 } } );
-
 
 =head2 dbi_dsn, dbi_user, dbi_passwd, dbi_options
 
-Required by MooseX::DBI.
+Required by L<MooseX::DBI|MooseX::DBI>.
 
 DSN: Build from database, host and port
 
 Options always fixed: RaiseError on, AutoCommit off
 
-When host is "-", then the complete DSN is set to "-" (means STDOUT)
+When host is "-", then the complete DSN is set to "-" (means STDOUT). 
+This feature is not implemented yet complete!
 
 =cut
 
@@ -266,8 +294,8 @@ sub dbi_options
 This method returns a host description as string. When we have a host,
 then this is returned.
 
-When no host is set, then this is talken from PGHOST environment, if available,
-or a message indicating that nohst is given.
+When no host is set, then this is taken from PGHOST environment, if available,
+or a message indicating that no host is given.
 
 
 Don't use the returnvalue for connecting; use it for messages and debug output!
@@ -301,8 +329,6 @@ Alvar C.H. FReude, C<< <"alvar at a-blast.org"> >>
 Please report any bugs or feature requests in the GitHub Repository:
 
   http://github.com/alvar-freude/Posemo
-
-
 
 
 =head1 SUPPORT
@@ -344,27 +370,28 @@ You can find documentation for this module and all others in this distribution w
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2016 - 2017 Alvar C.H. Freude, http://alvar.a-blast.org/
+Copyright 2016 - 2018 Alvar C.H. Freude, http://alvar.a-blast.org/
 
-Posemo is released under the L<PostgreSQL License|https://opensource.org/licenses/postgresql>, a liberal Open Source license, similar to the BSD or MIT licenses.
+Posemo is released under the L<PostgreSQL License|https://opensource.org/licenses/postgresql>, 
+a liberal Open Source license, similar to the BSD or MIT licenses.
 
-Copyright (c) 2016, 2017, Alvar C.H. Freude and contributors
+   Copyright (c) 2016, 2018 Alvar C.H. Freude and contributors
 
-Permission to use, copy, modify, and distribute this software and its
-documentation for any purpose, without fee, and without a written agreement
-is hereby granted, provided that the above copyright notice and this paragraph
-and the following two paragraphs appear in all copies.
+   Permission to use, copy, modify, and distribute this software and its
+   documentation for any purpose, without fee, and without a written agreement
+   is hereby granted, provided that the above copyright notice and this paragraph
+   and the following two paragraphs appear in all copies.
 
-IN NO EVENT SHALL THE AUTHOR BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT,
-SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS,
-ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF THE
-AUTHOR HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+   IN NO EVENT SHALL THE AUTHOR BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT,
+   SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS,
+   ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF THE
+   AUTHOR HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-THE AUTHOR SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, BUT NOT LIMITED
-TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-PURPOSE. THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS, AND THE
-AUTHOR HAS NO OBLIGATIONS TO PROVIDE MAINTENANCE, SUPPORT, UPDATES,
-ENHANCEMENTS, OR MODIFICATIONS.
+   THE AUTHOR SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, BUT NOT LIMITED
+   TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+   PURPOSE. THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS, AND THE
+   AUTHOR HAS NO OBLIGATIONS TO PROVIDE MAINTENANCE, SUPPORT, UPDATES,
+   ENHANCEMENTS, OR MODIFICATIONS.
 
 
 
