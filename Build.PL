@@ -10,19 +10,19 @@
 use 5.014;
 use strict;
 use warnings FATAL => 'all';
-eval " use Module::Build; return 1; " or die "Please install perl module Module::Build for installation. Stopped.\n";
+eval " use Module::Build 0.36; return 1; " or die "Please install perl module Module::Build 0.36 or newer for installation. Stopped.\n";
 
 # The socketdir, which is used by Test::PostgreSQL::Starter
 my $socketdir = ( $ENV{POSTGRES_TEST_DIR} // "/tmp/_test-postgresql-starter" ) . "/sockets";
 
 my $builder = Module::Build->new(
    module_name       => 'Posemo',
-   license           => 'artistic_2',
+   license           => 'open_source',             # PostgreSQL license not known by Module::Buid
    dist_author       => q{Alvar C.H. Freude <alvar@a-blast.org>},
    dist_version_from => 'lib/PostgreSQL/SecureMonitoring.pm',
-   dist_abstract     => 'PostgreSQL Secure Monitoring -- flexible and secure Postgres monitoring',
-   test_file_exts    => [qw(.t .pg)],
-   release_status    => 'testing',
+   dist_abstract  => 'PostgreSQL Secure Monitoring -- flexible and secure Postgres monitoring',
+   test_file_exts => [qw(.t .pg)],
+   release_status => 'testing',
 
    tap_harness_args => {
       sources => {
@@ -38,7 +38,7 @@ my $builder = Module::Build->new(
                  },
    },
 
-   configure_requires => { 'Module::Build' => 0, },
+   configure_requires => { 'Module::Build' => 0.36, },
    build_requires     => {
       'Test::More'                        => 0,
       'Test::Exception'                   => 0.25,
@@ -88,6 +88,10 @@ my $builder = Module::Build->new(
    add_to_cleanup     => ['Posemo-*'],
    create_makefile_pl => 'traditional',
                                 );
+
+# TODO:
+# How to install the files in pod directory?
+# Add them manually, via rscan_dir? Hmmm.
 
 $builder->create_build_script();
 
