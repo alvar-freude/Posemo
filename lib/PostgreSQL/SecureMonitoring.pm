@@ -82,7 +82,6 @@ Optional name of the host. Used for reporting / output. Usually used internally.
 
 
 
-
 #<<< no perltidy
 
 has log_config      => ( is => "ro", isa => "Str", default   => $DEFAULT_LOG_CONFIG,      documentation => "Alternative logging config" );
@@ -174,11 +173,10 @@ sub get_all_checks
    }
 
 # uniqstr is only available in newer List::Util versions
-sub _uniqstr ()                                    ## no critic (Subroutines::RequireArgUnpacking)
+sub _uniqstr ()
    {
    my %seen;
-   my @uniq = grep { !$seen{$_}++ } @ARG;
-   return @uniq;
+   return grep { !$seen{$_}++ } @ARG;
    }
 
 
