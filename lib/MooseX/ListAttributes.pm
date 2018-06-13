@@ -60,8 +60,8 @@ sub list_attributes
       {
       next unless $attr->documentation;
       my $attr_name   = $attr->name;
-      my $attr_reader = $attr->reader;
-
+      my $attr_reader = $attr->reader // $attr_name;
+      
       next if $attr_name =~ m{^_}x;
       $attr_name =~ s{_}{-}g unless $no_dashes;
 
