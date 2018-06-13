@@ -95,10 +95,10 @@ check_has
          INSERT INTO writeable VALUES (message) RETURNING true;
       },
    install_sql => q{
-         CREATE TABLE            writeable (message text, date_inserted TIMESTAMP WITH TIME ZONE DEFAULT now());
-         REVOKE ALL           ON writeable FROM PUBLIC;
-         REVOKE ALL           ON writeable FROM current_user;
-         GRANT INSERT, DELETE ON writeable TO   current_user;
+         CREATE TABLE                    writeable (message text, date_inserted TIMESTAMP WITH TIME ZONE DEFAULT now());
+         REVOKE ALL                   ON writeable FROM PUBLIC;
+         REVOKE ALL                   ON writeable FROM current_user;
+         GRANT INSERT, DELETE, SELECT ON writeable TO   current_user;  -- need SELECT for DELETE with WHERE!
        };
 
 # Default timeout is the critical level (which is in seconds)
