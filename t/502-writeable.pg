@@ -18,6 +18,8 @@ SELECT plan(10);
 SELECT has_function( 'writeable'::name, ARRAY['text', 'interval']::name[], 'function writeable exists' );
 
 
+DELETE FROM writeable; -- remove old existing entries, wheren there is more then one run
+
 SELECT is( (SELECT count(*) FROM writeable), 0::BIGINT, 'writeable table empty');
 SELECT is( (SELECT writeable('Textmeldung')), true, 'writeable check returns true value');
 SELECT is( (SELECT count(*) FROM writeable), 1::BIGINT, 'writeable has one entry');
