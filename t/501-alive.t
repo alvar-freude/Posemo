@@ -34,6 +34,7 @@ $result = result_ok "Alive", "test", { no_critical => 1, warn_if_failed => 1, },
 message_like $result, qr{^Failed Alive check}, "Message for failed alive check";
 warning_ok $result;
 no_critical_ok $result;
+no_error_ok $result;
 name_is $result,        "Alive";
 result_is $result,      0;
 row_type_is $result,    "single";
