@@ -424,6 +424,8 @@ sub run_checks
             if ( $check->enabled ) { $result = $check->run_check; }
             else                   { DEBUG "SKIP Check ${ \$check->name } for host ${ \$check->host_desc }: not enabled"; }
 
+            $self->inc_error if $result->{error};
+
             return 1;
             }
             or
