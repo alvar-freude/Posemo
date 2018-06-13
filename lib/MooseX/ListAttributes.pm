@@ -30,7 +30,7 @@ use version; our $VERSION = qv("v0.9.0");
   with 'MooseX::ListAttributes';
 
   # later, inside a method
-  $self->usage if $self->show_options;
+  $self->list_attributes if $self->show_options;
 
 =head1 DESCRIPTION
 
@@ -59,9 +59,9 @@ sub list_attributes
    foreach my $attr ( sort { $a->name cmp $b->name } $self->meta->get_all_attributes )
       {
       next unless $attr->documentation;
-      my $attr_name   = $attr->name;
+      my $attr_name = $attr->name;
       my $attr_reader = $attr->reader // $attr_name;
-      
+
       next if $attr_name =~ m{^_}x;
       $attr_name =~ s{_}{-}g unless $no_dashes;
 
