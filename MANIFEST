@@ -74,7 +74,7 @@ t/520-transactions.t
 t/523-checkpoint-time.t
 t/524-allocated-buffers.t
 t/530-cache-hit-ratio.t
-t/531-crod-count.t
+t/531-crud-count.t
 t/701-run-json.t
 t/702-run-check_mk.t
 t/710-run-output.t
@@ -86,6 +86,7 @@ t/930-pod-coverage.t
 t/931-pod.t
 t/990-postgresql-stop.t
 t/conf/posemo-test-logging.properties
+t/conf/simple-connerror.conf
 t/conf/simple.conf
 t/conf/test-example.conf
 t/conf/test-nonexistent-logging.conf
