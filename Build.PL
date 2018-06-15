@@ -10,7 +10,8 @@
 use 5.014;
 use strict;
 use warnings FATAL => 'all';
-eval " use Module::Build 0.36; return 1; " or die "Please install perl module Module::Build 0.36 or newer for installation. Stopped.\n";
+eval " use Module::Build 0.36; return 1; "
+   or die "Please install perl module Module::Build 0.36 or newer for installation. Stopped.\n";
 
 # The socketdir, which is used by Test::PostgreSQL::Starter
 my $socketdir = ( $ENV{POSTGRES_TEST_DIR} // "/tmp/_test-postgresql-starter" ) . "/sockets";
