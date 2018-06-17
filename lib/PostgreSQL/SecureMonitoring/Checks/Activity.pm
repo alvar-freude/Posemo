@@ -6,9 +6,17 @@ package PostgreSQL::SecureMonitoring::Checks::Activity;
 
 =head1 SYNOPSIS
 
+   # you may set some parameters in the config file
+   <Check Activity>
+     skip_db_re     = "(^template[01]|_backup)$"      # Change the default value for ignored databases 
+     critical_level = 1000                            # Set a critical and warning level 
+     warning_level  = 900                             # The level is for all columns and rows; so it's for $TOTAL
+   </Check>
+
+
 =head1 DESCRIPTION
 
-This check returns a matrix list of all active sessions on all databases
+This check returns a matrix list of all active sessions on all databases.
 
 
 =head2 SQL/Result
