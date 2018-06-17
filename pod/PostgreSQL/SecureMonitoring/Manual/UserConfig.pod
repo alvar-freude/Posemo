@@ -32,7 +32,7 @@ and a I<false> value as C<0>, C<off>, C<false> or C<no>.
 =head2 Example
 
 A complex example with some documentation. 
-You can include any number of hosts and host groups in your config as in the example below.
+You can include any number of hosts and host groups in your config as shown below.
 
 
    #
