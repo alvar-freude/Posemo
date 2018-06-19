@@ -431,7 +431,7 @@ sub run_checks
             or
             do { $self->inc_error; $result->{error} = "FATAL error in check $check_name for host $host->{host}: $EVAL_ERROR"; };
 
-         push @host_results, $result if $result;
+         push @host_results, $result if keys %$result;
 
          } ## end foreach my $check_name ( $posemo...)
 
