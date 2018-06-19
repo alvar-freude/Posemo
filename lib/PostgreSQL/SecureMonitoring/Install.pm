@@ -1,8 +1,5 @@
 package PostgreSQL::SecureMonitoring::Install;
 
-use Moose;
-use 5.010;
-
 =head1 NAME
 
  PostgreSQL::SecureMonitoring::Install - Install all functions from all Checks etc.
@@ -35,13 +32,14 @@ For this, wrap dbh object in other class, outputs the SQL in do-method and handl
 
 =cut
 
+use Moose;
+use 5.010;
+
 use English qw( -no_match_vars );
-use FindBin qw($Bin);
 
 use Config::FindFile qw(search_conf);
 use Log::Log4perl::EasyCatch ( log_config => search_conf("posemo-logging.properties") );
 
-use Moose;
 extends "PostgreSQL::SecureMonitoring";
 
 =head1 METHODS
