@@ -319,7 +319,7 @@ sub host_desc
 
 =head1 AUTHOR
 
-Alvar C.H. FReude, C<< <"alvar at a-blast.org"> >>
+Alvar C.H. Freude, C<< <"alvar at a-blast.org"> >>
 
 
 =head1 BUGS
