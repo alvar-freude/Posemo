@@ -13,3 +13,8 @@ Revision history for Posemo -- PostgreSQL-Secure-Monitoring
 0.6.1  2018-06-11 
        A lot of documentation updates 
 
+0.6.2  2018-06-20
+       Change output module API,
+       prepared for CheckMK metrics output.
+       Set attribute "output" instead of return value.
+       This allows output modules to have multiple outputs.
