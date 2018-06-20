@@ -57,8 +57,9 @@ sub generate_output
    my $complete_result = shift;
 
    my $json = JSON->new->pretty( $self->pretty );
+   $self->output( $json->encode($complete_result) );
 
-   return $json->encode($complete_result);
+   return;
    }
 
 1;

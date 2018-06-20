@@ -8,14 +8,14 @@ package PostgreSQL::SecureMonitoring;
 
 =head1 VERSION
 
-Version 0.4.0
+Version 0.6.2
 
 =cut
 
 use Moose;
 use 5.010;
 
-use version; our $VERSION = qv("v0.6.1");
+use version; our $VERSION = qv("v0.6.2");
 
 
 =head1 SYNOPSIS

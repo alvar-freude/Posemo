@@ -27,12 +27,23 @@ method: C<generate_output>. The role will be consumed by C<PostgreSQL::SecureMon
 Output Modules may have any number of Moose attributes, which 
 a user can use as command line parameters.
 
+The C<generate_output> should set the C<output> attribute; 
+it can be set directly or via adding content.
 
-=head3 Global Metrics
+  # Set everything
+  $self->output( $complete_output_string );
 
-[…] 
-TODO, not implemented yet.
-[…]
+  # Or add something (default: empty string, so you can add from begin):
+  $self->add_output( $partly_output_string );
+
+
+=head3 Global Metrics or Graph Info
+
+Some implementations (e.g. check_mk) need some globbal metrics 
+or graph info file.
+
+You should may collect all infos in the C<generate_output> method inside 
+your output module and write some extra files. See C<CheckMk.pm> as example.
 
 
 =head2 Simple Example
@@ -49,8 +60,9 @@ variant for JSON, the default output module:
       my $complete_result = shift;
 
       my $json = JSON->new->pretty( $self->pretty );
+      $self->output( $json->encode( $complete_result) );
 
-      return $json->encode($complete_result);
+      return;
       }
 
 This defines a new attibute C<pretty>, which can be set via command line. 

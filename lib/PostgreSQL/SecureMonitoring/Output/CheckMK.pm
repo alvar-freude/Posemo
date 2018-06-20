@@ -69,8 +69,10 @@ has pretty => ( is => "ro", isa => "Bool", default => 0, );
 
 =head2 generate_output
 
-Implements the output mechanism, here plain JSON.
+Implements the output mechanism, here check_mk PiggybackHosts format, 
+which is encapsulated JSON.
 
+TODO: Add metrics output.
 
 =cut
 
@@ -98,7 +100,7 @@ sub generate_output
       $metadata{$key} = $complete_result->{$key};
       }
 
-   my $output = "<<<posemo_base>>>\n" . $json->encode( \%metadata ) . "\n";
+   $self->add_output( "<<<posemo_base>>>\n" . $json->encode( \%metadata ) . "\n" );
 
 
    #
@@ -108,15 +110,15 @@ sub generate_output
    foreach my $host_result ( @{ $complete_result->{result} } )
       {
       #<<< no pertidy formatting
-      $output .= "<<<<$host_result->{name}>>>>\n" 
+      $self->add_output( "<<<<$host_result->{name}>>>>\n" 
               .  "<<<posemo>>>\n" 
-              .  $json->encode( $host_result ) . "\n";
+              .  $json->encode( $host_result ) . "\n" );
       #>>>
       }
 
-   $output .= "<<<<>>>>\n";
+   $self->add_output("<<<<>>>>\n");
 
-   return $output;
+   return;
    } ## end sub generate_output
 
 

@@ -9,21 +9,22 @@ package PostgreSQL::SecureMonitoring::Run;
 
 =encoding utf8
 
-
    use PostgreSQL::SecureMonitoring::Run;
 
    # or:
    use PostgreSQL::SecureMonitoring::Run output => "JSON";
-
+   
    my $posemo = PostgreSQL::SecureMonitoring::Run->new_with_options();
    $posemo->run;
-
-   # or:
+   
+   # or simply:
    PostgreSQL::SecureMonitoring::Run->new_with_options->run;
 
 
-
 =head1 DESCRIPTION
+
+Class for running all checks. It contains the main run 
+
 
 
 
@@ -159,6 +160,17 @@ has _errcount => (
                                 inc_error => 'inc',
                               },
                  );
+
+has _output => (
+                 accessor => "output",
+                 traits   => ['String'],
+                 is       => "rw",
+                 isa      => "Str",
+                 default  => q{},
+                 handles  => {
+                              add_output => "append",
+                            },
+               );
 
 
 
@@ -365,7 +377,7 @@ sub run
 
    INFO "All Checks Done. Runtime: $runtime seconds.";
 
-   my $output = $self->generate_output(
+   $self->generate_output(
       {
         message        => $message,
         posemo_version => $posemo_version . "",   # convert to string!
@@ -378,7 +390,7 @@ sub run
       }
    );
 
-   $self->write_result($output);
+   $self->write_result;
 
    return;
    } ## end sub run
@@ -460,10 +472,9 @@ May be overridden by output modules, e.g. don't write file, instead write it to 
 
 sub write_result
    {
-   my $self   = shift;
-   my $output = shift;
+   my $self = shift;
 
-   io( $self->outfile )->print($output);
+   io( $self->outfile )->print( $self->output );
 
    return;
    }
@@ -654,5 +665,7 @@ sub _split_hosts
    return @hosts;
 
    }
+
+
 
 1;
