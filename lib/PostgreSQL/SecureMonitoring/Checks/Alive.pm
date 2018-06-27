@@ -65,6 +65,7 @@ around execute => sub {
       $result->{message}  = "Failed Alive check for host ${ \$self->host_desc }; error: $EVAL_ERROR";
       $result->{critical} = 1 unless $self->no_critical;
       $result->{warning}  = 1 if $self->warn_if_failed;
+      $result->{columns}  = [qw(alive)];
       };
 
    return $result;
