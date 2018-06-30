@@ -273,6 +273,27 @@ sub error_ok($;$)
 
 
 
+=head2 status_is( $result, $status [ , $message ] )
+
+Test passes, if status in result is a given value (see Checks.pm, sub status):
+
+   0: OK
+   1: warning
+   2: critical
+   3: unknown (e.g. SQL error)
+
+=cut
+
+sub status_is($$;$)
+   {
+   my $result  = shift;
+   my $status  = shift;
+   my $message = shift // "Status is $status";
+   return is( $result->{critical}, $status, $message );
+   }
+
+
+
 =head2 message_like( $result, $regexp [, $message] )
 
 Compares an internal message (used when check failed) via regexp.
