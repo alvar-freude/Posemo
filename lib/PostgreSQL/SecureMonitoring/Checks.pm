@@ -640,6 +640,7 @@ This method returns a C<status> according to the warning/critical flags in the g
   0: OK
   1: warning
   2: critical
+  3: unknown (e.g. SQL error)
 
 This may be used by some frontend or output modules to interpret the result instead 
 of looking into critical/warning result.
@@ -657,6 +658,7 @@ sub status
 
    return 2 if $result->{critical};
    return 1 if $result->{warning};
+   return 3 if $result->{error};
    return 0;
    }
 
