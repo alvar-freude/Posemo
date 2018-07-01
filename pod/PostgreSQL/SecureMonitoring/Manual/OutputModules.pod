@@ -345,9 +345,14 @@ They may be used as name/description for each graph element in the output.
 
 The warning/critical status. May contain the following values:
 
-  0: Everything is OK
-  1: Warning level reached
-  2: Critical level reached
+  0: STATUS_OK        Everything is OK
+  1: STATUS_WARNING   Warning level reached
+  2: STATUS_CRITICAL  Critical level reached
+  3: STATUS_UNKNOWN   unknown
+ 
+ The names above are constants in the C<PostgreSQL::SecureMonitoring::Checks> Module, which can be importet:
+ 
+   use PostgreSQL::SecureMonitoring::Checks qw(:status);
 
 
 =back
