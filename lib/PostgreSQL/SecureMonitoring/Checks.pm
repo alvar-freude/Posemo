@@ -148,6 +148,23 @@ use Carp;
 use Config::FindFile qw(search_conf);
 use Log::Log4perl::EasyCatch ( log_config => search_conf("posemo-logging.properties") );
 
+=head3 Constants: STATUS_OK, STATUS_WARNING, STATUS_CRITICAL, STATUS_UNKNOWN
+
+Constants for the result status infos. See status sub.
+
+=cut
+
+use constant {
+               STATUS_OK       => 0,
+               STATUS_WARNING  => 1,
+               STATUS_CRITICAL => 2,
+               STATUS_UNKNOWN  => 3,
+             };
+
+use base qw(Exporter);
+our @EXPORT_OK = qw( STATUS_OK STATUS_WARNING STATUS_CRITICAL STATUS_UNKNOWN );
+our %EXPORT_TAGS = ( all => \@EXPORT_OK, status => \@EXPORT_OK );    # at the moment: status and all are the same
+
 
 #<<< no pertidy formatting
 
@@ -441,8 +458,10 @@ sub run_check
    if ( not $result->{error} )
       {
       $self->test_critical_warning($result);
-      $result->{status} = $self->status($result);
       }
+
+   # according to set status according to critical/warning/error
+   $result->{status} = $self->status($result);
 
    TRACE "Finished check ${ \$self->name } for host ${ \$self->host_desc }";
    TRACE "Result: " . Dumper($result);
@@ -656,10 +675,10 @@ sub status
    my $self = shift;
    my $result = shift // croak "status needs a result hash for checking!";
 
-   return 2 if $result->{critical};
-   return 1 if $result->{warning};
-   return 3 if $result->{error};
-   return 0;
+   return STATUS_CRITICAL if $result->{critical};
+   return STATUS_WARNING  if $result->{warning};
+   return STATUS_UNKNOWN  if $result->{error};
+   return STATUS_OK;
    }
 
 
