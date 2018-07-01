@@ -66,6 +66,7 @@ our @EXPORT = qw(
    result_ok
    no_warning_ok no_critical_ok warning_ok critical_ok
    no_error_ok error_ok
+   status_is
    message_like
    name_is result_type_is row_type_is result_unit_is
    result_is result_cmp
@@ -289,7 +290,7 @@ sub status_is($$;$)
    my $result  = shift;
    my $status  = shift;
    my $message = shift // "Status is $status";
-   return is( $result->{critical}, $status, $message );
+   return is( $result->{status}, $status, $message );
    }
 
 
