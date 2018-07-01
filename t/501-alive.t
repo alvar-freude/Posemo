@@ -6,11 +6,13 @@ use warnings;
 use Test::More;
 use Test::PostgreSQL::SecureMonitoring;
 
+use PostgreSQL::SecureMonitoring::Checks qw(:status);
 
 my $result = result_ok "Alive", "test";
 
 no_warning_ok $result;
 no_critical_ok $result;
+status_is $result,      STATUS_OK;
 name_is $result,        "Alive";
 result_is $result,      1;
 row_type_is $result,    "single";
@@ -22,6 +24,7 @@ $result = result_ok "Alive", "test", {}, { port => 5999 };
 message_like $result, qr{^Failed Alive check}, "Message for failed alive check";
 no_warning_ok $result;
 critical_ok $result;
+status_is $result,      STATUS_CRITICAL;
 name_is $result,        "Alive";
 result_is $result,      0;
 row_type_is $result,    "single";
@@ -35,6 +38,7 @@ message_like $result, qr{^Failed Alive check}, "Message for failed alive check";
 warning_ok $result;
 no_critical_ok $result;
 no_error_ok $result;
+status_is $result,      STATUS_WARNING;
 name_is $result,        "Alive";
 result_is $result,      0;
 row_type_is $result,    "single";

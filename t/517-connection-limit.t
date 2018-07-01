@@ -7,7 +7,10 @@ use Test::More;
 use Test::PostgreSQL::SecureMonitoring;
 use Test::PostgreSQL::Starter;
 
-plan tests => 136;
+use PostgreSQL::SecureMonitoring::Checks qw(:status);
+
+
+plan tests => 139;
 
 my $result = result_ok "ConnectionLimit", "test";
 
@@ -38,6 +41,8 @@ $result = result_ok "ConnectionLimit", "test";
 no_warning_ok $result;
 no_critical_ok $result;
 no_error_ok $result;
+status_is $result, STATUS_OK;
+
 
 cmp_ok $result->{result}, '>', 45, "More then 45% connections used";
 cmp_ok $result->{result}, '<', 55, "Fewer then 55% connections used";
@@ -52,6 +57,8 @@ $result = result_ok "ConnectionLimit", "test";
 warning_ok $result;
 no_critical_ok $result;
 no_error_ok $result;
+status_is $result, STATUS_WARNING;
+
 
 cmp_ok $result->{result}, '>', 75, "More then 75% connections used";
 cmp_ok $result->{result}, '<', 80, "Fewer then 80% connections used";
@@ -66,6 +73,8 @@ $result = result_ok "ConnectionLimit", "test";
 warning_ok $result;
 critical_ok $result;
 no_error_ok $result;
+status_is $result, STATUS_CRITICAL;
+
 
 cmp_ok $result->{result}, '>', 90, "More then 90% connections used";
 cmp_ok $result->{result}, '<', 95, "Fewer then 95% connections used";
