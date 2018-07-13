@@ -110,6 +110,7 @@ not in the order of the following example.
                                       warning_level  => 3,
                                       critical_level => 5,
                                     },
+                                    # […] more checks
                                    ],
                       },
                       # […] more hosts
