@@ -1,0 +1,47 @@
+#!/usr/bin/env perl
+
+=head1 NAME
+
+ cmk_posemo -- A simple check_mk starter for Posemo
+
+=head1 SYNOPSIS
+
+ cmk_posemo
+ cmk_posemo [all other Posemo parameters]
+ cmk_posemo --show-options
+ cmk_posemo --help
+
+
+=head1 DESCRIPTION 
+
+This simple starter starts Posemo for easy check_mk output.
+Other messages are disabled (quiet flag set).
+
+The purpose of this script is, to run it directly from check_mk 
+
+
+For all CLI parameters see Posemo documentation; for viewing all 
+options with (default) values run it with C<--show-options>.
+
+This script is a shorthand for:
+
+  posemo.pl CheckMK --quiet
+
+You may use it as example for building your own starter with a 
+fixed config file.
+
+Use this script here or something similar, if your monitoring system 
+does not allow command line parameters without an other shell wrapper.
+
+=cut
+
+use strict;
+use warnings;
+use PostgreSQL::SecureMonitoring::Run output => "CheckMK";
+
+PostgreSQL::SecureMonitoring::Run->new_with_options( quiet => 1 )->run;
+
+# For other config file you may change the above against
+# PostgreSQL::SecureMonitoring::Run->new_with_options( quiet => 1, configfile => "/path/to/configfile.conf" )->run;
+
+
