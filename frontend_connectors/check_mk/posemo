@@ -1,0 +1,77 @@
+#!/usr/bin/env python                                                    
+
+#
+# Proof of concept for new Posemo check for check_mk
+#
+
+
+# 
+# parse_posemo
+# Parser function. This parses the output from Posemo (CheckMK output module) and
+# returns a data structure (Python dictionary) for the other functions.
+#
+# We get our result as JSON data, because this is most flexible and readable!
+# This parser joins all lines and decodes the JSON.
+#
+# Because check_mk already splittet every line by whitespace, we have to join it again! 
+#
+
+import json
+
+def parse_posemo(info):
+    json_data = ""
+    for line in info:
+        json_data += " ".join(line)
+    parsed = json.loads(json_data.decode('utf-8'))
+
+    return parsed
+
+
+# 
+# inventory_posemo
+# 
+# In:
+#   parsed
+#     Already parsed data structure from Posemo
+#     In the key check_mk_inventory everything is ready
+#
+# Return value: 
+# List of ..........
+#
+
+def inventory_posemo (parsed):
+    return parsed["check_mk_inventory"]
+
+
+# 
+# check_posemo
+# 
+# In:
+#   item
+#     ...
+#   params
+#     ...
+#   parsed
+#     Already parsed data structure from Posemo
+#     In the key check_mk_perfdata everything is ready to use
+#
+# Return value: 
+# List of ..........
+#
+
+def check_posemo(item, params, parsed):
+    return parsed["check_mk_data"]
+
+
+#
+# The following check_info dictionary entry defines, which functions should be called for what task
+#
+
+check_info["posemo"] =  {
+    "inventory_function"      : inventory_posemo,
+    "check_function"          : check_posemo,
+    "parse_function"          : parse_posemo,
+    "service_description"     : "PostgreSQL %s",        # the source of %s are the inventory services?
+    "has_perfdata"            : True,
+}
+
