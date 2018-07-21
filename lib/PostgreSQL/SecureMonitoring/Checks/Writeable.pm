@@ -151,7 +151,8 @@ around 'execute' => sub {
    die "$error\n" if $error;
 
    # Change the result: not true as from SQL, but the timing
-   $result->{result} = $timing;
+   $result->{result}  = $timing;
+   $result->{columns} = ["write_time"];
    return $result;
 };
 
