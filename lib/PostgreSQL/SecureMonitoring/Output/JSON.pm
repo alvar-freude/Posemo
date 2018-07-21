@@ -22,8 +22,9 @@ Here it simply converts the given result to JSON without any conversion or other
 
 
 use Moose::Role;
-
 use JSON;
+
+requires "output";
 
 
 =head2 Additional attributes
