@@ -2,7 +2,7 @@
 
 =head1 NAME
 
- cmk_posemo -- A simple check_mk starter for Posemo
+ cmk_posemo -- A simple check_mk starter example for Posemo
 
 =head1 SYNOPSIS
 
@@ -28,10 +28,23 @@ This script is a shorthand for:
   posemo.pl CheckMK --quiet
 
 You may use it as example for building your own starter with a 
-fixed config file.
+fixed config file, or use the Posemo default locations via C<Config::FindFile>. 
+
+You can add defaults to all CLI parameters at the C<new_with_options> 
+method, e.g.:
+
+  PostgreSQL::SecureMonitoring::Run->new_with_options( quiet => 1, configfile => "/path/to/configfile.conf" )->run;
+
 
 Use this script here or something similar, if your monitoring system 
 does not allow command line parameters without an other shell wrapper.
+
+To run this scipt, you must install Posemo or add it's C<lib> path to 
+C<PERLLIB> environment. Another hack may be to add a C<use lib> statement 
+with path to the directory:
+
+   use FindBin qw($Bin);
+   use lib "$Bin/../../lib";
 
 =cut
 

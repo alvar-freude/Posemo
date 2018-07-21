@@ -10,8 +10,9 @@ conf/posemo.conf
 conf/simple-local.conf
 conf/test-example.conf
 Documentation/README.md
-extra-dummy-tests/insert-and-delete.pl
-extra-dummy-tests/performance_hash_slices_loops.pl
+frontend_connectors/check_mk/cmk_posemo_example
+frontend_connectors/check_mk/posemo
+frontend_connectors/check_mk/TODO.txt
 ignore.txt
 lib/Config/FindFile.pm
 lib/Log/Log4perl/EasyCatch.pm
