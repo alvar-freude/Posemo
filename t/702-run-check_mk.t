@@ -28,7 +28,7 @@ my $posemo;
 
 lives_ok sub {
    $posemo = PostgreSQL::SecureMonitoring::Run->new(
-                                                     configfile => "$Bin/conf/simple.conf",
+                                                     configfile => "$Bin/conf/run-default-checks.conf",
                                                      outfile    => "$dir/t-702-simple.json",
                                                      pretty     => 1,
                                                    );

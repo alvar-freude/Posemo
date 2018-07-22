@@ -87,6 +87,7 @@ t/930-pod-coverage.t
 t/931-pod.t
 t/990-postgresql-stop.t
 t/conf/posemo-test-logging.properties
+t/conf/run-default-checks.conf
 t/conf/simple-connerror.conf
 t/conf/simple.conf
 t/conf/test-example.conf
