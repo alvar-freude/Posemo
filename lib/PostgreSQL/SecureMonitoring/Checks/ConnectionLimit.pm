@@ -8,7 +8,7 @@ package PostgreSQL::SecureMonitoring::Checks::ConnectionLimit;
 
   # In config:
   # check, that connections doesn't are not higher then this (in percent of max_connections)
-  <Check CacheHitRatio>
+  <Check ConnectionLimit>
     warning_level  = 75   # default 75
     critical_level = 90   # default 90
   </Check>

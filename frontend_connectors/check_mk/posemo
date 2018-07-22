@@ -4,6 +4,18 @@
 # Proof of concept for new Posemo check for check_mk
 #
 
+#
+# Remarks about check_ml guidelines
+# According to https://mathias-kettner.de/cms_dev_guidelines.html, a check 
+# must return values with yield, when there are multiple values.
+# Here it returns everything with return to avoid an extra loop, but it 
+# may be easy to change this.
+# 
+# This agent plugin needs JSON, because it decodes JSON from Posemo.
+# It may be possible to use an other format; but this is the 
+# most flexible at the moment. 
+#
+
 
 # 
 # parse_posemo
