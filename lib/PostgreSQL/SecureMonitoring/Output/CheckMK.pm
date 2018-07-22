@@ -1,5 +1,7 @@
 package PostgreSQL::SecureMonitoring::Output::CheckMK;
 
+=encoding utf8
+
 =head1 NAME 
 
   PostgreSQL::SecureMonitoring::Output::CheckMK -- check_mk-Output module for posemo
@@ -16,7 +18,6 @@ package PostgreSQL::SecureMonitoring::Output::CheckMK;
 
 This Module generates output for the Check MK monitoring system in PiggybackHosts format. 
 All hosts results are in one results file (or output).
-
 
 =head2 output 
 
@@ -39,15 +40,182 @@ per Host one block with the following content:
      $JSON
   <<<<>>>
 
-$JSON is everything per host (from the internal data structure or default JSON output) as JSON.
+$JSON is everything per host (from the internal data structure of default JSON output) as JSON.
+
+
+=head2 special values for check_mk in output
+
+
+
+
+
+=head3 Precalculated check_mk perfdata
+
+As of Posemo version 0.6.3, this output module generates metrics files.
+
+ 
+
+  $check_function_name$column_name
+  
+  
+
+
+Units:
+
+(existing are enough?)
+
+e.g.:
+
+   unit_info["1/s"] = {
+       "title" : _("per second"),
+       "description" : _("Frequency (displayed in events/s)"),
+       "symbol" : _("/s"),
+       "render" : lambda v: "%s%s" % (drop_dotzero(v), _("/s")),
+   }
+
+
+ Metrics:
+
+   #   |  How various checks' performance data translate into the known       |
+   #   |  metrics                                                             |
+   #   '----------------------------------------------------------------------'
+
+
+   metric_info["runtime"] = {
+       "title" : _("Process Runtime"),
+       "unit"  : "s",
+       "color" : "#80f000",
+   }
+
+   metric_info["apache_state_startingup"] = {
+       "title" : _("Starting up"),
+       "unit"  : "count",
+       "color" : "11/a",
+   }
+
+   metric_info["apache_state_waiting"] = {
+       "title" : _("Waiting"),
+       "unit"  : "count",
+       "color" : "14/a",
+   }
+
+
+
+   # color Too: indexed_color(1, 4), # col 1 of 4 graphs
+
+# das scheint umsetzung von apache ausgabe zu checkMK; ist bei uns schon OK?
+
+   check_metrics["check_mk-apache_status"] = {
+       "Uptime"               : { "name" : "uptime" },
+       "IdleWorkers"          : { "name" : "idle_workers" },
+       "BusyWorkers"          : { "name" : "busy_workers" },
+       "IdleServers"          : { "name" : "idle_servers" },
+       "BusyServers"          : { "name" : "busy_servers" },
+       "OpenSlots"            : { "name" : "open_slots" },
+       "TotalSlots"           : { "name" : "total_slots" },
+       "CPULoad"              : { "name" : "load1" },
+       "ReqPerSec"            : { "name" : "requests_per_second" },
+       "BytesPerSec"          : { "name" : "direkt_io" },
+       "ConnsTotal"           : { "name" : "connections" },
+       "ConnsAsyncWriting"    : { "name" : "connections_async_writing" },
+       "ConnsAsyncKeepAlive"  : { "name" : "connections_async_keepalive" },
+       "ConnsAsyncClosing"    : { "name" : "connections_async_closing" },
+       "State_StartingUp"     : { "name" : "apache_state_startingup" },
+       "State_Waiting"        : { "name" : "apache_state_waiting" },
+       "State_Logging"        : { "name" : "apache_state_logging" },
+       "State_DNS"            : { "name" : "apache_state_dns" },
+       "State_SendingReply"   : { "name" : "apache_state_sending_reply" },
+       "State_ReadingRequest" : { "name" : "apache_state_reading_request" },
+       "State_Closing"        : { "name" : "apache_state_closing" },
+       "State_IdleCleanup"    : { "name" : "apache_state_idle_cleanup" },
+       "State_Finishing"      : { "name" : "apache_state_finishing" },
+       "State_Keepalive"      : { "name" : "apache_state_keep_alive" },
+   }
+
+   
+   # Types of Perf-O-Meters:
+   # linear      -> multiple values added from left to right
+   # logarithmic -> one value in a logarithmic scale
+   # dual        -> two Perf-O-Meters next to each other, the first one from right to left
+   # stacked     -> two Perf-O-Meters of type linear, logarithmic or dual, stack vertically
+   # The label of dual and stacked is taken from the definition of the contained Perf-O-Meters
+
+      perfometer_info.append({
+       "type"       : "logarithmic",
+       "metric"     : "runtime", 
+       "half_value" : 864000.0,
+       "exponent"   : 2,
+   })
+
+
+   # beware: the order of the list elements of graph_info is actually important.
+   # It determines the order of graphs of a service, which in turn is used by
+   # the report definitions to determine which graph to include.
+
+   # Order of metrics in graph recipes important if you use only 'area':
+   # The first one must be the bigger one, then descending.
+   # Example: ('tablespace_size', 'area'),
+   #          ('tablespace_used', 'area')
+
+   graph_info["fan_speed"] = {
+       "title"     : _("Fan speed"),
+       "metrics"   : [
+           ( "fan_speed", "area" ),
+       ]
+   }
+
+
+   graph_info["busy_and_idle_servers"] = {
+       "title"   : _("Busy and idle servers"),
+       "metrics" : [
+           ( "busy_servers", "area" ),
+           ( "idle_servers", "stack" ),
+       ],
+   }
+
+
+   graph_info["apache_status"] = {
+       "title"   : _("Apache status"),
+       "metrics" : [
+           ( "apache_state_startingup", "area" ),
+           ( "apache_state_waiting", "stack" ),
+           ( "apache_state_logging", "stack" ),
+           ( "apache_state_dns", "stack" ),
+           ( "apache_state_sending_reply", "stack" ),
+           ( "apache_state_reading_request", "stack" ),
+           ( "apache_state_closing", "stack" ),
+           ( "apache_state_idle_cleanup", "stack" ),
+           ( "apache_state_finishing", "stack" ),
+           ( "apache_state_keep_alive", "stack" ),
+       ],
+   }
+
+
+
+=head2 metrics files
+
+The check_mk output module can generate metrics files. There are two types: 
+global and local.
+
+Global metrics files are usually generated manually by the developers and are part 
+of this distribution. 
+
+TODO: You can generate local metrics, […] (Docs TODO too)
 
 
 =cut
 
-
 use Moose::Role;
+use Moose::Util::TypeConstraints;
 use JSON;
 
+use Config::FindFile qw(search_conf);
+use Log::Log4perl::EasyCatch ( log_config => search_conf("posemo-logging.properties") );
+
+use English qw( -no_match_vars );
+
+
+requires qw(add_output loop_over_all_results);
 
 =head2 Additional attributes
 
@@ -57,12 +225,41 @@ use JSON;
 
 Flag (boolean), if the output should be formatted pretty or compact (default).
 
+=item * metrics_outfile
+
+An additional outfile for the check_mk metrics. Default: to STDOUT (C<->)
+
+=item * service_type
+
+The type for the metrics file B<and> check_mk output. Default: C<none>, which does 
+not generate a metrics file and generates the same output as with C<local>.
+
+Other values may be C<global> and C<local>: global creates a global metrics file, which 
+[…] ((TODO!))
+
+When you want C<local> check_mk output, then always also an metrics file will 
+be generated.
 
 =back
 
 =cut
 
-has pretty => ( is => "ro", isa => "Bool", default => 0, );
+#<<<
+has pretty          => ( is => "ro", isa => "Bool", default => 0, );
+has metrics_outfile => ( is => "ro", isa => "Str",  default => q{-}, );
+has service_type    => ( is => "ro", isa => enum( [qw(none global local )] ), default => "none", );
+#>>>
+
+has _metrics_output => (
+                         accessor => "metrics_output",
+                         traits   => ['String'],
+                         is       => "rw",
+                         isa      => "Str",
+                         default  => q{},
+                         handles  => {
+                                      add_mectrics => "append",
+                                    },
+                       );
 
 
 =head1 METHODS
@@ -70,9 +267,24 @@ has pretty => ( is => "ro", isa => "Bool", default => 0, );
 =head2 generate_output
 
 Implements the output mechanism, here check_mk PiggybackHosts format, 
-which is encapsulated JSON.
+which contains encapsulated JSON.
 
-TODO: Add metrics output.
+
+Finally it adds two keys to each host:
+
+   check_mk_inventory   => [ 
+                              [ "Service Name 1", undef ], 
+                              [ "Service Name 2", undef ], 
+                              # ... 
+                           ]
+   check_mk_data        => [ 
+                              [ $status_code,  $infotext, [ [ $value_name, $value, $warn, $crit, $min, $max ], (…)  ]  ], 
+                              [ $status_code,  $infotext, [ [ $value_name, $value, $warn, $crit, $min, $max ], (…)  ]  ], 
+                              # ... 
+                           ]
+ 
+ 
+ 
 
 =cut
 
@@ -103,23 +315,272 @@ sub generate_output
    $self->add_output( "<<<posemo_base>>>\n" . $json->encode( \%metadata ) . "\n" );
 
 
-   #
-   # Host Data
+
+   # NEW version:
+   # let main code loop over all hosts.
+   # this calls the following methods:
+   #   for_each_host
+   #   for_each_check
+   #   for_each_row_result
+   #   for_each_single_result
    #
 
-   foreach my $host_result ( @{ $complete_result->{result} } )
-      {
-      #<<< no pertidy formatting
-      $self->add_output( "<<<<$host_result->{name}>>>>\n" 
-              .  "<<<posemo>>>\n" 
-              .  $json->encode( $host_result ) . "\n" );
-      #>>>
-      }
-
-   $self->add_output("<<<<>>>>\n");
+   $self->loop_over_all_results($complete_result);
 
    return;
    } ## end sub generate_output
+
+
+=head2 for_each_host($host_result)
+
+This method will be called by Posemo for each host (via ->loop_over_all_results).
+
+It creates the JSON output and adds it to the complete output.
+
+=cut
+
+
+sub for_each_host
+   {
+   my $self        = shift;
+   my $host_result = shift;
+
+   # Reformat result and write it into check_mk_inventory and check_mk_data keys
+
+   foreach my $service_name ( sort keys %{ $host_result->{_check_mk} } )
+      {
+      $host_result->{_check_mk}{$service_name}[1] =~ s{,\s$}{};    # remove trailing list delimeter
+      push @{ $host_result->{check_mk_inventory} }, [ $service_name, undef ];
+      push @{ $host_result->{check_mk_data} }, $host_result->{_check_mk}{$service_name};
+      }
+
+   # remove temporary values
+   # delete $host_result->{_check_mk};
+
+   my $json = JSON->new->pretty( $self->pretty );  # may be cached, but performance should be no problem here
+
+   #<<< no pertidy formatting
+   $self->add_output( "<<<<$host_result->{name}>>>>\n" 
+           .  "<<<posemo>>>\n" 
+           .  $json->encode( $host_result ) . "\n" );
+   #>>>
+
+   return;
+   } ## end sub for_each_host
+
+
+# =head2 for_each_check( $host_result, $check_result )
+#
+# This method will be called by Posemo for each check (via ->loop_over_all_results).
+#
+# It creates a service per check, except for multiline in global mode,
+# then one service per row is created by C<for_each_row_result>
+#
+# =cut
+#
+# sub for_each_check
+#    {
+#    my $self         = shift;
+#    my $host_result  = shift;
+#    my $check_result = shift;
+#
+#    return if $check_result->{row_type} eq "multiline" and $self->metric_type ne "local";
+#
+#
+#
+#    return;
+#    }
+
+
+#
+# =head2 for_each_row_result($host_result, $check_result, $row)
+#
+# This method will be called by Posemo for each single row
+# for multiline results (via ->loop_over_all_results).
+#
+# When the result is not of type C<multiline>, this method will NOT be called.
+#
+# =cut
+#
+# sub for_each_row_result
+#    {
+#
+#    }
+
+
+=head2 for_each_single_result($host_result, $check_result, $single_result)
+
+This method will be called by Posemo for each single result (via ->loop_over_all_results).
+
+It builds the data structure for check_mk and metrics output.
+
+   # check_mk single result (final row) name:
+   # Global or none service_type:
+   #     Metric-Name: check_name, column_name
+   #     + Service name = Check-Name (+row title when multiline)
+   # Local service_type:
+   #     As above when NOT multiline; when multiline then:
+   #       Metric-Name: check_name, row_title, column_name
+   #       + Service Name = Check Name (only)
+   #
+
+
+Result is stored internally as hashref in the C<$host_result> in the key C<_check_mk> 
+in the following format:
+
+   _check_mk => 
+      {
+      "Service name 1" => [ $status_code,  $infotext, [ [ $metric_name, $value, $crit, $warn, $min, $max ], (…)  ]  ]
+      "Service name 2" => [ $status_code,  $infotext, [ [ $metric_name, $value, $crit, $warn, $min, $max ], (…)  ]  ]
+      }
+
+
+
+=cut
+
+#
+# Unit-Mappings
+# Map internal Posemo units to Check_MK units
+#
+# Key:   Posemo unit
+# Value: reference to a sub;
+#        parameter: value
+#        return value: new value, Check_MK unit
+#
+
+use constant BUFSIZE => 8 * 1024;
+
+#<<<
+my %unit_mappings = 
+   (
+   ms      => sub { return $ARG[0] / 1000,   "s"; },                    # check_mk doesn't know milliseconds
+   buffers => sub { return $ARG[0] * BUFSIZE, "bytes"; },                # hmmm, check module should calculate correct bytes, because we don't know real buffer size!
+   );
+# Wrong mapping: 
+# my %unit_mappings = 
+#    (
+#    q{%}    => sub { return "$ARG[0]%" },                                         # no space with %, see Check_MK guidelines
+#    ms      => sub { return ( ( $ARG[0] / 1000 ) . " s" ) },                      # check_mk doesn't know milliseconds
+#    buffers => sub { return ( ( $ARG[0] * 8*1024) . " bytes" )},                  # hmmm, check module should calculate correct bytes, because we don't know real buffer size!
+#    );
+#>>>
+
+
+sub for_each_single_result
+   {
+   my $self          = shift;
+   my $host_result   = shift;
+   my $check_result  = shift;
+   my $single_result = shift;
+
+   #
+   # Build the service name / key
+   #
+
+   my $service_name;
+   my $metric_name;
+
+   ( my $function_name = $check_result->{sql_function_name} ) =~ s{^(.*[.])}{}msx;   # Remove schema name from check_function_name
+   ( my $column        = $single_result->{column} ) =~ s{\W}{_}g;                    # Remove all non-word-chars from column ...
+   ( my $title         = $single_result->{title} // q{} ) =~ s{\W}{_}g;              # ... and title
+
+
+   if ( $self->service_type eq "local" )
+      {
+      # do local type key building
+      $service_name = "PostgreSQL check $check_result->{check_name}";
+      $metric_name
+         = $title
+         ? "${function_name}__${title}__$column"
+         : "${function_name}__$column";
+      }
+   else
+      {
+      # global keys
+      $metric_name  = "${function_name}__$column";
+      $service_name = "PostgreSQL check $check_result->{check_name}";
+      $service_name .= " of $title" if $title;
+      }
+
+
+   my $value = my $msg_value = $single_result->{value};
+   my $cmk_unit;
+
+   if ( $check_result->{result_unit} and $value and $unit_mappings{ $check_result->{result_unit} } )
+      {
+      ( $value, $cmk_unit ) = &{ $unit_mappings{ $check_result->{result_unit} } }($value);
+      }
+   else
+      {
+      $cmk_unit = $check_result->{result_unit};
+      }
+
+   # build Perfdata
+   my @this_perfdata = (
+                         $metric_name, $value,
+                         $check_result->{critical_level},
+                         $check_result->{warning_level},
+                         $check_result->{min_value},
+                         $check_result->{max_value},
+                       );
+
+   # remove trailing undefs (Check_MK guidelines), but not the value (keep two)
+   pop @this_perfdata while @this_perfdata > 2 and not defined $this_perfdata[-1];
+
+   # Add perfdata to temporary internal storage
+   push @{ $host_result->{_check_mk}{$service_name}[2] }, \@this_perfdata;
+
+   # set status
+   # thanks to autovivification, all elements in hash are generated on the fly
+   $host_result->{_check_mk}{$service_name}[0] = $check_result->{status};
+
+   # calculate infotext ...
+   if ( $check_result->{message} )                 # take existing message or the results as text?
+      {
+      $host_result->{_check_mk}{$service_name}[1] = $check_result->{message};
+      }
+   elsif ( $self->service_type ne "local" or not $title or $title eq "_TOTAL" )    # Only add msg values for totals!
+      {
+      # unit with Check_MK guidelines: no space before %!
+      my $unit = $check_result->{result_unit} // "";
+      if ( defined $msg_value )
+         {
+         if    ( $unit eq q{%} ) { $msg_value .= q{%} }
+         elsif ($unit)           { $msg_value .= " $unit" }
+         }
+      else
+         {
+         $msg_value = "(undefined value)";
+         }
+
+      # name of the column according Check_mk Guideline
+      ( my $colname = ucfirst( $single_result->{column} ) ) =~ s{_}{ }g;
+      $host_result->{_check_mk}{$service_name}[1] .= "$colname: $msg_value, ";
+      }
+
+
+   #
+   # TODO: add metricts info stuff.
+   #
+
+   return;
+   } ## end sub for_each_single_result
+
+
+
+=head2 after write_result
+
+After C<write_result>, write our metrics result.
+
+=cut
+
+# after write_result => sub {
+#    my $self = shift;
+#    return if $self->metric_type eq "none";
+#
+#    io( $self->metrics_outfile )->print( $self->metrics_output );
+#    return;
+# };
 
 
 

@@ -434,11 +434,12 @@ sub run_check
       eval { $self->rollback if $self->has_dbh; return 1; } or ERROR "Error in rollback: $EVAL_ERROR";
       }
 
-   $result->{check_name}  = $self->name;
-   $result->{description} = $self->description;
-   $result->{result_unit} = $self->result_unit;
-   $result->{result_type} = $self->result_type;
-   $result->{return_type} = $self->return_type;
+   $result->{check_name}        = $self->name;
+   $result->{description}       = $self->description;
+   $result->{result_unit}       = $self->result_unit;
+   $result->{result_type}       = $self->result_type;
+   $result->{return_type}       = $self->return_type;
+   $result->{sql_function_name} = $self->sql_function_name;
 
    foreach my $attr (
                       qw(warning_level critical_level

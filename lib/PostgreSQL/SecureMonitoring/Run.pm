@@ -128,7 +128,7 @@ has quiet      => ( is => "ro", isa => "Bool",                                  
 
 #>>>
 
-# conf must be lazy, because in the builder must be called after initialization of all other attributes!
+# conf must be lazy, because the builder must be called after initialization of all other attributes!
 has _conf => (
                reader        => "conf",
                is            => "ro",
@@ -665,6 +665,182 @@ sub _split_hosts
    return @hosts;
 
    }
+
+=head2 graph_info_for_host
+
+Helper sub, usable by all frontend modules for parsing everything usable by 
+
+
+
+{
+   "results" : [
+      {
+         "return_type" : "boolean",
+         "check_name" : "Alive",
+         "result_unit" : "",
+         "result" : 0,
+         "critical" : 1,
+         "message" : "Failed Alive check for host localhost; error: Can't get DB handle: could not connect to server: Connection refused\n\tIs the server running on host \"localhost\" (::1) and accepting\n\tTCP/IP connections on port 5432?\ncould not connect to server: Connection refused\n\tIs the server running on host \"localhost\" (127.0.0.1) and accepting\n\tTCP/IP connections on port 5432?\n",
+         "row_type" : "single",
+         "status" : 2,
+         "description" : "Checks if server is alive.",
+         "result_type" : "boolean"
+      }
+   ],
+   "name" : "localhost",
+   "hostgroup" : "_GLOBAL",
+   "host" : "localhost"
+}
+
+
+This method calls the C<set_graph_info_for> method for each graph element, with a key 
+and the complete result. Each result entry is a graph element. 
+
+The key contains the check name and result column name for C<graph_info_type> global, 
+and check name, host name, row title (if multirow) and column name for C<graph_info_type> local.
+
+
+
+What to set:
+
+When in mode global:
+
+
+
+
+
+
+=cut 
+
+sub graph_info_for_host
+   {
+   my $self   = shift;
+   my $result = shift;
+
+   if ( $result->{error} )
+      {
+      ERROR "Can not generate graph info for $result->{results}{check_name}, because error in execution!";
+      return;
+      }
+
+   my $columns = $result->{columns};
+   my $title;
+   $title = shift @$columns if $result->{results}{row_type} eq "multiline";
+   ( my $check_name = lc( $result->{results}{check_name} ) ) =~ s{\W}{_}g;
+
+   if ( $self->graph_info_type eq "global" )
+      {
+      $self->set_graph_info_for( "$result->{results}{check_name}_$ARG", $result ) foreach @$columns;
+      return;
+      }
+
+   die "Unknown metrics type: '${ \$self->metrics_type }'\n" if $self->graph_info_type ne "local";
+
+   # metrics type is local
+
+   # When local, then build graph infos for:
+   #
+   my @result_titles;
+   if ( $result->{results}{row_type} eq "multiline" )
+      {
+      @result_titles = map { $ARG->[0] } @{ $result->{results}{result} };
+      }
+   else
+      {
+      @result_titles = (q{});
+      }
+
+   # foreach my $resultrow (
+   #    ?  : ( [""] ) )
+   #       {
+   #       $self->set_graph_info_for( "$result->{results}{check_name}", $result );
+   #       }
+
+
+   return;
+   } ## end sub graph_info_for_host
+
+
+=head2 loop_over_all_results($complete_result)
+
+Helper method for output modules. It loops over all results and calls methods, which must 
+be defined in the output Module:
+
+  for_each_host
+  for_each_check
+  for_each_row_result
+  for_each_single_result
+
+=cut
+
+sub loop_over_all_results
+   {
+   my $self            = shift;
+   my $complete_result = shift;
+
+   TRACE "Loop over all results";
+
+   foreach my $host_result ( @{ $complete_result->{result} } )
+      {
+      # Loop over all Checks
+      foreach my $check_result ( @{ $host_result->{results} } )
+         {
+         #
+         # Only when we have to call "for_each_single_result",
+         # collect all single results and build a hash
+         #
+         if ( $self->can("for_each_single_result") or $self->can("for_each_row_result") )
+            {
+            my @values;
+
+            if ( $check_result->{row_type} eq "single" )
+               {
+               @values = {
+                           value  => $check_result->{result},
+                           column => $check_result->{columns}[0],
+                         };
+               }
+            elsif ( $check_result->{row_type} eq "list" )
+               {
+               my $pos = 0;
+               @values = map { { value => $ARG, column => $check_result->{columns}[ $pos++ ], } } @{ $check_result->{result} };
+               }
+            elsif ( $check_result->{row_type} eq "multiline" )
+               {
+
+               # extract all values from result rows; first column is title
+               foreach my $row ( @{ $check_result->{result} } )
+                  {
+                  my $pos = 1;
+                  push @values,
+                     map { { value => $ARG, column => $check_result->{columns}[ $pos++ ], title => $row->[0], } }
+                     @{$row}[ 1 .. $#$row ];
+
+                  # We may call the row method ...
+                  $self->for_each_row_result( $host_result, $check_result, $row ) if $self->can("for_each_row_result");
+                  }
+               }
+
+            # Call single result method, if it exists.
+            if ( $self->can("for_each_single_result") )
+               {
+               $self->for_each_single_result( $host_result, $check_result, $ARG ) foreach @values;
+               }
+
+            } ## end if ( $self->can("for_each_single_result"...))
+
+         # call check method; after single results, because the above may modify host result.
+         $self->for_each_check( $host_result, $check_result ) if $self->can("for_each_check");
+
+         } ## end foreach my $check_result ( ...)
+
+
+      # At last call the host method; at last, because the hosts result may be modified
+      $self->for_each_host($host_result) if $self->can("for_each_host");
+      } ## end foreach my $host_result ( @...)
+
+   return;
+   } ## end sub loop_over_all_results
 
 
 
