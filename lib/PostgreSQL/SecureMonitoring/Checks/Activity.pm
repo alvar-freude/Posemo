@@ -52,6 +52,7 @@ check_has
    has_multiline_result => 1,
    result_type          => "integer",
    arguments            => [ [ skip_db_re => 'TEXT', '^template[01]$' ], ],
+   graph_type           => "stacked_area",
 
    # complex return type
    return_type => q{
