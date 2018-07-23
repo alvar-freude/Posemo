@@ -40,7 +40,7 @@ has skip_db_re => ( is => "ro", isa => "Str", );
 
 
 check_has
-   description          => "Get transaction counter.",
+   description          => "Transaction counter",
    result_type          => "bigint",
    result_is_counter    => 1,
    graph_mirrored       => 1,                      # display commit/rolback obove/below middle line

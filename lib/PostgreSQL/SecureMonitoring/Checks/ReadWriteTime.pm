@@ -52,7 +52,7 @@ has skip_db_re => ( is => "ro", isa => "Str", );
 
 check_has
    name                 => "Read/Write Time",
-   description          => "Time spent reading/writing data file blocks.",
+   description          => "Time spent reading/writing data file blocks",
    enabled              => 0,
    result_type          => "double precision",
    result_unit          => "ms",

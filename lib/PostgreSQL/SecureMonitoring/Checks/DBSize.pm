@@ -42,7 +42,7 @@ has skip_db_re => ( is => "ro", isa => "Str", );
 
 check_has
    name                 => "DB Size",
-   description          => 'Get database sizes.',
+   description          => 'Database sizes',
    has_multiline_result => 1,
    result_unit          => "bytes",
    result_type          => "integer",

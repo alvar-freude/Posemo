@@ -39,7 +39,7 @@ has no_critical    => ( is => "ro", isa => "Bool", );
 has warn_if_failed => ( is => "ro", isa => "Bool", );
 
 check_has
-   description => 'Checks if server is alive.',
+   description => 'Checks if server is alive',
    code        => "SELECT true";
 
 

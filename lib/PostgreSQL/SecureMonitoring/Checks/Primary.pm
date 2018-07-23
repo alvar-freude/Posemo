@@ -37,7 +37,7 @@ has is_primary   => ( is => "ro", isa => "Bool", );
 has isnt_primary => ( is => "ro", isa => "Bool", );
 
 check_has
-   description => 'Checks if server is primary (master) not (secondary, slave).',
+   description => 'Checks if server is primary (master) not (secondary, slave)',
    code        => "SELECT not pg_is_in_recovery() AS primary;";
 
 

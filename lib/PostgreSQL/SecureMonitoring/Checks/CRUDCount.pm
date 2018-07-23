@@ -46,7 +46,7 @@ has skip_db_re => ( is => "ro", isa => "Str", );
 
 check_has
    name                 => "CRUD Count",
-   description          => 'Show counter for rows fetched, returned, inserted, updated and deleted.',
+   description          => 'Rows fetched, returned, inserted, updated and deleted',
    has_multiline_result => 1,
    result_is_counter    => 1,
    result_unit          => "",

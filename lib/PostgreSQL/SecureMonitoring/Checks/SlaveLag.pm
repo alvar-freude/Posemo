@@ -19,7 +19,7 @@ use PostgreSQL::SecureMonitoring::ChecksHelper;
 extends "PostgreSQL::SecureMonitoring::Checks";
 
 check_has
-   description => 'When the server is a slave, then return the replication lag in seconds.',
+   description => 'Replication lag in seconds (slaves)',
    return_type => 'double precision',
    result_unit => 's',
    code        => "SELECT CASE WHEN pg_is_in_recovery()
