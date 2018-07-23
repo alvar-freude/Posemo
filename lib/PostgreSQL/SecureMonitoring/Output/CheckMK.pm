@@ -19,6 +19,11 @@ package PostgreSQL::SecureMonitoring::Output::CheckMK;
 This Module generates output for the Check MK monitoring system in PiggybackHosts format. 
 All hosts results are in one results file (or output).
 
+This module generates everything completely ready for Check_MK.
+
+
+
+
 =head2 output 
 
 The output is a text with the following elements:
@@ -41,6 +46,15 @@ per Host one block with the following content:
   <<<<>>>
 
 $JSON is everything per host (from the internal data structure of default JSON output) as JSON.
+
+For easyer parsing at Python/Check_MK side, the JSON contains some extra keys, ready for Check_MK:
+
+   check_mk_inventory:  complete inventory
+   check_mk_data:       complete results with perfdata and all values
+   
+   metric_info:         metrics definition (Hash, copy each key to Check_MK)
+   graph_info:          graph defintion    (Hash, copy each key to Check_MK)
+
 
 
 =head2 special values for check_mk in output
@@ -189,6 +203,33 @@ e.g.:
            ( "apache_state_keep_alive", "stack" ),
        ],
    }
+
+
+
+
+
+
+
+For writeable 
+
+   "PostgreSQL check Writeable" : [
+       0,
+       "Write time: 0.00123810768127441 s",
+       [
+         [
+             "writeable__write_time",
+             0.00123810768127441,
+             5,
+             3
+         ]
+       ]
+   ],
+
+
+=>
+
+
+
 
 
 
@@ -466,8 +507,8 @@ my %unit_mappings =
 #>>>
 
 
-sub for_each_single_result
-   {
+sub for_each_single_result                         ## no critic (Subroutines::ProhibitExcessComplexity)
+   {                                               # this is a complex method, but linear ... (TODO: split in smaller subs?)
    my $self          = shift;
    my $host_result   = shift;
    my $check_result  = shift;
@@ -477,36 +518,39 @@ sub for_each_single_result
    # Build the service name / key
    #
 
-   my $service_name;
-   my $metric_name;
-
    ( my $function_name = $check_result->{sql_function_name} ) =~ s{^(.*[.])}{}msx;   # Remove schema name from check_function_name
    ( my $column        = $single_result->{column} ) =~ s{\W}{_}g;                    # Remove all non-word-chars from column ...
    ( my $title         = $single_result->{title} // q{} ) =~ s{\W}{_}g;              # ... and title
 
+   my $service_name = "PostgreSQL check $check_result->{check_name}";
+   my $graph_title  = $check_result->{description};
+   my $graph_name   = $function_name;
+   my $metric_name;
 
    if ( $self->service_type eq "local" )
       {
       # do local type key building
-      $service_name = "PostgreSQL check $check_result->{check_name}";
       $metric_name
          = $title
          ? "${function_name}__${title}__$column"
          : "${function_name}__$column";
+      $graph_name .= "__$title";
+      $graph_title .= " of " . ( $single_result->{title} ) if $single_result->{title};
       }
    else
       {
       # global keys
-      $metric_name  = "${function_name}__$column";
-      $service_name = "PostgreSQL check $check_result->{check_name}";
-      $service_name .= " of $title" if $title;
+      $metric_name = "${function_name}__$column";
+      $service_name .= " of $single_result->{title}" if $single_result->{title};
       }
+
+   ( $graph_name = lc($graph_name) ) =~ s{\W}{_}g;
 
 
    my $value = my $msg_value = $single_result->{value};
    my $cmk_unit;
 
-   if ( $check_result->{result_unit} and $value and $unit_mappings{ $check_result->{result_unit} } )
+   if ( $check_result->{result_unit} and defined $value and $unit_mappings{ $check_result->{result_unit} } )
       {
       ( $value, $cmk_unit ) = &{ $unit_mappings{ $check_result->{result_unit} } }($value);
       }
@@ -534,7 +578,10 @@ sub for_each_single_result
    # thanks to autovivification, all elements in hash are generated on the fly
    $host_result->{_check_mk}{$service_name}[0] = $check_result->{status};
 
-   # calculate infotext ...
+   # name of the column according Check_mk Guideline
+   ( my $colname = ucfirst( $single_result->{column} ) ) =~ s{_}{ }g;
+
+   # build infotext ...
    if ( $check_result->{message} )                 # take existing message or the results as text?
       {
       $host_result->{_check_mk}{$service_name}[1] = $check_result->{message};
@@ -553,15 +600,64 @@ sub for_each_single_result
          $msg_value = "(undefined value)";
          }
 
-      # name of the column according Check_mk Guideline
-      ( my $colname = ucfirst( $single_result->{column} ) ) =~ s{_}{ }g;
       $host_result->{_check_mk}{$service_name}[1] .= "$colname: $msg_value, ";
       }
 
 
+   # return if $self->service_type eq "none";
+
    #
-   # TODO: add metricts info stuff.
+   # add metricts and graph info stuff.
+   # When check_mk can not use this input from agent plugin, then do it global and create python file
    #
+
+   #
+   # metric_info["writeable__write_time"] = {
+   #     "title" : _("Write time"),
+   #     "unit"  : "s",
+   #     $color
+   # }
+   #
+   #
+   $host_result->{check_mk_metric_info}{$metric_name} = {
+                                                          title => $colname,                           # I18N missing, can't do python function call!
+                                                          unit  => $cmk_unit,
+                                                        };
+   $host_result->{check_mk_metric_info}{$metric_name}{color} = $check_result->{color} if $check_result->{color};
+
+
+   # graph_info["writeable"] = {
+   #     "title"     : _("Writeable"),
+   #     "metrics"   : [
+   #         ( "writeable__write_time", "line" ),
+   #     ]
+   # }
+   #
+
+   $host_result->{check_mk_graph_info}{$graph_name}{title} = $graph_title;    # I18N missing, can't do python function call!
+
+   # for non local multiline, build only the first row ($TOTAL)
+   if ( not defined $single_result->{title} or $single_result->{title} eq '$TOTAL' or $self->service_type eq "local" )
+      {
+      my $graph_type = $check_result->{graph_type} // "line";                 # Posemo default is LINE!
+
+      # convert "stacked_area" into "area" (first) or "stacked" (other)
+      if ( $graph_type eq "stacked_area" )
+         {
+         if   ( $host_result->{check_mk_graph_info}{$graph_name}{metrics} ) { $graph_type = "stack"; }
+         else                                                               { $graph_type = "area"; }
+         }
+
+      # When mirrored: each second value is mirrored
+      if (     $check_result->{graph_mirrored}
+           and $host_result->{check_mk_graph_info}{$graph_name}{metrics}
+           and @{ $host_result->{check_mk_graph_info}{$graph_name}{metrics} } % 2 == 1 )
+         {
+         $graph_type = "-$graph_type";
+         }
+
+      push @{ $host_result->{check_mk_graph_info}{$graph_name}{metrics} }, [ $metric_name, $graph_type ];
+      } ## end if ( not defined $single_result...)
 
    return;
    } ## end sub for_each_single_result
