@@ -30,11 +30,17 @@
 
 import json
 
+import pprint
+
 def parse_posemo(info):
     json_data = ""
     for line in info:
         json_data += " ".join(line)
     parsed = json.loads(json_data.decode('utf-8'))
+    
+    # Test ....
+    pprint.pprint(check_info)
+    pprint.pprint(graph_info)        # klappt das? dann kann ich die Sachen doch auch hier befüllen?
 
     return parsed
 
@@ -86,4 +92,5 @@ check_info["posemo"] =  {
     "service_description"     : "PostgreSQL %s",        # the source of %s are the inventory services?
     "has_perfdata"            : True,
 }
+
 
