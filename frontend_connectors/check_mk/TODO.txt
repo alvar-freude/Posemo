@@ -2,7 +2,7 @@
 
 TODO:
 
- * correct naming according to check_mk
- * use (correct) sub-folders
+ * check naming conventions of files according to check_mk, 
+   including names of folders
 
  
