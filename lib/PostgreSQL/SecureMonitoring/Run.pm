@@ -582,10 +582,10 @@ sub _parameter_for_one_host
    return %params;
    } ## end sub _parameter_for_one_host
 
-
+# TODO: $in_host is sometimes undef. Check it!
 sub _split_host_and_name
    {
-   my $in_host    = shift;
+   my $in_host    = shift // "";
    my $out_params = shift;
 
    TRACE "Set config option for unsplitted Host $in_host";
