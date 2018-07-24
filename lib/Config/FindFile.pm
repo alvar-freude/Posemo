@@ -104,7 +104,7 @@ use 5.010;                                         # "defined or" operator exist
 
 sub search_conf
    {
-   my $name = shift;
+   my $name   = shift;
    my $module = shift // caller;
 
    # 1. Look on development place

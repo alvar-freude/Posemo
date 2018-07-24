@@ -401,8 +401,8 @@ sub for_each_host
    my $json = JSON->new->pretty( $self->pretty );  # may be cached, but performance should be no problem here
 
    #<<< no pertidy formatting
-   $self->add_output( "<<<<$host_result->{name}>>>>\n" 
-           .  "<<<posemo>>>\n" 
+   $self->add_output( "<<<<$host_result->{name}>>>>\n"
+           .  "<<<posemo>>>\n"
            .  $json->encode( $host_result ) . "\n" );
    #>>>
 
@@ -492,7 +492,7 @@ in the following format:
 use constant BUFSIZE => 8 * 1024;
 
 #<<<
-my %unit_mappings = 
+my %unit_mappings =
    (
    ms      => sub { return $ARG[0] / 1000,   "s"; },                    # check_mk doesn't know milliseconds
    buffers => sub { return $ARG[0] * BUFSIZE, "bytes"; },                # hmmm, check module should calculate correct bytes, because we don't know real buffer size!

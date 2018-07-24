@@ -234,7 +234,7 @@ Reads and returns a stored config
 
 sub pg_read_conf_ok(;$$)
    {
-   my $name = shift;
+   my $name    = shift;
    my $message = shift // "Read conf <$name>";
 
    my $pathconf = _build_conf($name);
@@ -482,7 +482,7 @@ Drops a named cluster
 
 sub pg_dropcluster_ok($;$)
    {
-   my $conf = _build_conf(shift);
+   my $conf    = _build_conf(shift);
    my $message = shift // "Dropping cluster $conf->{name}";
 
    my $tb = __PACKAGE__->builder;
@@ -526,7 +526,7 @@ Drop a named cluster, but don't thow an failure if it exists.
 
 sub pg_dropcluster_if_exists_ok($;$)
    {
-   my $conf = _build_conf(shift);
+   my $conf    = _build_conf(shift);
    my $message = shift // "Dropping cluster $conf->{name}";
 
    unless ( -d "$conf->{cluster_path}/$conf->{name}" )
@@ -575,7 +575,7 @@ starts the cluster $name
 
 sub pg_start_ok(;$$)
    {
-   my $conf = _build_conf(shift);
+   my $conf    = _build_conf(shift);
    my $message = shift // "Start Server $conf->{name}";
 
    my $tb = __PACKAGE__->builder;
@@ -664,7 +664,7 @@ Stops the cluster $name
 
 sub pg_stop_ok(;$$)
    {
-   my $conf = _build_conf(shift);
+   my $conf    = _build_conf(shift);
    my $message = shift // "Stopping Cluster '$conf->{name}'";
 
    my $tb = __PACKAGE__->builder;
@@ -702,7 +702,7 @@ Stops the cluster $name
 
 sub pg_stop_if_running_ok(;$$)
    {
-   my $conf = _build_conf(shift);
+   my $conf    = _build_conf(shift);
    my $message = shift // "Stopping Cluster '$conf->{name}'";
 
    if ( -f "$conf->{cluster_path}/$conf->{name}/postmaster.pid" )

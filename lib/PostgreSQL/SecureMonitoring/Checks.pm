@@ -183,11 +183,11 @@ has language             => ( is => "ro", isa => "Str",           default   => "
 has volatility           => ( is => "ro", isa => "Str",           default   => "STABLE", );
 has has_multiline_result => ( is => "ro", isa => "Bool",          default   => 0, );
 has has_writes           => ( is => "ro", isa => "Bool",          default   => 0, );
-has arguments            => ( is => "ro", isa => "ArrayRef[Any]", default   => sub { [] }, traits  => ['Array'], 
-                                                                                           handles => 
-                                                                                             { 
-                                                                                             has_arguments => 'count', 
-                                                                                             all_arguments => 'elements', 
+has arguments            => ( is => "ro", isa => "ArrayRef[Any]", default   => sub { [] }, traits  => ['Array'],
+                                                                                           handles =>
+                                                                                             {
+                                                                                             has_arguments => 'count',
+                                                                                             all_arguments => 'elements',
                                                                                              }, );
 # options for graphs, display, ...
 # Graph type: line, area, stacked_area, ...
@@ -198,7 +198,7 @@ has graph_mirrored       => ( is => "ro", isa => "Bool",          predicate => "
 
 
 # The following values can be set via config file etc as parameter
-has enabled              => ( is => "ro", isa => "Bool",          default   => 1,); 
+has enabled              => ( is => "ro", isa => "Bool",          default   => 1,);
 has warning_level        => ( is => "ro", isa => "Num",           predicate => "has_warning_level", );
 has critical_level       => ( is => "ro", isa => "Num",           predicate => "has_critical_level", );
 has min_value            => ( is => "ro", isa => "Num",           predicate => "has_min_value", );
@@ -333,7 +333,7 @@ sub _build_sql_function
    if ( $return_type =~ m{,} )
       {
       #<<<
-      $new_type    = "CREATE TYPE ${ \$self->sql_function_name }_type AS ($return_type);" 
+      $new_type    = "CREATE TYPE ${ \$self->sql_function_name }_type AS ($return_type);"
                    . "ALTER  TYPE ${ \$self->sql_function_name }_type OWNER TO ${ \$self->superuser };";
       $return_type = "${ \$self->sql_function_name }_type";
       #>>>
@@ -487,7 +487,7 @@ sub execute
    foreach my $par_ref ( $self->all_arguments )
       {
       my ( $name, $type, $default ) = @$par_ref;
-      push @values, $self->$name // $default;
+      push @values,       $self->$name // $default;
       push @placeholders, q{?};
       }
 
@@ -673,7 +673,7 @@ override C<test_critical_warning> instead (or too).
 
 sub status
    {
-   my $self = shift;
+   my $self   = shift;
    my $result = shift // croak "status needs a result hash for checking!";
 
    return STATUS_CRITICAL if $result->{critical};

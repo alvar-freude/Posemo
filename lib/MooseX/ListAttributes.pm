@@ -59,7 +59,7 @@ sub list_attributes
    foreach my $attr ( sort { $a->name cmp $b->name } $self->meta->get_all_attributes )
       {
       next unless $attr->documentation;
-      my $attr_name = $attr->name;
+      my $attr_name   = $attr->name;
       my $attr_reader = $attr->reader // $attr_name;
 
       next if $attr_name =~ m{^_}x;

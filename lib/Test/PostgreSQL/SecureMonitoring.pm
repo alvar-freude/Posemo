@@ -189,7 +189,7 @@ Test passes, if there is a warning in the result
 
 sub warning_ok($;$)
    {
-   my $result = shift;
+   my $result  = shift;
    my $message = shift // "Result has warning";
    return ok( $result->{warning}, $message );
    }
@@ -204,7 +204,7 @@ Test passes, if there is no warning in the result
 
 sub no_warning_ok($;$)
    {
-   my $result = shift;
+   my $result  = shift;
    my $message = shift // "Result has no warning";
    return ok( !$result->{warning}, $message );
    }
@@ -219,7 +219,7 @@ Test passes, if result is critical.
 
 sub critical_ok($;$)
    {
-   my $result = shift;
+   my $result  = shift;
    my $message = shift // "Result is critical";
    return ok( $result->{critical}, $message );
    }
@@ -233,7 +233,7 @@ Test passes, if result is not critical.
 
 sub no_critical_ok($;$)
    {
-   my $result = shift;
+   my $result  = shift;
    my $message = shift // "Result is not crtitical";
    return ok( !$result->{critical}, $message );
    }
@@ -387,7 +387,7 @@ Checks if the result_is_counter flag is set
 
 sub result_is_counter($;$)
    {
-   my $result = shift;
+   my $result  = shift;
    my $message = shift // "Result is counter";
 
    return ok( $result->{result_is_counter}, $message );
@@ -395,7 +395,7 @@ sub result_is_counter($;$)
 
 sub result_isnt_counter($;$)
    {
-   my $result = shift;
+   my $result  = shift;
    my $message = shift // "Result is counter";
 
    return ok( !$result->{result_is_counter}, $message );
