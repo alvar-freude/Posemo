@@ -82,7 +82,7 @@ has message          => ( is => "ro", isa => "Str", builder   => "_build_message
 
 check_has
    description    => 'Database is writeable before timeout',
-   return_type    => "bool",                       # the SQL-functions returns true/false
+   return_type    => "boolean",                    # the SQL-functions returns true/false
    result_type    => "float",                      # but the check itself returns seconds as float
    result_unit    => "s",
    volatility     => "VOLATILE",                   # Our check modifies the database ...
