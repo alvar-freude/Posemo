@@ -30,7 +30,6 @@ check_has
    return_type       => "bigint",
    result_unit       => "buffers",
    result_is_counter => 1,
-   graph_type        => "line",
 
    code => q{
       SELECT buffers_alloc FROM pg_stat_bgwriter;
