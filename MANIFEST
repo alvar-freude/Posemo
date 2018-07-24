@@ -10,8 +10,9 @@ conf/posemo.conf
 conf/simple-local.conf
 conf/test-example.conf
 Documentation/README.md
+frontend_connectors/check_mk/checks/posemo
 frontend_connectors/check_mk/cmk_posemo_example
-frontend_connectors/check_mk/posemo
+frontend_connectors/check_mk/metrics/posemo
 frontend_connectors/check_mk/TODO.txt
 ignore.txt
 lib/Config/FindFile.pm
