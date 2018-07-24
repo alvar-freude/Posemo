@@ -39,9 +39,13 @@ def parse_posemo(info):
     parsed = json.loads(json_data.decode('utf-8'))
     
     # Test ....
-    pprint.pprint(check_info)
-    pprint.pprint(graph_info)        # klappt das? dann kann ich die Sachen doch auch hier befüllen?
-
+    # pprint.pprint(check_info)
+    # pprint.pprint(graph_info)        # klappt das? dann kann ich die Sachen doch auch hier befüllen?
+    
+    # this will not work ... 
+    # metric_info.merge(parsed["check_mk_metric_info"])
+    # graph_info.merge(parsed["check_mk_graph_info"])
+    # 
     return parsed
 
 
