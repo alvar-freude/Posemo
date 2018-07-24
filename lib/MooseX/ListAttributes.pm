@@ -27,7 +27,7 @@ use version; our $VERSION = qv("v0.9.0");
 
 =head1 SYNOPSIS
 
-  with 'MooseX::ListAttributes';
+  with 'MooseX::ListAttributes'; 
 
   # later, inside a method
   $self->list_attributes if $self->show_options;
