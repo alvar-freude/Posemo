@@ -2,13 +2,13 @@
 
 # Posemo – PostgreSQL Secure Monitoring
 
-Posemo is a PostgreSQL monitoring framework, that can monitor everything in Postgres with an unprivileged user, which has no access to any data. Posemo conforms to the rules of the *German Federal Office for Information Security* ([Bundesamt für Sicherheit in der Informationstechnik](https://www.bsi.bund.de/), BSI). It is build to check tens, hundrets or thousands of servers fast.
+Posemo is a PostgreSQL monitoring framework, that can monitor everything in Postgres with an unprivileged user, which has no access to any data. Posemo conforms to the rules of the *German Federal Office for Information Security* ([Bundesamt für Sicherheit in der Informationstechnik](https://www.bsi.bund.de/), BSI). It is built to check tens, hundreds or thousands of servers fast.
 
 Posemo itself has no display capabilities, but can output the results for every monitoring environment (e.g. check_mk, Nagios, Zabbix, Icinga, …).
 
 ## This is a Pre-Release!
 
-This is now a **usable** pre-release with limited checks. It is not feature comple. **See quick installation instructions below.**
+This is now a **usable** pre-release with limited checks. It is not feature complete. **See quick installation instructions below.**
 
 Posemo is in active development, more checks are coming!
 
@@ -24,9 +24,9 @@ Pull requests are welcome, feature requests too.
 
 ### Developer manuals
 
-* [How to write check Modules](pod/PostgreSQL/SecureMonitoring/Manual/CheckModules.pod)
+* [How to write Check Modules](pod/PostgreSQL/SecureMonitoring/Manual/CheckModules.pod)
 
-* [How to write a frontend connector / outout modules](pod/PostgreSQL/SecureMonitoring/Manual/OutputModules.pod)
+* [How to write a frontend connector / output modules](pod/PostgreSQL/SecureMonitoring/Manual/OutputModules.pod)
 
 * [Coding Styleguide](pod/PostgreSQL/SecureMonitoring/Manual/Styleguide.pod)
 
@@ -34,11 +34,11 @@ Pull requests are welcome, feature requests too.
 
 ## Concepts
 
-Posemo is a modular framework for creating monitoring checks for PostgreSQL. It is simple to add a new check. Usually just have to write the SQL for the check and add some configuration. And it is recommended, to write some tests for every check.
+Posemo is a modular framework for creating monitoring checks for PostgreSQL. It is simple to add a new check. Usually you just have to write the SQL for the check and add some configuration. It is recommended to write some tests for every check.
 
-You may look in [PostgreSQL::SecureMonitoring::Checks](lib/PostgreSQL/SecureMonitoring/Checks) for the checks which are currently ready to use.
+You may look in [PostgreSQL::SecureMonitoring::Checks](lib/PostgreSQL/SecureMonitoring/Checks) for the checks currently ready to use.
 
-Posemo is a modern Perl application using Moose; at installation it generates PostgerSQL functions for every check. These functions are called by an unprivileged user who can only call these functions, nothing else. But since they are `SECURITY DEFINER` functions, they run with more privileges (usually as superuser, and since PostgreSQL 10 as a user, which is member of `pg_monitor`). You need a superuser for installation, but checks can run (from remote or local) by an unprivileged user. Therefore, **the monitoring server need no access to your databases, no access to PostgreSQL internals; it can't change or read your data – it can only call some predefined functions.**
+Posemo is a modern Perl application using Moose; at installation it generates PostgreSQL functions for every check. These functions are called by an unprivileged user who can only call these functions, nothing else. But since they are `SECURITY DEFINER` functions, they run with more privileges (usually as superuser, and since PostgreSQL 10 as a user, which is member of `pg_monitor`). You need a superuser for installation, but checks can run (from remote or local) by an unprivileged user. Therefore, **the monitoring server need no access to your databases, no access to PostgreSQL internals; it can't change or read your data – it can only call some predefined functions.**
 
 
 For a simple check you may look below at the *SimpleAlive* Check, which simply returns always true. It uses a lot of defaults from `PostgreSQL::SecureMonitoring::Checks` and sugar from `PostgreSQL::SecureMonitoring::ChecksHelper`:
@@ -160,7 +160,7 @@ INFO : Run check Writeable for host localhost
 
 You can see all options with a short description via `--help` (Short: `-h`) or with default values via `--show_options`.
 
-Result is now in the outfile; if no outfile is given, then output goes to STDOUT. Messages (INFO, …) go to STDERR, so you can redirect them both.
+The result is now in the outfile; if no outfile is given, then output goes to STDOUT. Messages (INFO, …) go to STDERR, so you can redirect them both.
 
 For more complex configuration look into the examples in `conf/` or the tests in `t/`.
 
@@ -170,7 +170,7 @@ For more complex configuration look into the examples in `conf/` or the tests in
 
 For development, you usually don't run the real checks, but the test environment. It installs everything in a clean temporary PostgreSQL database (test files `t/[01]*`) and cleans it up after testing (test files `t/99*`).
 
-For testing you need a local PostgreSQL installation. We use a new testing module for starting/stopping/... PostgreSQL instances called `Test::PostgreSQL::Starter`, which is included (but will be an extra CPAN module later).
+For testing you need a local PostgreSQL installation. We use a new testing module for starting/stopping/... PostgreSQL instances called `Test::PostgreSQL::Starter`, which is included (but will be a separate CPAN module later).
 
 The [pgTAP PostgreSQL extension](http://pgtap.org) ([pgTAP code on GitHub](https://github.com/theory/pgtap/)) is necessary too (installed in the local Postgres-Installation).
 
