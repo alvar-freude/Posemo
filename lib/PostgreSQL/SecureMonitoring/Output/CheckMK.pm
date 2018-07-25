@@ -250,7 +250,7 @@ use Moose::Util::TypeConstraints;
 use JSON;
 
 use Config::FindFile qw(search_conf);
-use Log::Log4perl::EasyCatch ( log_config => search_conf("posemo-logging.properties") );
+use Log::Log4perl::EasyCatch ( log_config => search_conf( "posemo-logging.properties", "Posemo" ) );
 
 use English qw( -no_match_vars );
 

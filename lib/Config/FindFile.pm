@@ -104,9 +104,9 @@ use 5.010;                                         # "defined or" operator exist
 
 sub search_conf
    {
-   my $name   = shift;
+   my $name = shift;
    my $module = shift // caller;
-
+   
    # 1. Look on development place
    my $file = "$Bin/../conf/$name";
    return $file if -f $file;
@@ -124,11 +124,16 @@ sub search_conf
    return $file if -f $file;
 
    # and othervise look in applications share dir or local relative dir conf
-   my $distconfdir = eval { return File::ShareDir::module_dir($module) } // "conf";
+   my $distconfdir = eval { return $module =~ m{::} ? File::ShareDir::module_dir($module) : File::ShareDir::dist_dir($module) }
+      // "conf";
+
+   warn $@ if $@;
 
    # warn "Share-Dir-Eval-Error: $EVAL_ERROR" if $EVAL_ERROR;
    $file = "$distconfdir/$name";
    return $file if -f $file;
+
+   die "nix gefunden; Name: '$name', Module: '$module', Distconfdir: $distconfdir\n";
 
 
    ( my $cwd_without_lib = getcwd ) =~ s{/lib/.*}{}x;

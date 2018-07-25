@@ -110,17 +110,18 @@ use Data::Dumper;
 
 use Config::Any;
 
+use PostgreSQL::SecureMonitoring;
+
 use Config::FindFile qw(search_conf);
-use Log::Log4perl::EasyCatch ( log_config => search_conf("posemo-logging.properties") );
+use Log::Log4perl::EasyCatch ( log_config => search_conf( "posemo-logging.properties", "Posemo" ) );
 use Log::Log4perl::Level;
 
-use PostgreSQL::SecureMonitoring;
 
 use IO::All -utf8;
 
 #<<<
 
-has configfile => ( is => "ro", isa => "Str",          default => search_conf("posemo.conf"),            documentation => "Configuration file", );
+has configfile => ( is => "ro", isa => "Str",          default => search_conf("posemo.conf", "Posemo"),  documentation => "Configuration file", );
 has log_config => ( is => "rw", isa => "Str",                                                            documentation => "Alternative logging config", );
 has outfile    => ( is => "ro", isa => "Str",          default => q{-},                                  documentation => "Output file name; - for STDOUT (default)", );
 has verbose    => ( is => "ro", isa => "Bool",                                                           documentation => "Enable verbose messages to screen", );
@@ -585,7 +586,7 @@ sub _parameter_for_one_host
 # TODO: $in_host is sometimes undef. Check it!
 sub _split_host_and_name
    {
-   my $in_host    = shift // "";
+   my $in_host = shift // "";
    my $out_params = shift;
 
    TRACE "Set config option for unsplitted Host $in_host";

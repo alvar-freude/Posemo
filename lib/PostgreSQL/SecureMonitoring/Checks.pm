@@ -146,7 +146,7 @@ use Data::Dumper;
 use Carp;
 
 use Config::FindFile qw(search_conf);
-use Log::Log4perl::EasyCatch ( log_config => search_conf("posemo-logging.properties") );
+use Log::Log4perl::EasyCatch ( log_config => search_conf( "posemo-logging.properties", "Posemo" ) );
 
 =head3 Constants: STATUS_OK, STATUS_WARNING, STATUS_CRITICAL, STATUS_UNKNOWN
 
