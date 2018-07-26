@@ -80,11 +80,13 @@ my $builder = Module::Build->new(
 
    # install default configs (e.g. logging.properties!) in share_dir
    share_dir => {
-      module => {
-                  'PostgreSQL::SecureMonitoring' => [ 'conf', ],
-                },
+      dist => [qw(conf frontend_connectors)],
 
-   },
+      #      module => {
+      #                  'PostgreSQL::SecureMonitoring' => [ 'conf', ],
+      #                },
+
+                },
 
    add_to_cleanup     => ['Posemo-*'],
    create_makefile_pl => 'traditional',
@@ -115,7 +117,7 @@ $builder->create_build_script();
       libmodule-build-perl
 
   # Test Dependencies:
-  apt-get install libtap-parser-sourcehandler-pgtap-perl libtest-differences-perl libtest-exception-perl libtext-diff-perl
+  apt-get install libtap-parser-sourcehandler-pgtap-perl libtest-differences-perl libtest-exception-perl libtext-diff-perl libtest-deep-perl
 
 
 =end

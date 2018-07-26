@@ -2,7 +2,6 @@
 .travis.yml
 bin/posemo.pl
 bin/posemo_install.pl
-bin/posemo_json.pl
 Build.PL
 Changes
 conf/posemo-logging.properties
@@ -49,6 +48,7 @@ pod/PostgreSQL/SecureMonitoring/Manual/CheckModules.pod
 pod/PostgreSQL/SecureMonitoring/Manual/OutputModules.pod
 pod/PostgreSQL/SecureMonitoring/Manual/Styleguide.pod
 pod/PostgreSQL/SecureMonitoring/Manual/UserConfig.pod
+pod/PostgreSQL/SecureMonitoring/README.md
 README.md
 t/000-load.t
 t/001-postgresql-start.t

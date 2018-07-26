@@ -76,6 +76,9 @@
 \blogs\b
 .aus\b
 
+\bMETA\..*
+\bPosemo-.*tar\.gz$
+
 # Eclipse
 \.includepath$
 

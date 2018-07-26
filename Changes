@@ -19,6 +19,9 @@ Revision history for Posemo -- PostgreSQL-Secure-Monitoring
        Set attribute "output" instead of return value.
        This allows output modules to have multiple outputs.
 
-0.6.3 2018-07-24
+0.6.3  2018-07-24
        New CheckMK output with extra metrics output file.
-       
+
+0.7.0  2018-07-26
+       Packaging and fixes for share_dir
+
