@@ -22,6 +22,10 @@ Revision history for Posemo -- PostgreSQL-Secure-Monitoring
 0.6.3  2018-07-24
        New CheckMK output with extra metrics output file.
 
-0.7.0  2018-07-26
+0.70   2018-07-26
+       New Version number scheme
        Packaging and fixes for share_dir
+
+0.71   2018-07-27
+       Added two new checks by CF and CD: BGWriterPressure, Checkpoints
 

@@ -24,7 +24,9 @@ lib/PostgreSQL/SecureMonitoring/Checks/Activity.pm
 lib/PostgreSQL/SecureMonitoring/Checks/Alive.pm
 lib/PostgreSQL/SecureMonitoring/Checks/AllocatedBuffers.pm
 lib/PostgreSQL/SecureMonitoring/Checks/BackupAge.pm
+lib/PostgreSQL/SecureMonitoring/Checks/BGWriterPressure.pm
 lib/PostgreSQL/SecureMonitoring/Checks/CacheHitRatio.pm
+lib/PostgreSQL/SecureMonitoring/Checks/Checkpoints.pm
 lib/PostgreSQL/SecureMonitoring/Checks/CheckpointTime.pm
 lib/PostgreSQL/SecureMonitoring/Checks/ConnectionLimit.pm
 lib/PostgreSQL/SecureMonitoring/Checks/CRUDCount.pm
@@ -79,6 +81,8 @@ t/517-connection-limit.t
 t/520-transactions.t
 t/523-checkpoint-time.t
 t/524-allocated-buffers.t
+t/525-Checkpoints.t
+t/526-bgwriter-pressure.t
 t/530-cache-hit-ratio.t
 t/531-crud-count.t
 t/701-run-json.t
