@@ -13,10 +13,20 @@ use warnings FATAL => 'all';
 eval " use Module::Build 0.36; return 1; "
    or die "Please install perl module Module::Build 0.36 or newer for installation. Stopped.\n";
 
+
+
+
 # The socketdir, which is used by Test::PostgreSQL::Starter
 my $socketdir = ( $ENV{POSTGRES_TEST_DIR} // "/tmp/_test-postgresql-starter" ) . "/sockets";
 
-my $builder = Module::Build->new(
+my $class = Module::Build->subclass( class => "Module::Build::Posemo", code => <<'CODE');
+BEGIN
+{
+   eval 'use Module::Build::Debian; return 1;' or warn "Missing Module::Build::Debian ... $@\n";
+}
+CODE
+
+my $builder = $class->new(
    module_name       => 'Posemo',
    license           => 'open_source',             # PostgreSQL license not known by Module::Buid
    dist_author       => q{Alvar C.H. Freude <alvar@a-blast.org>},
@@ -29,12 +39,12 @@ my $builder = Module::Build->new(
       sources => {
          Perl  => undef,
          pgTAP => {
-                    dbname   => '_posemo_tests',
-                    username => '_posemo_tests',           # no superuser -- switch manuelly, when pgTAP needs it!
-                                                           # superuser => '_posemo_superuser',
-                    host     => $socketdir,
-                    suffix   => '.pg',
-                    port     => 15432,
+                   dbname   => '_posemo_tests',
+                   username => '_posemo_tests',           # no superuser -- switch manuelly, when pgTAP needs it!
+                                                          # superuser => '_posemo_superuser',
+                   host     => $socketdir,
+                   suffix   => '.pg',
+                   port     => 15432,
                   },
                  },
    },
@@ -90,7 +100,7 @@ my $builder = Module::Build->new(
 
    add_to_cleanup     => ['Posemo-*'],
    create_makefile_pl => 'traditional',
-                                );
+                         );
 
 # TODO:
 # How to install the files in pod directory?
@@ -118,6 +128,18 @@ $builder->create_build_script();
 
   # Test Dependencies:
   apt-get install libtap-parser-sourcehandler-pgtap-perl libtest-differences-perl libtest-exception-perl libtext-diff-perl libtest-deep-perl
+
+
+
+# packaging test:
+
+  apt-get install libmodule-build-perl 
+
+  cpan Module::Build::Debian
+  # (PROXY!)
+
+
+
 
 
 =end

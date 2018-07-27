@@ -85,7 +85,6 @@ The following options of Gonfig::General are enabled:
   -IncludeRelative    => 1,
   -IncludeDirectories => 1,
   -IncludeGlob        => 1,
-
 So all options may be written in lower/upper case mixed. If you use another config file format
 (YAML, JSON, ...), then you should write all attribute names in lowercase.
 
@@ -586,7 +585,7 @@ sub _parameter_for_one_host
 # TODO: $in_host is sometimes undef. Check it!
 sub _split_host_and_name
    {
-   my $in_host = shift // "";
+   my $in_host    = shift // "";
    my $out_params = shift;
 
    TRACE "Set config option for unsplitted Host $in_host";

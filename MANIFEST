@@ -97,3 +97,5 @@ t/log-test.properties
 t/perlcriticrc
 t/perltidyrc
 TODO.txt
+META.yml
+META.json

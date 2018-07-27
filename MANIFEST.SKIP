@@ -78,6 +78,8 @@
 
 \bMETA\..*
 \bPosemo-.*tar\.gz$
+\bdebian.*
+
 
 # Eclipse
 \.includepath$
