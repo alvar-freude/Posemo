@@ -64,7 +64,6 @@
 \bBuild.COM$
 \bBUILD.COM$
 \bbuild.com$
-^MANIFEST\.SKIP
 ^MANIFEST\.bak
 
 # Avoid archives of this distribution
@@ -76,9 +75,10 @@
 \blogs\b
 .aus\b
 
-\bMETA\..*
 \bPosemo-.*tar\.gz$
-\bdebian.*
+
+# exclude debian build directory (for ./Build debian)
+\bdebian\b
 
 
 # Eclipse

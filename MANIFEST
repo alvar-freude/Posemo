@@ -42,7 +42,11 @@ lib/PostgreSQL/SecureMonitoring/Run.pm
 lib/Test/PostgreSQL/SecureMonitoring.pm
 lib/Test/PostgreSQL/Starter.pm
 LICENSE.txt
+Makefile.PL
 MANIFEST			This list of files
+MANIFEST.SKIP
+META.json
+META.yml
 pod/PostgreSQL/SecureMonitoring/Manual.pod
 pod/PostgreSQL/SecureMonitoring/Manual/CheckModules.pod
 pod/PostgreSQL/SecureMonitoring/Manual/OutputModules.pod
@@ -97,5 +101,3 @@ t/log-test.properties
 t/perlcriticrc
 t/perltidyrc
 TODO.txt
-META.yml
-META.json
