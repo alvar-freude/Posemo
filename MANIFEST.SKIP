@@ -77,8 +77,9 @@
 
 \bPosemo-.*tar\.gz$
 
-# exclude debian build directory (for ./Build debian)
+# exclude packages and debian build directory (for ./Build debian)
 \bdebian\b
+\bpackages\b
 
 
 # Eclipse
