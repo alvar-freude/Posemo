@@ -16,56 +16,56 @@ Pull requests are welcome, feature requests too.
 
 Starting with version 0.71, there is also a Debian package. See packages folder.
 
-Starting with version 0.72, Posemo can also run as daemon.
+Starting with version 0.72, Posemo can also run as daemon (via `posemo_daemon.pl`).
 
-## Synopsis
+## Synopsis / Examples
 
-  ```
+  ```shell
   # Install Posemo in local PostgreSQL
-  $ posemo_install.pl --create-database --create-schema
+  posemo_install.pl --create-database --create-schema
 
   # Show all options, current and default values of installation programm
-  $ posemo_install.pl --show-options
+  posemo_install.pl --show-options
   
   # Start a simple run with default configs
-  $ posemo.pl 
+  posemo.pl 
 
   # Show all options, current and default values
-  $ posemo.pl --show-options
+  posemo.pl --show-options
 
   # Format output pretty
-  $ posemo.pl --pretty
+  posemo.pl --pretty
   
   # The same, explizit JSON output
-  $ posemo.pl JSON --pretty
+  posemo.pl JSON --pretty
   
   # Output for CheckMK, instead plain JSON
-  $ posemo.pl CheckMk
+  posemo.pl CheckMK
   
   # Run with default output (JSON), given configfile and outfile
-  $ posemo.pl --configfile=conf/my-posemo-config.conf --outfile=results/posemo-test.json --pretty
+  posemo.pl --configfile=conf/my-posemo-config.conf --outfile=results/posemo-test.json --pretty
   
   # Run as daemon in background, run all 60 seconds with outfile
-  $ posemo_daemon.pl --outfile=results/daemon-test.json
+  posemo_daemon.pl --outfile=results/daemon-test.json
   
   # The same, explicit start command
-  $ posemo_daemon.pl start --outfile=results/daemon-test.json
+  posemo_daemon.pl start --outfile=results/daemon-test.json
 
   # Daemon mode and CheckMK output
-  $ posemo_daemon.pl start CheckMK --outfile=results/daemon-test.checkmk
+  posemo_daemon.pl start CheckMK --outfile=results/daemon-test.checkmk
   
   # Start daemon und run checks every 5 seconds!
-  $ posemo_daemon.pl --outfile=results/daemon-test.json --sleep-time
+  posemo_daemon.pl --outfile=results/daemon-test.json --sleep-time
 
   # Check, if the daemon is running.
-  $ posemo_daemon.pl status
+  posemo_daemon.pl status
   
   # Stop daemon
-  $ posemo_daemon.pl stop
+  posemo_daemon.pl stop
   
   # Daemon mode understands everything from App::Daemon
   # e.g. set other PID file etc.
-  $ posemo_daemon.pl --outfile=tmp/result.json -p posemo.pid
+  posemo_daemon.pl --outfile=tmp/result.json -p posemo.pid
   
   ```
 
