@@ -1,6 +1,7 @@
 .project
 .travis.yml
 bin/posemo.pl
+bin/posemo_daemon.pl
 bin/posemo_install.pl
 Build.PL
 Changes

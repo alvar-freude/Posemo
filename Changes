@@ -29,3 +29,7 @@ Revision history for Posemo -- PostgreSQL-Secure-Monitoring
 0.71   2018-07-27
        Added two new checks by CF and CD: BGWriterPressure, Checkpoints
 
+0.72   2018-07-29
+       New feature: Daemon mode!
+       See new Synopsis/Examples in README.md
+

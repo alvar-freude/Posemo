@@ -120,11 +120,13 @@ use IO::All -utf8;
 
 #<<<
 
-has configfile => ( is => "ro", isa => "Str",          default => search_conf("posemo.conf", "Posemo"),  documentation => "Configuration file", );
-has log_config => ( is => "rw", isa => "Str",                                                            documentation => "Alternative logging config", );
-has outfile    => ( is => "ro", isa => "Str",          default => q{-},                                  documentation => "Output file name; - for STDOUT (default)", );
-has verbose    => ( is => "ro", isa => "Bool",                                                           documentation => "Enable verbose messages to screen", );
-has quiet      => ( is => "ro", isa => "Bool",                                                           documentation => "Silent mode: don't log messages to screen", );
+has configfile => ( is => "ro", isa => "Str",  default => search_conf("posemo.conf", "Posemo"),  documentation => "Configuration file", );
+has log_config => ( is => "rw", isa => "Str",                                                    documentation => "Alternative logging config", );
+has outfile    => ( is => "ro", isa => "Str",  default => q{-},                                  documentation => "Output file name; - for STDOUT (default)", );
+has verbose    => ( is => "ro", isa => "Bool",                                                   documentation => "Enable verbose messages to screen", );
+has quiet      => ( is => "ro", isa => "Bool",                                                   documentation => "Silent mode: don't log messages to screen", );
+has sleep_time => ( is => "ro", isa => "Int",  default => 60,                                    documentation => "When running in Daemon mode, time between runs", );
+has _is_daemon => ( is => "ro", isa => "Bool", default => 0, );
 
 #>>>
 
@@ -278,6 +280,8 @@ sub BUILD
       {
       DEBUG "Logging still initialised with default config: $DEFAULT_LOG_CONFIG.";
       }
+
+   die "Can't write to STDOUT in daemon mode; set --outfile!\n" if $self->_is_daemon and $self->outfile eq q{-};
 
    return $self;
    } ## end sub BUILD
@@ -463,7 +467,12 @@ sub run_checks
 
 =head2 write_result()
 
-Writes the final result.
+Writes the final result to the file in the C<outfile> attribute. 
+When this is C<->, then to STDOUT.
+
+The file will be written atomic to avoid race conditions: 
+When written to a file, first create a temp file with additional extension 
+C<.temp> and rename it afterwards.  
 
 May be overridden by output modules, e.g. don't write file, instead write it to a database ...
 
@@ -474,7 +483,12 @@ sub write_result
    {
    my $self = shift;
 
-   io( $self->outfile )->print( $self->output );
+   my $outfile = $self->outfile;
+
+   # write the file atomic, if not STDOUT.
+   $outfile .= ".temp" if $outfile ne q{-};
+   io($outfile)->print( $self->output );
+   rename( $outfile, $self->outfile ) || die "Error while renaming temp outfile '$outfile': $OS_ERROR\n" if $outfile ne q{-};
 
    return;
    }

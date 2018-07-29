@@ -14,12 +14,70 @@ Posemo is in active development, more checks are coming!
 
 Pull requests are welcome, feature requests too.
 
+Starting with version 0.71, there is also a Debian package. See packages folder.
+
+Starting with version 0.72, Posemo can also run as daemon.
+
+## Synopsis
+
+  ```
+  # Install Posemo in local PostgreSQL
+  $ posemo_install.pl --create-database --create-schema
+
+  # Show all options, current and default values of installation programm
+  $ posemo_install.pl --show-options
+  
+  # Start a simple run with default configs
+  $ posemo.pl 
+
+  # Show all options, current and default values
+  $ posemo.pl --show-options
+
+  # Format output pretty
+  $ posemo.pl --pretty
+  
+  # The same, explizit JSON output
+  $ posemo.pl JSON --pretty
+  
+  # Output for CheckMK, instead plain JSON
+  $ posemo.pl CheckMk
+  
+  # Run with default output (JSON), given configfile and outfile
+  $ posemo.pl --configfile=conf/my-posemo-config.conf --outfile=results/posemo-test.json --pretty
+  
+  # Run as daemon in background, run all 60 seconds with outfile
+  $ posemo_daemon.pl --outfile=results/daemon-test.json
+  
+  # The same, explicit start command
+  $ posemo_daemon.pl start --outfile=results/daemon-test.json
+
+  # Daemon mode and CheckMK output
+  $ posemo_daemon.pl start CheckMK --outfile=results/daemon-test.checkmk
+  
+  # Start daemon und run checks every 5 seconds!
+  $ posemo_daemon.pl --outfile=results/daemon-test.json --sleep-time
+
+  # Check, if the daemon is running.
+  $ posemo_daemon.pl status
+  
+  # Stop daemon
+  $ posemo_daemon.pl stop
+  
+  # Daemon mode understands everything from App::Daemon
+  # e.g. set other PID file etc.
+  $ posemo_daemon.pl --outfile=tmp/result.json -p posemo.pid
+  
+  ```
+
+
 
 ## HOWTOs and Manuals 
 
 ### User manuals
 
 * [Users Guide to the config file](pod/PostgreSQL/SecureMonitoring/Manual/UserConfig.pod)
+
+* TODO: Write Users guide for running posemo ...
 
 
 ### Developer manuals
@@ -148,10 +206,10 @@ INFO : Posemo installed.
 
 You can see all options with a short description via `--help` (Short: `-h`) or with default values via `--show_options`.
 
-Now you can run the checks with `posemo_json.pl`:
+Now you can run the checks with `posemo.pl`:
 
 ```
-$ bin/posemo_json.pl --pretty --outfile=monitoring-result.json
+$ bin/posemo.pl --pretty --outfile=monitoring-result.json
 INFO : Run check Activity for host localhost
 INFO : Run check Alive for host localhost
 INFO : Run check Backup Age for host localhost
