@@ -15,15 +15,14 @@ eval " use Module::Build 0.36; return 1; "
 
 
 
-
 # The socketdir, which is used by Test::PostgreSQL::Starter
 my $socketdir = ( $ENV{POSTGRES_TEST_DIR} // "/tmp/_test-postgresql-starter" ) . "/sockets";
 
 my $class = Module::Build->subclass( class => "Module::Build::Posemo", code => <<'CODE');
 BEGIN
-{
-   eval 'use Module::Build::Debian; return 1;' or warn "Missing Module::Build::Debian ... $@\n";
-}
+   {
+   eval 'use Module::Build::Debian; return 1;' or warn "Can't build Debian packages, missing Module::Build::Debian\n";
+   }
 CODE
 
 my $builder = $class->new(
@@ -39,12 +38,12 @@ my $builder = $class->new(
       sources => {
          Perl  => undef,
          pgTAP => {
-                   dbname   => '_posemo_tests',
-                   username => '_posemo_tests',           # no superuser -- switch manuelly, when pgTAP needs it!
-                                                          # superuser => '_posemo_superuser',
-                   host     => $socketdir,
-                   suffix   => '.pg',
-                   port     => 15432,
+                    dbname   => '_posemo_tests',
+                    username => '_posemo_tests',           # no superuser -- switch manuelly, when pgTAP needs it!
+                                                           # superuser => '_posemo_superuser',
+                    host     => $socketdir,
+                    suffix   => '.pg',
+                    port     => 15432,
                   },
                  },
    },
