@@ -191,6 +191,10 @@ it uses File::HomeDir to get the dist data directory for the given application.
 So, for testing create a "logs" directory in your distributions directory; 
 othervise or after installation, the logic of L<File::HomeDir|File::HomeDir> is used.
 
+TODO: Because of "state $logdir ..." the logdir is only set once; when an application 
+uses multiple application names, then this uses only the first one! => TODO is: use a 
+hash in package.
+
 
 =cut
 
