@@ -597,7 +597,7 @@ sub for_each_single_result                         ## no critic (Subroutines::Pr
    ( my $column        = $single_result->{column} ) =~ s{\W}{_}g;                    # Remove all non-word-chars from column ...
    ( my $title         = $single_result->{title} // q{} ) =~ s{\W}{_}g;              # ... and title
 
-   my $service_name = "PostgreSQL check $check_result->{check_name}";
+   my $service_name = "PostgreSQL $check_result->{check_name}";
    my $graph_title  = $check_result->{description};
    my $graph_name   = "posemo__$function_name";
    my $metric_name;
