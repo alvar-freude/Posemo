@@ -658,9 +658,12 @@ sub for_each_single_result                         ## no critic (Subroutines::Pr
    ( my $colname = ucfirst( $single_result->{column} ) ) =~ s{_}{ }g;
 
    # build infotext ...
-   if ( $check_result->{message} )                 # take existing message or the results as text?
+   # TODO: when error, then usually there is no result, so the following case "error" can't happen???
+   #       build an undef one in loop_over_all_results?
+   my $msg = $check_result->{message} // $check_result->{error};
+   if ($msg)                                       # take existing message or the results as text?
       {
-      $host_result->{_check_mk}{$service_name}[1] = $check_result->{message};
+      $host_result->{_check_mk}{$service_name}[1] = $check_result->{$msg};
       }
    elsif ( $self->service_type ne "local" or not $title or $title eq "_TOTAL" )    # Only add msg values for totals!
       {
