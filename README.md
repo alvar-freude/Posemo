@@ -21,12 +21,14 @@ Starting with version 0.72, Posemo can also run as daemon (via `posemo_daemon.pl
 ## Synopsis / Examples
 
   ```shell
+  # Installation:
   # Install Posemo in local PostgreSQL
   posemo_install.pl --create-database --create-schema
 
   # Show all options, current and default values of installation programm
   posemo_install.pl --show-options
   
+  # Running:
   # Start a simple run with default configs
   posemo.pl 
 
@@ -45,6 +47,11 @@ Starting with version 0.72, Posemo can also run as daemon (via `posemo_daemon.pl
   # Run with default output (JSON), given configfile and outfile
   posemo.pl --configfile=conf/my-posemo-config.conf --outfile=results/posemo-test.json --pretty
   
+  # Run checks and generate metrics file for Check_MK
+  # You may use "=" --option=value, or space: --option value
+  posemo.pl CheckMK posemo.pl CheckMK --metrics-outfile=/path/to/checkmk/metrics/posemo --outfile result.txt
+  
+  # Posemo as Daemon:
   # Run as daemon in background, run all 60 seconds with outfile
   posemo_daemon.pl --outfile=results/daemon-test.json
   
@@ -77,7 +84,7 @@ Starting with version 0.72, Posemo can also run as daemon (via `posemo_daemon.pl
 
 * [Users Guide to the config file](pod/PostgreSQL/SecureMonitoring/Manual/UserConfig.pod)
 
-* TODO: Write Users guide for running posemo ...
+* TODO: Write Users guide for setup and running posemo ...
 
 
 ### Developer manuals
