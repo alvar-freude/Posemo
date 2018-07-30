@@ -55,7 +55,7 @@ Starting with version 0.72, Posemo can also run as daemon (via `posemo_daemon.pl
   posemo_daemon.pl start CheckMK --outfile=results/daemon-test.checkmk
   
   # Start daemon und run checks every 5 seconds!
-  posemo_daemon.pl --outfile=results/daemon-test.json --sleep-time
+  posemo_daemon.pl --outfile=results/daemon-test.json --sleep-time=5
 
   # Check, if the daemon is running.
   posemo_daemon.pl status
