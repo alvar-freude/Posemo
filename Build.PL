@@ -81,11 +81,11 @@ my $builder = $class->new(
       'File::ShareDir'            => 1.102,        # used by Config::FindFile
       'JSON'                      => 2.90,
 
-      # currently not used:
-      # 'Config::Validate'  => '0.2.6',
-      # ' Data::Validate '  => 0.09, ???
-
                },
+
+   recommends => {
+                   'App::Daemon' => 0.22,
+                 },
 
    # install default configs (e.g. logging.properties!) in share_dir
    share_dir => {
@@ -123,6 +123,7 @@ $builder->create_build_script();
       libconfig-tiny-perl \
       libjson-perl \
       libjson-xs-perl \
+      libapp-daemon-perl \
       libmodule-build-perl
 
   # Test Dependencies:
