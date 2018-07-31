@@ -51,6 +51,7 @@ MANIFEST.SKIP
 META.json
 META.yml
 pod/PostgreSQL/SecureMonitoring/Manual.pod
+pod/PostgreSQL/SecureMonitoring/Manual/BuildDebianPackage.pod
 pod/PostgreSQL/SecureMonitoring/Manual/CheckModules.pod
 pod/PostgreSQL/SecureMonitoring/Manual/OutputModules.pod
 pod/PostgreSQL/SecureMonitoring/Manual/Styleguide.pod
