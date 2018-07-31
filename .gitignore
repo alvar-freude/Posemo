@@ -2,7 +2,6 @@
 .DS_Store
 Makefile
 Makefile.old
-Makefile.PL
 Build
 Build.bat
 MANIFEST.bak
