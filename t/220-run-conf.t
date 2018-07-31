@@ -48,7 +48,7 @@ lives_ok sub { $app = PostgreSQL::SecureMonitoring::Run->new( configfile => "$Bi
 
 my @host_groups = $app->all_host_groups;
 
-cmp_deeply( \@host_groups, [qw(Elephant Mammut SingleWithName MultiWithName ApplicationTests)], "Hostgroups found" );
+cmp_deeply( \@host_groups, [qw(Elephant Mammut SingleWithName MultiWithName NoCacheHitRatioCritical ApplicationTests)], "Hostgroups found" );
 
 
 #use Data::Dumper;
@@ -92,7 +92,7 @@ my $expected_hosts = [
                host          => $_,
                _check_params => { %elephant_check_params, },
          }
-         } qw(loc1_db1 loc1_db2 loc2_db1 loc2_db2),
+      } qw(loc1_db1 loc1_db2 loc2_db1 loc2_db2),
    ),
    {
       %outer_defaults,
@@ -116,7 +116,7 @@ my $expected_hosts = [
       host          => "123.45.67.89",
       _name         => "my_db_host_name",
       _check_params => { %outer_check_params, Writeable => { enabled => 1, timeout => 999, }, },
-   }, 
+   },
 
    {
       %outer_defaults,
@@ -131,6 +131,13 @@ my $expected_hosts = [
       host          => "2.2.2.2",
       _name         => "slave_server",
       _check_params => { %outer_check_params, },
+   },
+
+   {
+      %outer_defaults,
+      _hostgroup    => "NoCacheHitRatioCritical",
+      host          => "dont.warn.crit.cache",
+      _check_params => { %outer_check_params, CacheHitRatio => { warning_level => -1, critical_level => -1 }, },
    },
 
    {
