@@ -15,14 +15,17 @@ SELECT has_function( 'activity'::name, ARRAY['text']::name[], 'function activity
 
 SELECT ok( (SELECT count(*) FROM activity()) = 3, 'Activity gives three rows');
 
-SELECT is( (SELECT total FROM activity() WHERE database = '$TOTAL'), 1, 'only one connection to the databases ...' );
+SELECT is( 
+   (SELECT active+idle+"idle in transaction"+"idle in transaction (aborted)"+"fastpath function call"+disabled FROM activity() WHERE database = '$TOTAL'), 
+   1, 
+   'only one connection to the databases ...' );
 
 SELECT results_eq
    (
    'SELECT * FROM activity();', 
-   $$ VALUES ('$TOTAL'::VARCHAR(64),        1, 1, 0, 0, 0, 0, 0),
-             ('_posemo_tests'::VARCHAR(64), 1, 1, 0, 0, 0, 0, 0),
-             ('postgres'::VARCHAR(64),      0, 0, 0, 0, 0, 0, 0)
+   $$ VALUES ('$TOTAL'::VARCHAR(64),        1, 0, 0, 0, 0, 0),
+             ('_posemo_tests'::VARCHAR(64), 1, 0, 0, 0, 0, 0),
+             ('postgres'::VARCHAR(64),      0, 0, 0, 0, 0, 0)
    $$,
    'One active connection in activity (my connection)'
 );
@@ -31,11 +34,11 @@ SELECT results_eq
 SELECT results_eq
    (
    $$ SELECT * FROM activity(skip_db_re => ''); $$, 
-   $$ VALUES ('$TOTAL'::VARCHAR(64),        1, 1, 0, 0, 0, 0, 0),
-             ('_posemo_tests'::VARCHAR(64), 1, 1, 0, 0, 0, 0, 0),
-             ('postgres'::VARCHAR(64),      0, 0, 0, 0, 0, 0, 0),
-             ('template0'::VARCHAR(64),     0, 0, 0, 0, 0, 0, 0),
-             ('template1'::VARCHAR(64),     0, 0, 0, 0, 0, 0, 0)
+   $$ VALUES ('$TOTAL'::VARCHAR(64),        1, 0, 0, 0, 0, 0),
+             ('_posemo_tests'::VARCHAR(64), 1, 0, 0, 0, 0, 0),
+             ('postgres'::VARCHAR(64),      0, 0, 0, 0, 0, 0),
+             ('template0'::VARCHAR(64),     0, 0, 0, 0, 0, 0),
+             ('template1'::VARCHAR(64),     0, 0, 0, 0, 0, 0)
    $$,
    'empty skip regexp'
 );
@@ -44,11 +47,11 @@ SELECT results_eq
 SELECT results_eq
    (
    $$ SELECT * FROM activity(skip_db_re => NULL); $$, 
-   $$ VALUES ('$TOTAL'::VARCHAR(64),        1, 1, 0, 0, 0, 0, 0),
-             ('_posemo_tests'::VARCHAR(64), 1, 1, 0, 0, 0, 0, 0),
-             ('postgres'::VARCHAR(64),      0, 0, 0, 0, 0, 0, 0),
-             ('template0'::VARCHAR(64),     0, 0, 0, 0, 0, 0, 0),
-             ('template1'::VARCHAR(64),     0, 0, 0, 0, 0, 0, 0)
+   $$ VALUES ('$TOTAL'::VARCHAR(64),        1, 0, 0, 0, 0, 0),
+             ('_posemo_tests'::VARCHAR(64), 1, 0, 0, 0, 0, 0),
+             ('postgres'::VARCHAR(64),      0, 0, 0, 0, 0, 0),
+             ('template0'::VARCHAR(64),     0, 0, 0, 0, 0, 0),
+             ('template1'::VARCHAR(64),     0, 0, 0, 0, 0, 0)
    $$,
    'NULL skip regexp'
 );
@@ -57,10 +60,10 @@ SELECT results_eq
 SELECT results_eq
    (
    $$ SELECT * FROM activity(skip_db_re => 'ostg[a-z]e'); $$, 
-   $$ VALUES ('$TOTAL'::VARCHAR(64),        1, 1, 0, 0, 0, 0, 0),
-             ('_posemo_tests'::VARCHAR(64), 1, 1, 0, 0, 0, 0, 0),
-             ('template0'::VARCHAR(64),     0, 0, 0, 0, 0, 0, 0),
-             ('template1'::VARCHAR(64),     0, 0, 0, 0, 0, 0, 0)
+   $$ VALUES ('$TOTAL'::VARCHAR(64),        1, 0, 0, 0, 0, 0),
+             ('_posemo_tests'::VARCHAR(64), 1, 0, 0, 0, 0, 0),
+             ('template0'::VARCHAR(64),     0, 0, 0, 0, 0, 0),
+             ('template1'::VARCHAR(64),     0, 0, 0, 0, 0, 0)
    $$,
    'empty skip pOSTGRes regexp'
 );
@@ -69,9 +72,9 @@ SELECT results_eq
 SELECT results_eq
    (
    $$ SELECT * FROM activity(skip_db_re => '^template[01]$'); $$, 
-   $$ VALUES ('$TOTAL'::VARCHAR(64),        1, 1, 0, 0, 0, 0, 0),
-             ('_posemo_tests'::VARCHAR(64), 1, 1, 0, 0, 0, 0, 0),
-             ('postgres'::VARCHAR(64),      0, 0, 0, 0, 0, 0, 0)
+   $$ VALUES ('$TOTAL'::VARCHAR(64),        1, 0, 0, 0, 0, 0),
+             ('_posemo_tests'::VARCHAR(64), 1, 0, 0, 0, 0, 0),
+             ('postgres'::VARCHAR(64),      0, 0, 0, 0, 0, 0)
    $$,
    'skip template DBSs, like default'
 );

@@ -18,7 +18,7 @@ row_type_is $result,    "multiline";
 result_unit_is $result, "";
 
 result_is $result,
-   [ [ '$TOTAL', 1, 1, 0, 0, 0, 0, 0, ], [ "_posemo_tests", 1, 1, 0, 0, 0, 0, 0, ], [ "postgres", 0, 0, 0, 0, 0, 0, 0, ], ],
+   [ [ '$TOTAL', 1, 0, 0, 0, 0, 0, ], [ "_posemo_tests", 1, 0, 0, 0, 0, 0, ], [ "postgres", 0, 0, 0, 0, 0, 0, ], ],
    "Activity as expected";
 
 

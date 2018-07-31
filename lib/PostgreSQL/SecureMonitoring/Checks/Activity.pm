@@ -23,11 +23,11 @@ This check returns a matrix list of all active sessions on all databases.
 
 The SQL generates a result like this:
 
-    database    | total | active | idle | idle in transaction | idle in transaction (aborted) | fastpath function call | disabled 
- ---------------+-------+--------+------+---------------------+-------------------------------+------------------------+----------
-  $TOTAL        |     1 |      1 |    0 |                   0 |                             0 |                      0 |        0
-  _posemo_tests |     1 |      1 |    0 |                   0 |                             0 |                      0 |        0
-  postgres      |     0 |      0 |    0 |                   0 |                             0 |                      0 |        0
+    database    | active | idle | idle in transaction | idle in transaction (aborted) | fastpath function call | disabled 
+ ---------------+--------+------+---------------------+-------------------------------+------------------------+----------
+  $TOTAL        |      1 |    0 |                   0 |                             0 |                      0 |        0
+  _posemo_tests |      1 |    0 |                   0 |                             0 |                      0 |        0
+  postgres      |      0 |    0 |                   0 |                             0 |                      0 |        0
  (3 rows)
 
 
@@ -57,7 +57,6 @@ check_has
    # complex return type
    return_type => q{
       database                        VARCHAR(64), 
-      total                           INTEGER, 
       active                          INTEGER, 
       idle                            INTEGER, 
       "idle in transaction"           INTEGER, 
@@ -69,7 +68,6 @@ check_has
       WITH states AS 
          (
             SELECT db.datname::VARCHAR(64)                                                         AS database, 
-                   COUNT(CASE WHEN state IS NOT NULL                       THEN true END)::INTEGER AS total, 
                    COUNT(CASE WHEN state = 'active'                        THEN true END)::INTEGER AS active,
                    COUNT(CASE WHEN state = 'idle'                          THEN true END)::INTEGER AS idle,
                    COUNT(CASE WHEN state = 'idle in transaction'           THEN true END)::INTEGER AS "idle in transaction",
@@ -82,22 +80,22 @@ check_has
           GROUP BY database
           ORDER BY database
          )
-       SELECT '$TOTAL', sum(total)::INTEGER, 
-                        sum(active)::INTEGER, 
-                        sum(idle)::INTEGER, 
-                        sum("idle in transaction")::INTEGER, 
-                        sum("idle in transaction (aborted)")::INTEGER, 
-                        sum("fastpath function call")::INTEGER, 
-                        sum(disabled)::INTEGER 
+       SELECT '$TOTAL', 
+               sum(active)::INTEGER, 
+               sum(idle)::INTEGER, 
+               sum("idle in transaction")::INTEGER, 
+               sum("idle in transaction (aborted)")::INTEGER, 
+               sum("fastpath function call")::INTEGER, 
+               sum(disabled)::INTEGER 
          FROM states
        UNION ALL
-       SELECT database, total, 
-                        active, 
-                        idle, 
-                        "idle in transaction", 
-                        "idle in transaction (aborted)", 
-                        "fastpath function call", 
-                        disabled 
+       SELECT database,
+              active, 
+              idle, 
+              "idle in transaction", 
+              "idle in transaction (aborted)", 
+              "fastpath function call", 
+              disabled 
          FROM states;
       };
 
