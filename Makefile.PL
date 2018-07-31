@@ -2,35 +2,35 @@
 use ExtUtils::MakeMaker;
 WriteMakefile
 (
+  'NAME' => 'Posemo',
+  'VERSION_FROM' => 'lib/PostgreSQL/SecureMonitoring.pm',
+  'PREREQ_PM' => {
+                   'Config::General' => '2.5',
+                   'Config::Tiny' => '2.2',
+                   'DBD::Pg' => '3.005001',
+                   'DBI' => '1.631',
+                   'File::HomeDir' => '1',
+                   'File::ShareDir' => '1.102',
+                   'IO::All' => '0.84',
+                   'JSON' => '2.9',
+                   'Log::Log4perl' => '1.29',
+                   'Moose' => '2.0401',
+                   'MooseX::ConfigFromFile' => '0.04',
+                   'MooseX::Getopt' => '0.37',
+                   'MooseX::SimpleConfig' => '0.11',
+                   'MooseX::Types::Path::Tiny' => '0.011',
+                   'Readonly' => '1.03',
+                   'TAP::Parser::SourceHandler::pgTAP' => '3.25',
+                   'Test::Differences' => '0.64',
+                   'Test::Exception' => '0.25',
+                   'Test::More' => 0
+                 },
   'INSTALLDIRS' => 'site',
-  'PL_FILES' => {},
   'EXE_FILES' => [
                    'bin/posemo.pl',
                    'bin/posemo_daemon.pl',
                    'bin/posemo_install.pl'
                  ],
-  'PREREQ_PM' => {
-                   'Moose' => '2.0401',
-                   'DBD::Pg' => '3.005001',
-                   'File::ShareDir' => '1.102',
-                   'MooseX::ConfigFromFile' => '0.04',
-                   'TAP::Parser::SourceHandler::pgTAP' => '3.25',
-                   'Readonly' => '1.03',
-                   'File::HomeDir' => '1',
-                   'Config::General' => '2.5',
-                   'Config::Tiny' => '2.2',
-                   'MooseX::SimpleConfig' => '0.11',
-                   'Log::Log4perl' => '1.29',
-                   'Test::Differences' => '0.64',
-                   'IO::All' => '0.84',
-                   'DBI' => '1.631',
-                   'MooseX::Getopt' => '0.37',
-                   'Test::More' => 0,
-                   'JSON' => '2.9',
-                   'MooseX::Types::Path::Tiny' => '0.011',
-                   'Test::Exception' => '0.25'
-                 },
-  'VERSION_FROM' => 'lib/PostgreSQL/SecureMonitoring.pm',
-  'NAME' => 'Posemo'
+  'PL_FILES' => {}
 )
 ;

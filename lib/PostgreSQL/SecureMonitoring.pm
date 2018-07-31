@@ -15,7 +15,7 @@ Version 0.6.3
 use Moose;
 use 5.010;
 
-our $VERSION = "0.801002";
+our $VERSION = "0.801003";
 
 #use version; our $VERSION = qv("0.7.0");
 
