@@ -1,7 +1,11 @@
 Revision history for Posemo -- PostgreSQL-Secure-Monitoring
 
+
+0.801002 2018-07-31
+         Changed $TOTAL to !TOTAL everywhere. 
+
 0.800001 2018-07-30
-         Updated check_mk metrics; updated checks (color infos).
+         Updated check_mk metrics; updated checks (color infos).  
 
 0.72     2018-07-29
          New feature: Daemon mode!
