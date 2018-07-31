@@ -715,15 +715,32 @@ sub loop_over_all_results
 
             if ( $check_result->{row_type} eq "single" )
                {
-               @values = {
-                           value  => $check_result->{result},
-                           column => $check_result->{columns}[0],
-                         };
+               @values = (
+                           {
+                             value  => $check_result->{result},
+                             column => $check_result->{columns}[0],
+                             pos    => 1,
+                           }
+                         );
+               $values[0]{color} = $check_result->{graph_colors}[0] if $check_result->{graph_colors};
                }
             elsif ( $check_result->{row_type} eq "list" )
                {
                my $pos = 0;
-               @values = map { { value => $ARG, column => $check_result->{columns}[ $pos++ ], } } @{ $check_result->{result} };
+
+               #@values = map { { value => $ARG, column => $check_result->{columns}[ $pos++ ], } } @{ $check_result->{result} };
+               my $result = $check_result->{result};
+               for my $pos ( 0 .. $#$result )
+                  {
+                  push @values,
+                     {
+                       value  => $result->[$pos],
+                       column => $check_result->{columns}[$pos],
+                       pos    => $pos + 1,
+                     };
+                  $values[-1]{color} = $check_result->{graph_colors}[$pos] if $check_result->{graph_colors};
+                  }
+
                }
             elsif ( $check_result->{row_type} eq "multiline" )
                {
@@ -731,15 +748,23 @@ sub loop_over_all_results
                # extract all values from result rows; first column is title
                foreach my $row ( @{ $check_result->{result} } )
                   {
-                  my $pos = 1;
-                  push @values,
-                     map { { value => $ARG, column => $check_result->{columns}[ $pos++ ], title => $row->[0], } }
-                     @{$row}[ 1 .. $#$row ];
+                  # TODO: clean nested!
+                  for my $pos ( 1 .. $#$row )      ## no critic (ControlStructures::ProhibitDeepNests)
+                     {
+                     push @values,
+                        {
+                          value  => $row->[$pos],
+                          column => $check_result->{columns}[$pos],
+                          title  => $row->[0],
+                          pos    => $pos,
+                        };
+                     $values[-1]{color} = $check_result->{graph_colors}[ $pos - 1 ] if $check_result->{graph_colors};
+                     }
 
                   # We may call the row method ...
                   $self->for_each_row_result( $host_result, $check_result, $row ) if $self->can("for_each_row_result");
                   }
-               }
+               } ## end elsif ( $check_result->{row_type...})
 
             # Call single result method, if it exists.
             if ( $self->can("for_each_single_result") )

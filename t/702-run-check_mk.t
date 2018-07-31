@@ -77,15 +77,14 @@ is $error_count, 0, "No error state in data";
 is $data->{check_mk_inventory}[0][0], 'PostgreSQL Activity of $TOTAL', "First service name in inventory";
 
 is $data->{check_mk_data}[0][1],
-   'Total: 1, Active: 1, Idle: 0, Idle in transaction: 0, Idle in transaction (aborted): 0, Fastpath function call: 0, Disabled: 0',
+   'Active: 1, Idle: 0, Idle in transaction: 0, Idle in transaction (aborted): 0, Fastpath function call: 0, Disabled: 0',
    "First message in data";
-is $data->{check_mk_data}[0][2][0][0], "posemo__activity__total",                         "Column total";
-is $data->{check_mk_data}[0][2][1][0], "posemo__activity__active",                        "Column active";
-is $data->{check_mk_data}[0][2][2][0], "posemo__activity__idle",                          "Column idle";
-is $data->{check_mk_data}[0][2][3][0], "posemo__activity__idle_in_transaction",           "Column idle in transaction";
-is $data->{check_mk_data}[0][2][4][0], "posemo__activity__idle_in_transaction__aborted_", "Column idle in transaction (aborted)";
-is $data->{check_mk_data}[0][2][5][0], "posemo__activity__fastpath_function_call",        "Column fastpath function call";
-is $data->{check_mk_data}[0][2][6][0], "posemo__activity__disabled",                      "Column disbled";
+is $data->{check_mk_data}[0][2][0][0], "posemo__activity__active",                        "Column active";
+is $data->{check_mk_data}[0][2][1][0], "posemo__activity__idle",                          "Column idle";
+is $data->{check_mk_data}[0][2][2][0], "posemo__activity__idle_in_transaction",           "Column idle in transaction";
+is $data->{check_mk_data}[0][2][3][0], "posemo__activity__idle_in_transaction__aborted_", "Column idle in transaction (aborted)";
+is $data->{check_mk_data}[0][2][4][0], "posemo__activity__fastpath_function_call",        "Column fastpath function call";
+is $data->{check_mk_data}[0][2][5][0], "posemo__activity__disabled",                      "Column disbled";
 
 # Removed, because metric/graph infos will not created here anymore
 # TODO: test new metrics file definition.

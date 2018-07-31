@@ -34,6 +34,7 @@ check_has
 	result_type       => "integer",
 	result_is_counter => 1,
 	graph_type        => "stacked_area",
+   graph_colors      => [qw(green purple)],
 
 	# complex return type
 	return_type => q{

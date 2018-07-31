@@ -52,6 +52,7 @@ check_has
    result_unit          => "",
    result_type          => "bigint",
    arguments            => [ [ skip_db_re => 'TEXT', '^template[01]$' ], ],
+   graph_colors         => [qw(light_blue blue pastel_green orange purple)],
 
    # complex return type
    return_type => q{

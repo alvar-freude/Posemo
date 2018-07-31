@@ -1,35 +1,38 @@
 Revision history for Posemo -- PostgreSQL-Secure-Monitoring
 
-0.10    2017-05-18 
-        First public version, Pre-Release!
+0.800001 2018-07-30
+         Updated check_mk metrics; updated checks (color infos).
 
-...
+0.72     2018-07-29
+         New feature: Daemon mode!
+         See new Synopsis/Examples in README.md
+       
+0.71     2018-07-27
+         Added two new checks by CF and CD: BGWriterPressure, Checkpoints
 
-0.6.0  2018-04-30 
-       Full usable Version with some checks and output modules
-       as JSON and CheckMK. 
-       A lot of changes since last enty above, see git log for more.
+0.70     2018-07-26
+         New Version number scheme
+         Packaging and fixes for share_dir
 
-0.6.1  2018-06-11 
-       A lot of documentation updates 
+0.6.3    2018-07-24
+         New CheckMK output with extra metrics output file.
 
-0.6.2  2018-06-20
-       Change output module API,
-       prepared for CheckMK metrics output.
-       Set attribute "output" instead of return value.
-       This allows output modules to have multiple outputs.
+0.6.2    2018-06-20
+         Change output module API,
+         prepared for CheckMK metrics output.
+         Set attribute "output" instead of return value.
+         This allows output modules to have multiple outputs.
 
-0.6.3  2018-07-24
-       New CheckMK output with extra metrics output file.
+0.6.1    2018-06-11 
+         A lot of documentation updates 
 
-0.70   2018-07-26
-       New Version number scheme
-       Packaging and fixes for share_dir
+0.6.0    2018-04-30 
+         Full usable Version with some checks and output modules
+         as JSON and CheckMK. 
+         A lot of changes since last enty above, see git log for more.
 
-0.71   2018-07-27
-       Added two new checks by CF and CD: BGWriterPressure, Checkpoints
+         ...
 
-0.72   2018-07-29
-       New feature: Daemon mode!
-       See new Synopsis/Examples in README.md
+0.10     2017-05-18 
+         First public version, Pre-Release!
 

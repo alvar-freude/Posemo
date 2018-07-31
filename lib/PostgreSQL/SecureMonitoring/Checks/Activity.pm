@@ -53,6 +53,7 @@ check_has
    result_type          => "integer",
    arguments            => [ [ skip_db_re => 'TEXT', '^template[01]$' ], ],
    graph_type           => "stacked_area",
+   graph_colors         => [qw(blue pastel_green red purple light_yellow yellow)],
 
    # complex return type
    return_type => q{

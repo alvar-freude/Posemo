@@ -35,6 +35,7 @@ check_has
    result_unit       => "ms",
    result_is_counter => 1,
    graph_type        => "stacked_area",
+   graph_colors      => [qw(light_blue purple)],
 
    # complex return type
    return_type => q{

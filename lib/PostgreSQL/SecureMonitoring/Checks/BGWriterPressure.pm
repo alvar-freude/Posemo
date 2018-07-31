@@ -35,6 +35,7 @@ check_has
    result_is_counter => 1,
    graph_type        => "area",
    graph_mirrored    => 1,
+   graph_colors      => [ qw(red red_variant) ],
 
    # complex return type
    return_type => q{

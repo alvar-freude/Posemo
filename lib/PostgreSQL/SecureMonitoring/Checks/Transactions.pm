@@ -45,6 +45,7 @@ check_has
    result_is_counter    => 1,
    graph_mirrored       => 1,                      # display commit/rolback obove/below middle line
    graph_type           => "area",
+   graph_colors         => [qw(green purple)],
    has_multiline_result => 1,
    arguments            => [ [ skip_db_re => 'TEXT', '^template[01]$' ], ],
 

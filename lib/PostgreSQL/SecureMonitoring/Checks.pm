@@ -195,6 +195,7 @@ has arguments            => ( is => "ro", isa => "ArrayRef[Any]", default   => s
 has result_is_counter    => ( is => "ro", isa => "Bool",          predicate => "has_result_is_counter", );
 has graph_type           => ( is => "ro", isa => "Str",           predicate => "has_graph_type",        );
 has graph_mirrored       => ( is => "ro", isa => "Bool",          predicate => "has_graph_mirrored",    );
+has graph_colors         => ( is => "ro", isa => "ArrayRef[Str]", predicate => "has_graph_colors",      );
 
 
 # The following values can be set via config file etc as parameter
@@ -434,6 +435,8 @@ sub run_check
       eval { $self->rollback if $self->has_dbh; return 1; } or ERROR "Error in rollback: $EVAL_ERROR";
       }
 
+   $result->{row_type} //= "none";
+
    $result->{check_name}        = $self->name;
    $result->{description}       = $self->description;
    $result->{result_unit}       = $self->result_unit;
@@ -446,7 +449,7 @@ sub run_check
                       min_value max_value
                       lower_is_worse
                       result_is_counter
-                      graph_type graph_mirrored
+                      graph_type graph_mirrored graph_colors
                       )
       )
       {
