@@ -1,0 +1,94 @@
+=encoding utf8
+
+=head1 Posemo Developer Manual: How to create Debian packages
+
+=head2 Prerequisites
+
+You need the following packages installed on the build machine. 
+
+Everything listed in Build.PL:
+
+ apt-get install libdbd-pg-perl \
+      libmoosex-simpleconfig-perl \
+      libmoosex-configfromfile-perl \
+      liblog-log4perl-perl \
+      libconfig-general-perl \
+      libreadonly-perl \
+      libio-all-perl \
+      libfile-homedir-perl \
+      libfile-sharedir-perl \
+      libconfig-tiny-perl \
+      libjson-perl \
+      libjson-xs-perl \
+      libapp-daemon-perl \
+      libmodule-build-perl
+
+  # Test Dependencies:
+  apt-get install libtap-parser-sourcehandler-pgtap-perl libtest-differences-perl libtest-exception-perl libtext-diff-perl libtest-deep-perl
+
+
+For Building Debian packages you need the following packages too:
+
+ apt-get install  \
+   postgresql-96  \
+   pgtap          \
+   dh-make-perl
+
+
+
+And you need the Perl Module Module::Build::Debian from CPAN, because there is no Debian package.
+
+Call CPAN shell as root (and with correct proxy Environment) and call the install command!
+
+  cpan
+  [...]
+  > install Module::Build::Debian
+
+
+Or install in a single CLI call:
+
+  cpan Module::Build::Debian
+
+
+=head2 Building Debian package
+
+
+First build an archive as Perl Distribution:
+
+  > perl Build.PL      # this catches the version number from the lib!
+  > ./Build dist
+
+
+Then extract this dist package (don't (re)move it!):
+
+  > tar -xzvf Posemo-0.801002-TRIAL.tar.gz
+
+Go to the new directory:
+
+  > cd Posemo-0.801002-TRIAL
+
+Here you can build the debian package. B<But you need an environment, 
+where no other Perl then the system perl is in tht PATH!>
+
+Build Debian package:
+
+  > perl Build.PL
+  > ./Build debian
+
+
+Now this creates a Debian package in the directory below; while building, 
+everything get's tested.
+
+Now remove the build directory and move the Debian package 
+to packages folder:
+
+  > cd ..
+  > rm -rvf Posemo-0.801002-TRIAL/
+  > mv libposemo-perl_0.801002-1_all.deb packages/
+
+
+
+=cut
+
+
+
