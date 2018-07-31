@@ -22,8 +22,9 @@ All hosts results are in one results file (or output).
 This module generates everything completely ready for Check_MK.
 
 
-TODO: remove everything with local.
-
+ TODO: remove and clean up everything with local.
+       clean up code and comments
+       remove no critics
 
 
 =head2 output 
@@ -653,7 +654,12 @@ sub for_each_single_result                         ## no critic (Subroutines::Pr
       # global keys
       $metric_name = "posemo__${function_name}";
       $metric_name .= "__$column" if $check_result->{row_type} ne "single";
-      $service_name .= " of $single_result->{title}" if $single_result->{title};
+
+      if ( $single_result->{title} )
+         {
+         $service_name .= " of" if $single_result->{title} ne "!TOTAL";
+         $service_name .= " $single_result->{title}";
+         }
       }
 
    ( $graph_name = lc($graph_name) ) =~ s{\W}{_}g;
@@ -759,8 +765,8 @@ sub for_each_single_result                         ## no critic (Subroutines::Pr
 
    $graph_info->{$graph_name}{title} = $graph_title;    # I18N missing, can't do python function call!
 
-   # for non local multiline, build only the first row ($TOTAL)
-   if ( not defined $single_result->{title} or $single_result->{title} eq '$TOTAL' or $self->service_type eq "local" )
+   # for non local multiline, build only the first row (!TOTAL)
+   if ( not defined $single_result->{title} or $single_result->{title} eq '!TOTAL' or $self->service_type eq "local" )
       {
       # Graph type default with Posemo is LINE, except single result, then area!
       my $graph_type = $check_result->{graph_type} // ( $check_result->{row_type} eq "single" ? "area" : "line" );

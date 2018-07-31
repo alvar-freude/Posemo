@@ -10,7 +10,7 @@ package PostgreSQL::SecureMonitoring::Checks::Activity;
    <Check Activity>
      skip_db_re     = "(^template[01]|_backup)$"      # Change the default value for ignored databases 
      critical_level = 1000                            # Set a critical and warning level 
-     warning_level  = 900                             # The level is for all columns and rows; so it's for $TOTAL
+     warning_level  = 900                             # The level is for all columns and rows; so it's for !TOTAL
    </Check>
 
 
@@ -25,7 +25,7 @@ The SQL generates a result like this:
 
     database    | active | idle | idle in transaction | idle in transaction (aborted) | fastpath function call | disabled 
  ---------------+--------+------+---------------------+-------------------------------+------------------------+----------
-  $TOTAL        |      1 |    0 |                   0 |                             0 |                      0 |        0
+  !TOTAL        |      1 |    0 |                   0 |                             0 |                      0 |        0
   _posemo_tests |      1 |    0 |                   0 |                             0 |                      0 |        0
   postgres      |      0 |    0 |                   0 |                             0 |                      0 |        0
  (3 rows)
@@ -81,7 +81,7 @@ check_has
           GROUP BY database
           ORDER BY database
          )
-       SELECT '$TOTAL', 
+       SELECT '!TOTAL', 
                sum(active)::INTEGER, 
                sum(idle)::INTEGER, 
                sum("idle in transaction")::INTEGER, 

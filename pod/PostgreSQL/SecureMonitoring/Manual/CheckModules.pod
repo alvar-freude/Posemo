@@ -201,7 +201,7 @@ one summary row and one value per row.
              WHERE ( CASE WHEN length(skip_db_re) > 0 THEN datname !~ skip_db_re ELSE true END )
           ORDER BY database
             )
-          SELECT '$TOTAL' AS database,
+          SELECT '!TOTAL' AS database,
                  CAST(
                       (
                       CASE WHEN sum(blks_hit) = 0
@@ -258,7 +258,7 @@ A result of this check may look like this, when you manually call the internally
    monitoring=> SELECT * FROM cache_hit_ratio();
        database     | cache_hit_ratio
    -----------------+-----------------
-    $TOTAL          |         99.9925
+    !TOTAL          |         99.9925
     elephant        |         99.9911
     mammut          |         99.9896
     postgres        |         99.9993

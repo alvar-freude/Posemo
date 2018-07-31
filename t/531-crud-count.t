@@ -21,7 +21,7 @@ row_type_is $result,    "multiline";
 result_unit_is $result, "";
 result_is_counter $result;
 
-cmp_deeply [ map { $_->[0] } @{ $result->{result} } ], [qw( $TOTAL _posemo_tests postgres )], "Database names";
+cmp_deeply [ map { $_->[0] } @{ $result->{result} } ], [qw( !TOTAL _posemo_tests postgres )], "Database names";
 
 cmp_ok $result->{result}[1][1], '>', 1000, "Database _posemo_tests some returned rows";
 cmp_ok $result->{result}[1][2], '>', 1000, "Database _posemo_tests some fetched rows";

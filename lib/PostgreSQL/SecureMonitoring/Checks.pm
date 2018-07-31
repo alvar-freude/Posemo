@@ -67,14 +67,13 @@ If there are more then one database which delivers inforations in one check, it
 should report the database in the first column:
 
 
-   database   | total | active | idle | idle in transaction | idle aborted | fastpath  | disabled
-  ------------+-------+--------+------+---------------------+-------
-   $TOTAL     |   137 |     18 |  111 |                   8 |     0
-   postgres   |     1 |      0 |    1 |                   0 |     0
-   monitoring |     1 |      1 |    0 |                   0 |     0
-   test_1     |   123 |     16 |  100 |                   7 |     0
-   test_2     |    12 |      1 |   10 |                   1 |     0
 
+    database    | active | idle | idle in transaction | idle in transaction (aborted) | fastpath function call | disabled 
+ ---------------+--------+------+---------------------+-------------------------------+------------------------+----------
+  !TOTAL        |      1 |    0 |                   0 |                             0 |                      0 |        0
+  _posemo_tests |      1 |    0 |                   0 |                             0 |                      0 |        0
+  postgres      |      0 |    0 |                   0 |                             0 |                      0 |        0
+ (3 rows)
 
 
 Types of results:

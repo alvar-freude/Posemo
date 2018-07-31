@@ -24,7 +24,7 @@ row_type_is $result,    "multiline";
 result_unit_is $result, "";
 result_is_counter $result;
 
-cmp_deeply [ map { $_->[0] } @{ $result->{result} } ], [qw( $TOTAL _posemo_tests postgres )], "Database names";
+cmp_deeply [ map { $_->[0] } @{ $result->{result} } ], [qw( !TOTAL _posemo_tests postgres )], "Database names";
 
 my $transcount_total          = $result->{result}[0][1];
 my $transcount                = $result->{result}[1][1];

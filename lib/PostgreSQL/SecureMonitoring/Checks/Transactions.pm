@@ -17,7 +17,7 @@ The SQL generates a result like this:
 
     database    | xact_commit | xact_rollback 
  ---------------+-------------+---------------
-  $TOTAL        |          48 |             3
+  !TOTAL        |          48 |             3
   _posemo_tests |          31 |             3
   postgres      |          17 |             0
 
@@ -66,7 +66,7 @@ check_has
           WHERE ( CASE WHEN length(skip_db_re) > 0 THEN datname !~ skip_db_re ELSE true END )
        ORDER BY database
          )
-       SELECT '$TOTAL', sum(xact_commit)::BIGINT, sum(xact_rollback)::BIGINT FROM xacts
+       SELECT '!TOTAL', sum(xact_commit)::BIGINT, sum(xact_rollback)::BIGINT FROM xacts
        UNION ALL
        SELECT database, xact_commit, xact_rollback FROM xacts;
       };

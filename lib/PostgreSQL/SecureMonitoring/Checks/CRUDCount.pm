@@ -19,7 +19,7 @@ The SQL generates a result like this:
    >  SELECT * FROM crud_count();
      database  | rows_returned | rows_fetched | rows_inserted | rows_updated | rows_deleted 
    ------------+---------------+--------------+---------------+--------------+--------------
-    $TOTAL     |    4319036903 |    815248355 |       3015595 |      6440502 |        75179
+    !TOTAL     |    4319036903 |    815248355 |       3015595 |      6440502 |        75179
     monitoring |      62921444 |     13044164 |         18996 |          668 |        18293
     my_cms     |    2175313445 |    710610692 |       2777476 |      5871634 |         4494
     my_webapp  |    1481707499 |      7525438 |            18 |           27 |            8
@@ -77,7 +77,7 @@ check_has
           WHERE ( CASE WHEN length(skip_db_re) > 0 THEN datname !~ skip_db_re ELSE true END )
        ORDER BY database
          )
-       SELECT '$TOTAL', 
+       SELECT '!TOTAL', 
                sum(rows_returned)::BIGINT,
                sum(rows_fetched)::BIGINT, 
                sum(rows_inserted)::BIGINT, 

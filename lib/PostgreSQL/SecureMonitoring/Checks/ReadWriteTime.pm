@@ -79,7 +79,7 @@ check_has
           WHERE ( CASE WHEN length(skip_db_re) > 0 THEN datname !~ skip_db_re ELSE true END )
        ORDER BY database
          )
-       SELECT '$TOTAL', sum(read_time) AS read_time, sum(write_time) AS write_time FROM rw
+       SELECT '!TOTAL', sum(read_time) AS read_time, sum(write_time) AS write_time FROM rw
        UNION ALL
        SELECT database, read_time, write_time FROM rw;
       };

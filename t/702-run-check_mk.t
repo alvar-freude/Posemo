@@ -28,10 +28,9 @@ my $posemo;
 
 lives_ok sub {
    $posemo = PostgreSQL::SecureMonitoring::Run->new(
-                                                     configfile   => "$Bin/conf/run-default-checks.conf",
-                                                     outfile      => "$dir/t-702-simple.json",
-                                                     pretty       => 1,
-                                                     # service_type => "global",
+                                                     configfile => "$Bin/conf/run-default-checks.conf",
+                                                     outfile    => "$dir/t-702-simple.json",
+                                                     pretty     => 1,
                                                    );
 }, "Object for simple";
 
@@ -74,7 +73,8 @@ my $error_count = grep { $_ != 0 } map { $_[1] } @{ $data->{check_mk_data} };
 is $error_count, 0, "No error state in data";
 
 
-is $data->{check_mk_inventory}[0][0], 'PostgreSQL Activity of $TOTAL', "First service name in inventory";
+is $data->{check_mk_inventory}[0][0], 'PostgreSQL Activity !TOTAL',           "First service name in inventory";
+is $data->{check_mk_inventory}[1][0], 'PostgreSQL Activity of _posemo_tests', "second service name in inventory";
 
 is $data->{check_mk_data}[0][1],
    'Active: 1, Idle: 0, Idle in transaction: 0, Idle in transaction (aborted): 0, Fastpath function call: 0, Disabled: 0',
@@ -101,12 +101,12 @@ is $data->{check_mk_data}[0][2][5][0], "posemo__activity__disabled",            
 # cmp_deeply( $data->{check_mk_metric_info}{connection_limit__connection_limit},
 #             { title => "Connection limit", unit => "%", },
 #             "Metrics Info for ConnectionLimit" );
-# 
+#
 # cmp_deeply( $data->{check_mk_metric_info}{activity__total},
 #             { title => "Total", unit => "", },
 #             "Metrics Info for Activity, total" );
-# 
-# 
+#
+#
 # eq_or_diff(
 #             $data->{check_mk_graph_info}{activity},
 #             {
@@ -123,7 +123,6 @@ is $data->{check_mk_data}[0][2][5][0], "posemo__activity__disabled",            
 #             },
 #             "Graph Info for Activity (global)"
 #           );
-
 
 
 

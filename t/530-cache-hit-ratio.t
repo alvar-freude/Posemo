@@ -20,7 +20,7 @@ result_type_is $result, "real";
 row_type_is $result,    "multiline";
 result_unit_is $result, "%";
 
-cmp_deeply [ map { $_->[0] } @{ $result->{result} } ], [qw( $TOTAL _posemo_tests postgres )], "Database names";
+cmp_deeply [ map { $_->[0] } @{ $result->{result} } ], [qw( !TOTAL _posemo_tests postgres )], "Database names";
 
 for my $idx ( 0 .. 2 )
    {

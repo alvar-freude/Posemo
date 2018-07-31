@@ -281,7 +281,7 @@ A complex result, the SQL function returns multiple lines.
 Therefore the key C<result> contains a B<array reference of array references>.
 
 Usually each first column contains a title like a database name or table name. 
-The first row usually contains a column with the title C<$TOTAL> and summary values 
+The first row usually contains a column with the title C<!TOTAL> and summary values 
 of all other rows.
 
 As example see the checks C<DBSize>, C<Transactions> or C<Activity>.

@@ -35,7 +35,7 @@ The SQL generates a result like this:
 
     database    | cache_hit_ratio 
  ---------------+-----------------
-  $TOTAL        |         97.5702
+  !TOTAL        |         97.5702
   _posemo_tests |         97.7321
   postgres      |         89.9823
 
@@ -89,7 +89,7 @@ check_has
           WHERE ( CASE WHEN length(skip_db_re) > 0 THEN datname !~ skip_db_re ELSE true END )
        ORDER BY database
          )
-       SELECT '$TOTAL' AS database,
+       SELECT '!TOTAL' AS database,
               CAST( 
                    (
                    CASE WHEN sum(blks_hit) = 0 
