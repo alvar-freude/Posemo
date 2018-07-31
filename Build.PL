@@ -110,7 +110,7 @@ $builder->create_build_script();
 
 =begin install Ubuntu dependencies
 
-  # UNTESTED!
+  # 
   apt-get install libdbd-pg-perl \
       libmoosex-simpleconfig-perl \
       libmoosex-configfromfile-perl \
