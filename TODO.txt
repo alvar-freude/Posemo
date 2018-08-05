@@ -12,9 +12,6 @@ Put extra non monitoring specific modules into their own CPAN distribution:
 
 
 
-Revoke login right on admin user (install.pm)
-
-
 More Checks
 
 
@@ -37,171 +34,56 @@ Or install new
   
 
 
-TODO: Check this:
+TODO: Check this: (warning is fixed, but check why $in_host is undef)
 ERROR: Perl warning: Use of uninitialized value $in_host in concatenation (.) or string at bin/../lib/PostgreSQL/SecureMonitoring/Run.pm line 520. 
 ERROR: Perl warning: Use of uninitialized value $in_host in split at bin/../lib/PostgreSQL/SecureMonitoring/Run.pm line 521. 
 ERROR: Perl warning: Use of uninitialized value $in_host in concatenation (.) or string at bin/../lib/PostgreSQL/SecureMonitoring/Run.pm line 530. 
 
 
 Slave(?):
-
 INFO : Critical values: 0 0 0 0 25.5998 55.8631!  in check Cache Hit Ratio for host XXX
 INFO : Warning values: 0 0 0 0 25.5998 55.8631 in check Cache Hit Ratio for host XXX
 
-
+=> by default don't have a critical/warning level for CacheHitRatio?
 
 
 Performance:
 
   * Add Daemon mode (no startup time, keep all connections open)
+    * => time based daeomon done; maybe change daemon library; 
+    * => REST-API?
   * Add parallel mode: Run Checks on multiple servers parallel.
 
 
 
 
 
+Frontend connectors:
+
+Check_MK:
+  * clean up check_mk output module
+  * integrate python part (T)
+ 
+ 
+ Others:
+ 
+  * talk with devs of ...
+    * ZAbbix
+    * Icinga
+    * Prometheus??? (https://prometheus.io)
+    
+ 
+ 
+ Make Version 1.0 ;)
+   * => pg announce!
+
+
+Build pg extension?
 
 
 
 
 
-
-
-
-
-
-===============================
-
-Metrics stuff
-
-
-
-
-
-
-=head1 TEMP
-
-
-https://mathias-kettner.de/download/2015-Konferenz-Metricsystem.pdf
-http://lists.mathias-kettner.de/pipermail/checkmk-de/2017-March/008956.html
-
-
-
-
-
-
-
-
-metric_info["sync_time"] = {
-        "title" : _("Synchronisation time"),
-        "unit"  : "s",
-        "color" : "#94b65a",
-}
-
-metric_info["write_time"] = {
-        "title" : _("Write time"),
-        "unit"  : "s",
-        "color" : "#94b65a",
-}
-~                                 
-
-
-
-
-
-
-
-metric_info["apache_state_startingup"] = {
-    "title" : _("Starting up"),
-    "unit"  : "count",
-    "color" : "11/a",
-}
-
-metric_info["apache_state_waiting"] = {
-    "title" : _("Waiting"),
-    "unit"  : "count",
-    "color" : "14/a",
-}
-
-metric_info["apache_state_logging"] = {
-    "title" : _("Logging"),
-    "unit"  : "count",
-    "color" : "21/a",
-}
-
-metric_info["apache_state_dns"] = {
-    "title" : _("DNS lookup"),
-    "unit"  : "count",
-    "color" : "24/a",
-}
-
-metric_info["apache_state_sending_reply"] = {
-    "title" : _("Sending reply"),
-    "unit"  : "count",
-    "color" : "31/a",
-}
-
-
-
-
-
-
-
-check_metrics["check_mk-apache_status"] = {
-    "Uptime"               : { "name" : "uptime" },
-    "IdleWorkers"          : { "name" : "idle_workers" },
-    "BusyWorkers"          : { "name" : "busy_workers" },
-    "IdleServers"          : { "name" : "idle_servers" },
-    "BusyServers"          : { "name" : "busy_servers" },
-    "OpenSlots"            : { "name" : "open_slots" },
-    "TotalSlots"           : { "name" : "total_slots" },
-    "CPULoad"              : { "name" : "load1" },
-    "ReqPerSec"            : { "name" : "requests_per_second" },
-    "BytesPerSec"          : { "name" : "direkt_io" },
-    "ConnsTotal"           : { "name" : "connections" },
-    "ConnsAsyncWriting"    : { "name" : "connections_async_writing" },
-    "ConnsAsyncKeepAlive"  : { "name" : "connections_async_keepalive" },
-    "ConnsAsyncClosing"    : { "name" : "connections_async_closing" },
-    "State_StartingUp"     : { "name" : "apache_state_startingup" },
-    "State_Waiting"        : { "name" : "apache_state_waiting" },
-    "State_Logging"        : { "name" : "apache_state_logging" },
-    "State_DNS"            : { "name" : "apache_state_dns" },
-    "State_SendingReply"   : { "name" : "apache_state_sending_reply" },
-    "State_ReadingRequest" : { "name" : "apache_state_reading_request" },
-    "State_Closing"        : { "name" : "apache_state_closing" },
-    "State_IdleCleanup"    : { "name" : "apache_state_idle_cleanup" },
-    "State_Finishing"      : { "name" : "apache_state_finishing" },
-    "State_Keepalive"      : { "name" : "apache_state_keep_alive" },
-}
-
-
-
-
-graph_info["apache_status"] = {
-    "title"   : _("Apache status"),
-    "metrics" : [
-        ( "apache_state_startingup", "area" ),
-        ( "apache_state_waiting", "stack" ),
-        ( "apache_state_logging", "stack" ),
-        ( "apache_state_dns", "stack" ),
-        ( "apache_state_sending_reply", "stack" ),
-        ( "apache_state_reading_request", "stack" ),
-        ( "apache_state_closing", "stack" ),
-        ( "apache_state_idle_cleanup", "stack" ),
-        ( "apache_state_finishing", "stack" ),
-        ( "apache_state_keep_alive", "stack" ),
-    ],
-}
-
-
-
-
-
-
-
-=cut
-
-1;
 
 
 
