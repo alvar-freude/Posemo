@@ -120,7 +120,7 @@ check_has code => "SELECT true";                           # This is our check S
 1;                                                         # every Perl module must return (end with) a true value
 ```
 
-(The real C<Alive> check has more code, because it's the only one, which catches connection errors by itself.)
+(The real `Alive` check has more code, because it's the only one, which catches connection errors by itself.)
 
 
 A more advanced check is *BackupAge* check, which checks how long a backup is running and returns the seconds as integer:
