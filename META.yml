@@ -1,0 +1,104 @@
+---
+abstract: 'PostgreSQL Secure Monitoring -- flexible and secure Postgres monitoring'
+author:
+  - 'Alvar C.H. Freude <alvar@a-blast.org>'
+build_requires:
+  Config::Tiny: '2.2'
+  TAP::Parser::SourceHandler::pgTAP: '3.25'
+  Test::Differences: '0.64'
+  Test::Exception: '0.25'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.36'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Posemo
+provides:
+  Config::FindFile:
+    file: lib/Config/FindFile.pm
+    version: v1.0.0
+  Log::Log4perl::EasyCatch:
+    file: lib/Log/Log4perl/EasyCatch.pm
+    version: v0.9.2
+  MooseX::DBI:
+    file: lib/MooseX/DBI.pm
+    version: v0.5.0
+  MooseX::ListAttributes:
+    file: lib/MooseX/ListAttributes.pm
+    version: v0.9.0
+  PostgreSQL::SecureMonitoring:
+    file: lib/PostgreSQL/SecureMonitoring.pm
+    version: '0.801002'
+  PostgreSQL::SecureMonitoring::Checks:
+    file: lib/PostgreSQL/SecureMonitoring/Checks.pm
+  PostgreSQL::SecureMonitoring::Checks::Activity:
+    file: lib/PostgreSQL/SecureMonitoring/Checks/Activity.pm
+  PostgreSQL::SecureMonitoring::Checks::Alive:
+    file: lib/PostgreSQL/SecureMonitoring/Checks/Alive.pm
+  PostgreSQL::SecureMonitoring::Checks::AllocatedBuffers:
+    file: lib/PostgreSQL/SecureMonitoring/Checks/AllocatedBuffers.pm
+  PostgreSQL::SecureMonitoring::Checks::BGWriterPressure:
+    file: lib/PostgreSQL/SecureMonitoring/Checks/BGWriterPressure.pm
+  PostgreSQL::SecureMonitoring::Checks::BackupAge:
+    file: lib/PostgreSQL/SecureMonitoring/Checks/BackupAge.pm
+  PostgreSQL::SecureMonitoring::Checks::CRUDCount:
+    file: lib/PostgreSQL/SecureMonitoring/Checks/CRUDCount.pm
+  PostgreSQL::SecureMonitoring::Checks::CacheHitRatio:
+    file: lib/PostgreSQL/SecureMonitoring/Checks/CacheHitRatio.pm
+  PostgreSQL::SecureMonitoring::Checks::CheckpointTime:
+    file: lib/PostgreSQL/SecureMonitoring/Checks/CheckpointTime.pm
+  PostgreSQL::SecureMonitoring::Checks::Checkpoints:
+    file: lib/PostgreSQL/SecureMonitoring/Checks/Checkpoints.pm
+  PostgreSQL::SecureMonitoring::Checks::ConnectionLimit:
+    file: lib/PostgreSQL/SecureMonitoring/Checks/ConnectionLimit.pm
+  PostgreSQL::SecureMonitoring::Checks::DBSize:
+    file: lib/PostgreSQL/SecureMonitoring/Checks/DBSize.pm
+  PostgreSQL::SecureMonitoring::Checks::Primary:
+    file: lib/PostgreSQL/SecureMonitoring/Checks/Primary.pm
+  PostgreSQL::SecureMonitoring::Checks::ReadWriteTime:
+    file: lib/PostgreSQL/SecureMonitoring/Checks/ReadWriteTime.pm
+  PostgreSQL::SecureMonitoring::Checks::SlaveLag:
+    file: lib/PostgreSQL/SecureMonitoring/Checks/SlaveLag.pm
+  PostgreSQL::SecureMonitoring::Checks::Transactions:
+    file: lib/PostgreSQL/SecureMonitoring/Checks/Transactions.pm
+  PostgreSQL::SecureMonitoring::Checks::Writeable:
+    file: lib/PostgreSQL/SecureMonitoring/Checks/Writeable.pm
+  PostgreSQL::SecureMonitoring::ChecksHelper:
+    file: lib/PostgreSQL/SecureMonitoring/ChecksHelper.pm
+  PostgreSQL::SecureMonitoring::Install:
+    file: lib/PostgreSQL/SecureMonitoring/Install.pm
+  PostgreSQL::SecureMonitoring::Output::CheckMK:
+    file: lib/PostgreSQL/SecureMonitoring/Output/CheckMK.pm
+  PostgreSQL::SecureMonitoring::Output::JSON:
+    file: lib/PostgreSQL/SecureMonitoring/Output/JSON.pm
+  PostgreSQL::SecureMonitoring::Run:
+    file: lib/PostgreSQL/SecureMonitoring/Run.pm
+  Test::PostgreSQL::SecureMonitoring:
+    file: lib/Test/PostgreSQL/SecureMonitoring.pm
+    version: v0.1.0
+  Test::PostgreSQL::Starter:
+    file: lib/Test/PostgreSQL/Starter.pm
+    version: v0.5.2
+recommends:
+  App::Daemon: '0.22'
+requires:
+  Config::General: '2.5'
+  DBD::Pg: '3.005001'
+  DBI: '1.631'
+  File::HomeDir: '1'
+  File::ShareDir: '1.102'
+  IO::All: '0.84'
+  JSON: '2.9'
+  Log::Log4perl: '1.29'
+  Moose: '2.0401'
+  MooseX::ConfigFromFile: '0.04'
+  MooseX::Getopt: '0.37'
+  MooseX::SimpleConfig: '0.11'
+  MooseX::Types::Path::Tiny: '0.011'
+  Readonly: '1.03'
+version: '0.801002'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

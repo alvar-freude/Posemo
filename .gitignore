@@ -5,7 +5,7 @@ Makefile.old
 Build
 Build.bat
 MANIFEST.bak
-META.*
+# META.*
 MYMETA.*
 .build
 _build
