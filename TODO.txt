@@ -58,7 +58,16 @@ Performance:
 
 
 
-Frontend connectors:
+Frontend connectors / output modules:
+
+Write PostgreSQL output module
+  * writes everything as JSON?
+  * or real relational data model?
+    * JSON seems reasonable.
+      * Usually there will be no search for single values 
+      * Filter/search only by time
+  * ??? do some precalculated basic aggregation over hours/days/… ???
+  * Read and display written data with Graphana? 
 
 Check_MK:
   * clean up check_mk output module
@@ -67,10 +76,11 @@ Check_MK:
  
  Others:
  
-  * talk with devs of ...
+  * talk with devs of / write output module for ...
     * ZAbbix
     * Icinga
-    * Prometheus??? (https://prometheus.io)
+    * Prometheus (https://prometheus.io)
+    * Sensu (https://sensu.io)
     
  
  
