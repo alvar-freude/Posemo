@@ -22,6 +22,8 @@ All hosts results are in one results file (or output).
 This module generates everything completely ready for Check_MK.
 
 
+=head2 IMPORTANT TODO!
+
  TODO: remove and clean up everything with local.
        clean up code and comments
        remove no critics
@@ -50,10 +52,12 @@ per Host one block with the following content:
 
 $JSON is everything per host (from the internal data structure of default JSON output) as JSON.
 
-For easyer parsing at Python/Check_MK side, the JSON contains some extra keys, ready for Check_MK:
+The following will be removed in a later version (the python part only uses the C<_check_mk key>)
 
-   check_mk_inventory:  complete inventory
-   check_mk_data:       complete results with perfdata and all values
+ # For easyer parsing at Python/Check_MK side, the JSON contains some extra keys, ready for Check_MK:
+ # 
+ #   check_mk_inventory:  complete inventory
+ #   check_mk_data:       complete results with perfdata and all values
 
 
 This parts of the data strucre can be used to read out all results and pass them to the check_mk core. 
@@ -68,176 +72,15 @@ This is used by C<frontend_connectors/check_mk/posemo>.
 
 =head3 Precalculated check_mk perfdata
 
-As of Posemo version 0.6.3, this output module generates metrics files.
-
- 
- 
-Notes. 
-
-
-
-Units:
-
-(existing are enough?)
-
-e.g.:
-
-   unit_info["1/s"] = {
-       "title" : _("per second"),
-       "description" : _("Frequency (displayed in events/s)"),
-       "symbol" : _("/s"),
-       "render" : lambda v: "%s%s" % (drop_dotzero(v), _("/s")),
-   }
-
-
- Metrics:
-
-   #   |  How various checks' performance data translate into the known       |
-   #   |  metrics                                                             |
-   #   '----------------------------------------------------------------------'
-
-
-   metric_info["runtime"] = {
-       "title" : _("Process Runtime"),
-       "unit"  : "s",
-       "color" : "#80f000",
-   }
-
-   metric_info["apache_state_startingup"] = {
-       "title" : _("Starting up"),
-       "unit"  : "count",
-       "color" : "11/a",
-   }
-
-   metric_info["apache_state_waiting"] = {
-       "title" : _("Waiting"),
-       "unit"  : "count",
-       "color" : "14/a",
-   }
-
-
-
-   # color Too: indexed_color(1, 4), # col 1 of 4 graphs
-
-# das scheint umsetzung von apache ausgabe zu checkMK; ist bei uns schon OK?
-
-   check_metrics["check_mk-apache_status"] = {
-       "Uptime"               : { "name" : "uptime" },
-       "IdleWorkers"          : { "name" : "idle_workers" },
-       "BusyWorkers"          : { "name" : "busy_workers" },
-       "IdleServers"          : { "name" : "idle_servers" },
-       "BusyServers"          : { "name" : "busy_servers" },
-       "OpenSlots"            : { "name" : "open_slots" },
-       "TotalSlots"           : { "name" : "total_slots" },
-       "CPULoad"              : { "name" : "load1" },
-       "ReqPerSec"            : { "name" : "requests_per_second" },
-       "BytesPerSec"          : { "name" : "direkt_io" },
-       "ConnsTotal"           : { "name" : "connections" },
-       "ConnsAsyncWriting"    : { "name" : "connections_async_writing" },
-       "ConnsAsyncKeepAlive"  : { "name" : "connections_async_keepalive" },
-       "ConnsAsyncClosing"    : { "name" : "connections_async_closing" },
-       "State_StartingUp"     : { "name" : "apache_state_startingup" },
-       "State_Waiting"        : { "name" : "apache_state_waiting" },
-       "State_Logging"        : { "name" : "apache_state_logging" },
-       "State_DNS"            : { "name" : "apache_state_dns" },
-       "State_SendingReply"   : { "name" : "apache_state_sending_reply" },
-       "State_ReadingRequest" : { "name" : "apache_state_reading_request" },
-       "State_Closing"        : { "name" : "apache_state_closing" },
-       "State_IdleCleanup"    : { "name" : "apache_state_idle_cleanup" },
-       "State_Finishing"      : { "name" : "apache_state_finishing" },
-       "State_Keepalive"      : { "name" : "apache_state_keep_alive" },
-   }
-
-   
-   # Types of Perf-O-Meters:
-   # linear      -> multiple values added from left to right
-   # logarithmic -> one value in a logarithmic scale
-   # dual        -> two Perf-O-Meters next to each other, the first one from right to left
-   # stacked     -> two Perf-O-Meters of type linear, logarithmic or dual, stack vertically
-   # The label of dual and stacked is taken from the definition of the contained Perf-O-Meters
-
-      perfometer_info.append({
-       "type"       : "logarithmic",
-       "metric"     : "runtime", 
-       "half_value" : 864000.0,
-       "exponent"   : 2,
-   })
-
-
-   # beware: the order of the list elements of graph_info is actually important.
-   # It determines the order of graphs of a service, which in turn is used by
-   # the report definitions to determine which graph to include.
-
-   # Order of metrics in graph recipes important if you use only 'area':
-   # The first one must be the bigger one, then descending.
-   # Example: ('tablespace_size', 'area'),
-   #          ('tablespace_used', 'area')
-
-   graph_info["fan_speed"] = {
-       "title"     : _("Fan speed"),
-       "metrics"   : [
-           ( "fan_speed", "area" ),
-       ]
-   }
-
-
-   graph_info["busy_and_idle_servers"] = {
-       "title"   : _("Busy and idle servers"),
-       "metrics" : [
-           ( "busy_servers", "area" ),
-           ( "idle_servers", "stack" ),
-       ],
-   }
-
-
-   graph_info["apache_status"] = {
-       "title"   : _("Apache status"),
-       "metrics" : [
-           ( "apache_state_startingup", "area" ),
-           ( "apache_state_waiting", "stack" ),
-           ( "apache_state_logging", "stack" ),
-           ( "apache_state_dns", "stack" ),
-           ( "apache_state_sending_reply", "stack" ),
-           ( "apache_state_reading_request", "stack" ),
-           ( "apache_state_closing", "stack" ),
-           ( "apache_state_idle_cleanup", "stack" ),
-           ( "apache_state_finishing", "stack" ),
-           ( "apache_state_keep_alive", "stack" ),
-       ],
-   }
-
-
-
-
-
-
-
-For writeable 
-
-   "PostgreSQL check Writeable" : [
-       0,
-       "Write time: 0.00123810768127441 s",
-       [
-         [
-             "writeable__write_time",
-             0.00123810768127441,
-             5,
-             3
-         ]
-       ]
-   ],
-
-
-=>
-
-
-
-
+In the key C<_check_mk>, this output module has the complete result for check_mk,
 
 
 =head2 metrics files
 
-The check_mk output module can generate metrics files. 
+As of Posemo version 0.6.3, this output module can generate metrics files.
+
+Unless you add your own checks, you don't need to generate new metrics files 
+and can use the precreated in C<frontend_connectors/check_mk/metrics/posemo>.
 
 
   TODO: docs
