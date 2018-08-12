@@ -15,19 +15,21 @@ all check results including critical/warning, some global meta data, some meta
 data for each host and some meta data (e.g. how to display graphs, names 
 and titles) per check. 
 
-Some fontends like C<check_mk> need some global "metrics" configuration 
-(infos about titles, graphs, … ), this may be generated too.
+Some fontends like C<check_mk> need some extra (global) "metrics" configuration, which 
+depend on the Checks, which can not included in the result. This may be infos about 
+titles, graphs, a list of all checks, … this infos may be generated too by the output 
+module.
 
 =head3 Output Modules
 
-Output Modules are L<Moose Roles|Moose::Role> which must implement one 
+Output Modules are L<Moose Roles|Moose::Role> which must implement at least one 
 method: C<generate_output>. The role will be consumed by C<PostgreSQL::SecureMonitoring::Run> 
 (or maybe any subclass). 
 
 Output Modules may have any number of Moose attributes, which 
-a user can use as command line parameters.
+a user can use as command line options.
 
-The C<generate_output> should set the C<output> attribute; 
+The C<generate_output> should set the C<output> attribute (a string); 
 it can be set directly or via adding content.
 
   # Set everything
@@ -36,10 +38,14 @@ it can be set directly or via adding content.
   # Or add something (default: empty string, so you can add from begin):
   $self->add_output( $partly_output_string );
 
+Posemo gives you helpers for looping over all results or hosts. Usually you should 
+use the buildin method and only write your needed callbacks, instead if looping 
+by yourself. See L</"Iterate over all results"> below.
+
 
 =head3 Global Metrics or Graph Info
 
-Some implementations (e.g. check_mk) need some globbal metrics 
+Some implementations (e.g. check_mk) need some global metrics 
 or graph info file.
 
 You should may collect all infos in the C<generate_output> method inside 
@@ -117,7 +123,7 @@ not in the order of the following example.
                   ], # End result list
    }
 
-
+   
 
 
 =head3 Global meta data
@@ -446,12 +452,42 @@ C<Transactions> check.
 =back
 
 
+=head2 Iterate over all results
+
+If you must touch the results to perform some work (e.g. collect each single result 
+or host in a flat list), use the following. It may help a lot to write output modules. 
+You should not lopp over all hosts or results by yourself, you should call the method 
+and write some callbacks.
+
+You can call the C<loop_over_all_results> method to loop over all single results. 
+This iterates over all results and calls methods in your output module for 
+each host, check and single result.
+
+Call it as:
+
+  $self->loop_over_all_results($complete_result);
+
+where C<$complete_result> is the result (input) parameter of the output method.
+
+This calls the following methods in your module, if it exists:
+
+   for_each_host          ($host_result)
+   for_each_check         ($host_result, $check_result)
+   for_each_row_result    ($host_result, $check_result, $row)
+   for_each_single_result ($host_result, $check_result, $single_result)
+
+=head3 TODO
+
+TODO: More Documentation here. You may look at the CheckMK output module for an 
+example, or in Run.pm for the code!
+
 
 
 =head2 Recommendations for frontends
 
-...
+TODO.
 
+...
 
 
 =cut
