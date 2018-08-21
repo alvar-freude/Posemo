@@ -40,6 +40,10 @@ use English qw( -no_match_vars );
 use Config::FindFile qw(search_conf);
 use Log::Log4perl::EasyCatch ( log_config => search_conf( "posemo-logging.properties", "Posemo" ) );
 
+use IO::All -utf8;
+
+
+
 extends "PostgreSQL::SecureMonitoring";
 
 =head1 METHODS
@@ -114,6 +118,8 @@ has drop_schema           => ( is => "ro", isa => "Bool", default => 0,         
 has installation_user     => ( is => "ro", isa => "Str",                                 documentation => "User for creating superuser", );
 has installation_passwd   => ( is => "ro", isa => "Str",                                 documentation => "Password for the connect_user", );
 has installation_database => ( is => "ro", isa => "Str",  default => "postgres",         documentation => "Connect DB for admin", );
+has outfile               => ( is => "ro", isa => "Str",                                 documentation => "Outfile for output in file instead of DB; '-' for STDOUT", );
+has extension             => ( is => "ro", isa => "Bool", default => 0,                  documentation => "Flag: creates extension file (needs outfile!)", );
 
 #>>> no perltidy
 
@@ -138,6 +144,8 @@ sub install
 
    return $self->list_attributes if $self->show_options;
 
+   die "outfile&extension not fully implemented yet!\n" if $self->outfile or $self->extension;
+
    my $installed_non_rollbackable = 0;
    INFO "Install Posemo and Checks";
    if ( $self->create_database )
@@ -156,14 +164,14 @@ sub install
       if ( $self->create_database )
          {
          TRACE "Clean up owner and permissions of created database";
-         $self->dbh->do("ALTER          DATABASE ${ \$self->database } OWNER TO ${ \$self->superuser };");
-         $self->dbh->do("REVOKE ALL  ON DATABASE ${ \$self->database } FROM PUBLIC;");
+         $self->do_sql("ALTER          DATABASE ${ \$self->database } OWNER TO ${ \$self->superuser };");
+         $self->do_sql("REVOKE ALL  ON DATABASE ${ \$self->database } FROM PUBLIC;");
          }
-      $self->dbh->do("GRANT  CONNECT ON DATABASE ${ \$self->database } TO ${ \$self->user }");
+      $self->do_sql("GRANT  CONNECT ON DATABASE ${ \$self->database } TO ${ \$self->user }");
 
       $self->_do_install_schema if $self->create_schema;
-      $self->dbh->do("SET search_path TO ${ \$self->schema }");
-      $self->dbh->do("SET role ${ \$self->superuser }");
+      $self->do_sql("SET search_path TO ${ \$self->schema }");
+      $self->do_sql("SET role ${ \$self->superuser }");
 
       INFO "Install all check functions";
       $self->install_checks;
@@ -181,6 +189,7 @@ sub install
 
    return 1;
    } ## end sub install
+
 
 =head2 install_basics
 
@@ -230,13 +239,36 @@ sub install_checks
    return 1;
    }
 
+=head2 ->do_sql($sql)
+
+Internal: called for every SQL. In normal mode it calls ->do_sql(), when there is 
+an outfile then append it to the file.
+
+Important: at initialization the file has to be emptied!
+
+
+
+=cut
+
+sub do_sql
+   {
+   my $self = shift;
+   my $sql  = shift;
+
+   if   ( $self->outfile ) { io( $self->outfile )->append($sql); }
+   else                    { $self->dbh->do($sql); }
+
+   return;
+   }
+
+
 sub _do_drop_user
    {
    my $self = shift;
 
    INFO "INSTALL: drop monitoring user '${ \$self->user }', but only if exists";
-   $self->dbh->do("DROP USER IF EXISTS ${ \$self->user };");
-   $self->dbh->do("DROP USER IF EXISTS ${ \$self->superuser };") if $self->create_superuser;
+   $self->do_sql("DROP USER IF EXISTS ${ \$self->user };");
+   $self->do_sql("DROP USER IF EXISTS ${ \$self->superuser };") if $self->create_superuser;
    DEBUG "drop user done";
 
    return $self;
@@ -249,8 +281,8 @@ sub _do_create_user
    $self->_do_drop_user if $self->drop_user;
 
    INFO "INSTALL: create monitoring user '${ \$self->user }'";
-   $self->dbh->do("CREATE USER ${ \$self->user };");
-   $self->dbh->do("ALTER USER ${ \$self->user } SET search_path TO ${ \$self->schema };");
+   $self->do_sql("CREATE USER ${ \$self->user };");
+   $self->do_sql("ALTER USER ${ \$self->user } SET search_path TO ${ \$self->schema };");
    DEBUG "create user done";
 
    return $self;
@@ -265,8 +297,8 @@ sub _do_create_superuser
    else                                                           { $role_string = "SUPERUSER"; }
 
    INFO "INSTALL: create monitoring superuser '${ \$self->superuser }'";
-   $self->dbh->do("CREATE ROLE ${ \$self->superuser } NOLOGIN $role_string;");
-   $self->dbh->do("ALTER USER ${ \$self->superuser } SET search_path TO ${ \$self->schema };");
+   $self->do_sql("CREATE ROLE ${ \$self->superuser } NOLOGIN $role_string;");
+   $self->do_sql("ALTER USER ${ \$self->superuser } SET search_path TO ${ \$self->schema };");
    DEBUG "create user done";
 
    return $self;
@@ -322,7 +354,7 @@ sub _do_install_schema
 
    my $drop = $self->drop_schema ? "DROP SCHEMA IF EXISTS ${ \$self->schema } CASCADE;" : "";
 
-   $self->dbh->do(
+   $self->do_sql(
       qq{ 
       $drop
       CREATE SCHEMA IF NOT EXISTS ${ \$self->schema };
@@ -330,7 +362,7 @@ sub _do_install_schema
       $revoke
       GRANT  USAGE ON SCHEMA ${ \$self->schema } TO ${ \$self->user };
    }
-                 );
+                );
 
    return $self;
 
