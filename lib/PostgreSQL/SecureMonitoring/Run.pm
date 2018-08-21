@@ -115,8 +115,8 @@ use Config::FindFile qw(search_conf);
 use Log::Log4perl::EasyCatch ( log_config => search_conf( "posemo-logging.properties", "Posemo" ) );
 use Log::Log4perl::Level;
 
-
 use IO::All -utf8;
+
 
 #<<<
 
