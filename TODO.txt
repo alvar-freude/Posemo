@@ -76,11 +76,12 @@ Check_MK:
  
  Others:
  
-  * talk with devs of / write output module for ...
-    * ZAbbix
+  * talk with devs of / write output module for, e.g. ...
+    * Zabbix
     * Icinga
     * Prometheus (https://prometheus.io)
     * Sensu (https://sensu.io)
+    * Riemann (http://riemann.io)
     
  
  
