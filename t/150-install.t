@@ -3,8 +3,6 @@
 use strict;
 use warnings;
 
-use FindBin qw($Bin);
-
 use Test::More;
 use Test::Exception;
 
