@@ -210,7 +210,7 @@ has lower_is_worse       => ( is => "ro", isa => "Bool",          predicate => "
 
 
 # Internal states
-has app                  => ( is => "ro", isa => "Object",        required  => 1,          handles => [qw(dbh has_dbh schema user superuser host port host_desc has_host has_port commit rollback)], );
+has app                  => ( is => "ro", isa => "Object",        required  => 1,          handles => [qw(dbh do_sql has_dbh schema user superuser host port host_desc has_host has_port commit rollback)], );
 # has result               => ( is => "ro", isa => "ArrayRef[Any]", default   => sub { [] }, ); 
 
 # attributes for attrs with builder method
@@ -398,11 +398,11 @@ sub install
    if ( $self->install_sql )
       {
       TRACE "${ \$self->sql_function_name }: call extra SQL for installation " . $self->install_sql;
-      $self->dbh->do( $self->install_sql );
+      $self->do_sql( $self->install_sql );
       }
 
    TRACE "SQL-Function to install: " . $self->sql_function;
-   $self->dbh->do( $self->sql_function );
+   $self->do_sql( $self->sql_function );
    return $self;
    }
 

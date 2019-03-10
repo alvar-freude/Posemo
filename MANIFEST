@@ -62,6 +62,7 @@ t/000-load.t
 t/001-postgresql-start.t
 t/003-init-db.t
 t/005-postgres-started.pg
+t/110-internal-helper.t
 t/150-install.t
 t/160-install-variants.t
 t/210-checks-helper.t
@@ -106,4 +107,5 @@ t/conf/test-nonexistent-logging.conf
 t/log-test.properties
 t/perlcriticrc
 t/perltidyrc
+test.sql
 TODO.txt
