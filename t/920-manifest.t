@@ -10,7 +10,9 @@ use Test::More;
 #   plan( skip_all => "Author tests not required for installation (set TEST_AUTHOR)" );
 #   }
 
-my $min_tcm = 1.33;                                # Needs 1.33 because symlink bug
+# Needs 1.33 because symlink bug, later need newer because more symlink bugs
+# It's only a developer check, so doesn't matter if skipped 
+my $min_tcm = 1.42;                                
 eval "use Test::CheckManifest $min_tcm";
 plan skip_all => "Test::CheckManifest $min_tcm required" if $@;
 
