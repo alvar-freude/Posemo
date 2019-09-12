@@ -358,7 +358,8 @@ sub for_each_host
    #<<< no pertidy formatting
    $self->add_output( "<<<<$host_result->{name}>>>>\n"
            .  "<<<posemo>>>\n"
-           .  $json->encode( $host_result ) . "\n" );
+           .  $json->encode( $host_result ) . "\n"
+           .  "<<<<>>>>\n" );
    #>>>
 
    return;
