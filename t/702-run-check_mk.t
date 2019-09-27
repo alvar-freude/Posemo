@@ -46,9 +46,14 @@ my $result = io("$dir/t-702-simple.json")->all;
 # diag $result;
 
 
-# <<<posemo>>>
+# extract posemo section froom result. 
+#   <<<posemo>>>
+#   .....
+# may end with new section marker
 
-( my $host_data = $result ) =~ s{(^.*<<<posemo>>>)}{}sx;
+# ( my $host_data = $result ) =~ s{(^.*<<<posemo>>>)}{}sx;
+(my $host_data) = $result =~ m{ <<<posemo>>>\n (.*?)   (:?^\s*<<<|$) }sx;
+#                               start          match   end match
 
 my $data;
 
