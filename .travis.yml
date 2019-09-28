@@ -9,7 +9,7 @@ perl:
 #  - "5.22"
 #  - "5.20"
 #  - "5.18"
-  - "5.16"
+#  - "5.16"
 
 matrix:
   include:
@@ -17,6 +17,9 @@ matrix:
         postgresql: 10
     - addons:
         postgresql: 9.6
+    - addons: 
+        postgresql: 11
+
 # Later; pgTAP CREATE EXTENSION fails ...
 #    - addons:
 #        postgresql: 9.5
