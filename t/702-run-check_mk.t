@@ -52,8 +52,8 @@ my $result = io("$dir/t-702-simple.json")->all;
 # may end with new section marker
 
 # ( my $host_data = $result ) =~ s{(^.*<<<posemo>>>)}{}sx;
-(my $host_data) = $result =~ m{ <<<posemo>>>\n (.*?)   (:?^\s*<<<|$) }sx;
-#                               start          match   end match
+(my $host_data) = $result =~ m{ <<<posemo>>> \s* \n (.*?)   (:? \n \s* <<<|$) }sx;
+#                               start               match              end match
 
 my $data;
 
